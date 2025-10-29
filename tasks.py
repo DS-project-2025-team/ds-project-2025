@@ -40,4 +40,4 @@ def coverage_html(ctx: Context) -> None:
 @task
 def start(ctx: Context) -> None:
     with ctx.cd(ROOT_DIR):
-        ctx.run(f"poetry run python {SOURCE_DIR}/main.py")
+        ctx.run(f"uv run python {SOURCE_DIR}/main.py")
