@@ -1,0 +1,13 @@
+name: Set up
+description: Set up Python and uv
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Load cached Poetry installation
+      uses: astral-sh/setup-uv@v7
+      with:
+        enable-cache: true
+        cache-python: true

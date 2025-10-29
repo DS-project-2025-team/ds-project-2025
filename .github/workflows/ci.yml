@@ -1,0 +1,44 @@
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Unit test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up
+        uses: ./.github/workflows/setup
+
+      - name: Run unit tests
+        run: uv run invoke test
+
+
+  format_lint:
+    name: Format and lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up
+        uses: ./.github/workflows/setup
+
+      - name: Format code
+        run: uv run invoke format
+
+      - name: Lint and fix
+        run: uv run invoke lint-fix
+
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: github-actions[bot]
+          author_email: github-actions[bot]@users.noreply.github.com
+          message: "style: Format code"
+          pull: "--rebase --autostash"
