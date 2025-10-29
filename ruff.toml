@@ -1,0 +1,10 @@
+#:schema https://json.schemastore.org/ruff.json
+
+[lint]
+extend-select = ["I", "ANN", "C90", "PT"]
+
+[lint.per-file-ignores]
+"src/tests/**" = ["ANN"]
+
+[lint.pydocstyle]
+convention = "google"
