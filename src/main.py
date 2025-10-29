@@ -1,5 +1,9 @@
+def hello(name: str) -> str:
+    return f"Hello {name}!"
+
+
 def hello_world() -> None:
-    print("Hello world!")
+    print(hello("world"))
 
 
 if __name__ == "__main__":
