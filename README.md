@@ -16,7 +16,9 @@
 
 ## Documentation
 
-Dependencies for compiling Typst documentation:
+For live preview and editing documentation, use [Tinymist](https://github.com/Myriad-Dreamin/tinymist) LSP, [extension](https://marketplace.visualstudio.com/items?itemName=myriad-dreamin.tinymist) for VS Code available.
+
+For compiling Typst documentation:
 
 1. Install cargo with a package manager or [rustup](https://rustup.rs/)
 
