@@ -8,12 +8,29 @@
     curl -LsSf https://astral.sh/uv/install.sh | sh
     ```
 
-1. Clone repository and go to project root
+2. Clone repository
 
    ```sh
    git clone git@github.com:DS-project-2025-team/ds-project-2025.git
-   cd ds-project-2025
    ```
+
+## Documentation
+
+Dependencies for compiling Typst documentation:
+
+1. Install cargo with a package manager or [rustup](https://rustup.rs/)
+
+2. Install Typst and Typstyle formatter
+
+   ```sh
+   cargo install --locked typst-cli typstyle
+   ```
+
+The documentation can be compiled with
+
+```sh
+typst compile path/to/file.typ
+```
 
 ## Invoke tasks
 
