@@ -20,8 +20,8 @@ Optional. Raft, for example, includes failure detection. If the period where tas
 === Scalability & performance
 
 Optional. The workload (SAT) scales well as the tasks can be predefined and there's no dependency between tasks. Therefore the amount of work is known in the beginning of execution and that is when the Leader divides it into set of independent tasks. Task sets are then assigned evenly to cluster nodes, which execute them until
-- they, or any other node finds the solution, 
+- they, or any other node finds the solution,
 - all tasks are done
-- Leader sends new init work message, including new tasks, changed configuration, etc. 
+- Leader sends new init work message, including new tasks, changed configuration, etc.
 
 In other words, the more there are nodes the faster all tasks are done.
