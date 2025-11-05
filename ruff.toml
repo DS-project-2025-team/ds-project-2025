@@ -1,7 +1,7 @@
 #:schema https://json.schemastore.org/ruff.json
 
 [lint]
-extend-select = ["I", "ANN", "C90", "PT"]
+extend-select = ["I", "ANN", "C90", "PT", "C4"]
 
 [lint.per-file-ignores]
 "src/tests/**" = ["ANN"]
