@@ -1,6 +1,6 @@
 import pytest
 
-from sat import check_literal
+from sat import check_clause, check_literal
 
 
 @pytest.mark.parametrize(
@@ -21,3 +21,28 @@ def test_check_literal(literal, assignment, expected):
 def test_check_literal_with_zero_fails():
     with pytest.raises(ValueError, match=r"zero"):
         check_literal(0, 0b1010)
+
+
+@pytest.mark.parametrize(
+    ("clause", "assignment", "expected"),
+    [
+        ((1, 2, 3), 0b100, True),
+        ((1, 2, 3), 0b111, True),
+        ((1, 2, 3), 0b000, False),
+    ],
+)
+def test_check_clause_with_positive_literals(clause, assignment, expected):
+    assert check_clause(clause, assignment) == expected
+
+
+@pytest.mark.parametrize(
+    ("clause", "assignment", "expected"),
+    [
+        ((-1, 2, -3), 0b111, True),
+        ((-1, 2, -3), 0b101, False),
+        ((-1, -2, -3), 0b100, True),
+        ((-1, -2, -3), 0b000, True),
+    ],
+)
+def test_check_satisfiable_clause_with_negative_literals(clause, assignment, expected):
+    assert check_clause(clause, assignment) == expected
