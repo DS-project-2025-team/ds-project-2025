@@ -1,6 +1,11 @@
 import pytest
 
-from sat import check_clause, check_cnf_formula, check_literal
+from sat import (
+    check_clause,
+    check_cnf_formula,
+    check_cnf_formula_with_interval,
+    check_literal,
+)
 
 
 @pytest.mark.parametrize(
@@ -59,3 +64,15 @@ def test_check_clause_with_negative_literals(clause, assignment, expected):
 )
 def test_check_cnf_formula(formula, assignment, expected):
     assert check_cnf_formula(formula, assignment) == expected
+
+
+@pytest.mark.parametrize(
+    ("formula", "begin", "end", "expected"),
+    [
+        ([(-1, 2, -3)], 0b000, 0b111, True),
+        ([(-1, 2, -3), (1, 2, 3)], 0b000, 0b111, True),
+        ([(1, 2), (1, -2), (-1, 2), (-1, -2)], 0b00, 0b11, False),
+    ],
+)
+def test_check_cnf_formula_with_interval(formula, begin, end, expected):
+    assert check_cnf_formula_with_interval(formula, begin, end) == expected
