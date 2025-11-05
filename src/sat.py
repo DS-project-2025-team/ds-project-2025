@@ -19,19 +19,19 @@ def check_cnf_formula_with_interval(
     """
 
     return any(
-        check_cnf_formula(clauses, assignment) for assignment in range(begin, end)
+        __check_cnf_formula(clauses, assignment) for assignment in range(begin, end)
     )
 
 
-def check_cnf_formula(clauses: Iterable[Iterable[int]], assignment: int) -> bool:
-    return all(check_clause(clause, assignment) for clause in clauses)
+def __check_cnf_formula(clauses: Iterable[Iterable[int]], assignment: int) -> bool:
+    return all(__check_clause(clause, assignment) for clause in clauses)
 
 
-def check_clause(literals: Iterable[int], assignment: int) -> bool:
-    return any(check_literal(literal, assignment) for literal in literals)
+def __check_clause(literals: Iterable[int], assignment: int) -> bool:
+    return any(__check_literal(literal, assignment) for literal in literals)
 
 
-def check_literal(literal: int, assignment: int) -> bool:
+def __check_literal(literal: int, assignment: int) -> bool:
     if literal == 0:
         raise ValueError("Literal cannot be zero")
 

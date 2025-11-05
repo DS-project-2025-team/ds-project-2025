@@ -1,10 +1,10 @@
 import pytest
 
 from sat import (
-    check_clause,
-    check_cnf_formula,
+    __check_clause,
+    __check_cnf_formula,
     check_cnf_formula_with_interval,
-    check_literal,
+    __check_literal,
 )
 
 
@@ -20,12 +20,12 @@ from sat import (
     ],
 )
 def test_check_literal(literal, assignment, expected):
-    assert check_literal(literal, assignment) == expected
+    assert __check_literal(literal, assignment) == expected
 
 
 def test_check_literal_with_zero_fails():
     with pytest.raises(ValueError, match=r"zero"):
-        check_literal(0, 0b1010)
+        __check_literal(0, 0b1010)
 
 
 @pytest.mark.parametrize(
@@ -37,7 +37,7 @@ def test_check_literal_with_zero_fails():
     ],
 )
 def test_check_clause_with_positive_literals(clause, assignment, expected):
-    assert check_clause(clause, assignment) == expected
+    assert __check_clause(clause, assignment) == expected
 
 
 @pytest.mark.parametrize(
@@ -50,7 +50,7 @@ def test_check_clause_with_positive_literals(clause, assignment, expected):
     ],
 )
 def test_check_clause_with_negative_literals(clause, assignment, expected):
-    assert check_clause(clause, assignment) == expected
+    assert __check_clause(clause, assignment) == expected
 
 
 @pytest.mark.parametrize(
@@ -63,7 +63,7 @@ def test_check_clause_with_negative_literals(clause, assignment, expected):
     ],
 )
 def test_check_cnf_formula(formula, assignment, expected):
-    assert check_cnf_formula(formula, assignment) == expected
+    assert __check_cnf_formula(formula, assignment) == expected
 
 
 @pytest.mark.parametrize(
