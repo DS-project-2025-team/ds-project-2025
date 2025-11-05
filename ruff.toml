@@ -1,10 +1,32 @@
 #:schema https://json.schemastore.org/ruff.json
 
 [lint]
-extend-select = ["I", "ANN", "C90", "PT", "C4"]
+extend-select = [
+    "I",
+    "W",
+    "E",
+    "A",
+    "N",
+    "C4",
+    "PT",
+    "UP",
+    "PL",
+    "PYI",
+    "ANN",
+    "C90",
+    "ISC",
+    "SIM",
+    "RET",
+    "TID",
+    "PTH",
+]
+exclude = ["tasks.py"]
 
 [lint.per-file-ignores]
 "src/tests/**" = ["ANN"]
 
 [lint.pydocstyle]
 convention = "google"
+
+[lint.pylint]
+max-statements = 20
