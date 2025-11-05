@@ -1,4 +1,4 @@
-= Disctibuting shared global state and maintaining consensus in distributed prototype project
+== Disctibuting shared global state and maintaining consensus in distributed prototype project
 
 Shared state is maintained by the Leader and replicated to Followers. Every change in the state requires that the majority of all nodes (incl. the Leader) store the change command before the Leader is allowed to run the update. This sounds like _Raft_ but there are alternatives like _viewstamped replication_ or _Paxos_. This is something we need to decide.
 
