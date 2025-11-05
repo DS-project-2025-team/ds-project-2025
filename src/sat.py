@@ -1,6 +1,10 @@
 from collections.abc import Iterable
 
 
+def check_cnf_formula(clauses: Iterable[Iterable[int]], assignment: int) -> bool:
+    return all(check_clause(clause, assignment) for clause in clauses)
+
+
 def check_clause(literals: Iterable[int], assignment: int) -> bool:
     return any(check_literal(literal, assignment) for literal in literals)
 

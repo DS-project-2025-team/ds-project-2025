@@ -1,6 +1,6 @@
 import pytest
 
-from sat import check_clause, check_literal
+from sat import check_clause, check_cnf_formula, check_literal
 
 
 @pytest.mark.parametrize(
@@ -46,3 +46,16 @@ def test_check_clause_with_positive_literals(clause, assignment, expected):
 )
 def test_check_clause_with_negative_literals(clause, assignment, expected):
     assert check_clause(clause, assignment) == expected
+
+
+@pytest.mark.parametrize(
+    ("formula", "assignment", "expected"),
+    [
+        ([(-1, 2, -3)], 0b111, True),
+        ([(-1, 2, -3), (1, 2, 3)], 0b010, True),
+        ([(-1, 2, -3), (1, 2, 3)], 0b000, False),
+        ([(-1, 2, -3), (2, 3, 5), (1, -4, 5)], 0b000000, False),
+    ],
+)
+def test_check_cnf_formula(formula, assignment, expected):
+    assert check_cnf_formula(formula, assignment) == expected
