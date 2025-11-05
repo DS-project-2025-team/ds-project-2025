@@ -44,5 +44,5 @@ def test_check_clause_with_positive_literals(clause, assignment, expected):
         ((-1, -2, -3), 0b000, True),
     ],
 )
-def test_check_satisfiable_clause_with_negative_literals(clause, assignment, expected):
+def test_check_clause_with_negative_literals(clause, assignment, expected):
     assert check_clause(clause, assignment) == expected
