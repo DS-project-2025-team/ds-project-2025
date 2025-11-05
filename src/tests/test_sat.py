@@ -3,8 +3,8 @@ import pytest
 from sat import (
     __check_clause,
     __check_cnf_formula,
-    check_cnf_formula_with_interval,
     __check_literal,
+    check_cnf_formula_with_interval,
 )
 
 
