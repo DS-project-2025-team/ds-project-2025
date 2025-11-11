@@ -1,15 +1,15 @@
-import os
-import json
 import argparse
 import asyncio
+import json
 import logging
+import os
 import sys
+from collections.abc import Awaitable, Callable
+from typing import Any
+
+from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 print("ARGV:", sys.argv)
-
-from typing import Dict, Any, Callable, Awaitable, List
-
-from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 
 # ---------------------------
 # Debug logging to stdout
@@ -24,19 +24,19 @@ def setup_logging(node_id: str) -> None:
 # ---------------------------
 # Dispatcher
 # ---------------------------
-Handler = Callable[[Dict[str, Any]], Awaitable[None]]
+Handler = Callable[[dict[str, Any]], Awaitable[None]]
 
 class Dispatcher:
     def __init__(self) -> None:
-        self._handlers: Dict[str, Handler] = {}
+        self._handlers: dict[str, Handler] = {}
 
-    def on(self, msg_type: str):
+    def on(self, msg_type: str) -> Callable[[Handler], Handler]:
         def deco(fn: Handler) -> Handler:
             self._handlers[msg_type] = fn
             return fn
         return deco
 
-    async def dispatch(self, msg_type: str, payload: Dict[str, Any]) -> None:
+    async def dispatch(self, msg_type: str, payload: dict[str, Any]) -> None:
         h = self._handlers.get(msg_type)
         if h is None:
             logging.warning("ei handleria tyypille %s, payload=%r", msg_type, payload)
@@ -57,7 +57,7 @@ class Envelope(dict):
         return self["type"]
 
     @property
-    def payload(self) -> Dict[str, Any]:
+    def payload(self) -> dict[str, Any]:
         return self["payload"]
 
 
@@ -69,8 +69,8 @@ class Node:
     def __init__(
         self,
         node_id: str,
-        peers: List[str],
-        bootstrap_servers: List[str],
+        peers: list[str],
+        bootstrap_servers: list[str],
         topic: str = "events",
     ) -> None:
         self.node_id = node_id
@@ -88,7 +88,8 @@ class Node:
             bootstrap_servers=self.bootstrap_servers,
             acks="all",
             enable_idempotence=True,
-            # Older aiokafka-version doesn't have max_in_flight_requests_per_connection parameter
+            # Older aiokafka-version doesn't have
+            # max_in_flight_requests_per_connection parameter
             #max_in_flight_requests_per_connection=1,
         )
 
@@ -140,7 +141,7 @@ class Node:
         except asyncio.CancelledError:
             pass
 
-    async def send(self, to_node: str, msg_type: str, payload: Dict[str, Any]) -> None:
+    async def send(self, to_node: str, msg_type: str, payload: dict[str, Any]) -> None:
         if self._producer is None:
             raise RuntimeError("Producer is not running")
 
@@ -159,7 +160,7 @@ class Node:
 # Handler example
 # ---------------------------
 @dispatcher.on("ping")
-async def handle_ping(payload: Dict[str, Any]) -> None:
+async def handle_ping(payload: dict[str, Any]) -> None:
     logging.info("Process ping from=%r seq=%r", payload.get("from"), payload.get("seq"))
 
 
@@ -177,19 +178,17 @@ async def async_main() -> None:
             "localhost:9092",
         ),
     )
+
     parser.add_argument("--topic", default="events")
     args = parser.parse_args()
-
     setup_logging(args.node_id)
-
     bootstrap_servers = [s.strip() for s in args.bootstrap.split(",") if s.strip()]
     logging.info("Node-id=%s peers=%r topic=%s", args.node_id, args.peer, args.topic)
-
     node = Node(
-        node_id=args.node_id,
-        peers=args.peer,
-        bootstrap_servers=bootstrap_servers,
-        topic=args.topic,
+         node_id=args.node_id,
+         peers=args.peer,
+         bootstrap_servers=bootstrap_servers,
+         topic=args.topic,
     )
 
     try:
@@ -199,7 +198,7 @@ async def async_main() -> None:
         return  # <-- Kafka isn't running etc. exit here.
 
     # Example: send ping messages
-    async def demo_sender():
+    async def demo_sender() -> None:
         seq = 0
         while True:
             for peer in node.peers:
