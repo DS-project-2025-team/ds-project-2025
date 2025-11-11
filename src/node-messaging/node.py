@@ -11,6 +11,7 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 print("ARGV:", sys.argv)
 
+
 # ---------------------------
 # Debug logging to stdout
 # ---------------------------
@@ -26,6 +27,7 @@ def setup_logging(node_id: str) -> None:
 # ---------------------------
 Handler = Callable[[dict[str, Any]], Awaitable[None]]
 
+
 class Dispatcher:
     def __init__(self) -> None:
         self._handlers: dict[str, Handler] = {}
@@ -34,6 +36,7 @@ class Dispatcher:
         def deco(fn: Handler) -> Handler:
             self._handlers[msg_type] = fn
             return fn
+
         return deco
 
     async def dispatch(self, msg_type: str, payload: dict[str, Any]) -> None:
@@ -51,6 +54,7 @@ dispatcher = Dispatcher()
 # Message
 # ---------------------------
 
+
 class Envelope(dict):
     @property
     def type(self) -> str:
@@ -64,6 +68,7 @@ class Envelope(dict):
 # ---------------------------
 # Class Node
 # ---------------------------
+
 
 class Node:
     def __init__(
@@ -90,7 +95,7 @@ class Node:
             enable_idempotence=True,
             # Older aiokafka-version doesn't have
             # max_in_flight_requests_per_connection parameter
-            #max_in_flight_requests_per_connection=1,
+            # max_in_flight_requests_per_connection=1,
         )
 
         await self._producer.start()
@@ -185,10 +190,10 @@ async def async_main() -> None:
     bootstrap_servers = [s.strip() for s in args.bootstrap.split(",") if s.strip()]
     logging.info("Node-id=%s peers=%r topic=%s", args.node_id, args.peer, args.topic)
     node = Node(
-         node_id=args.node_id,
-         peers=args.peer,
-         bootstrap_servers=bootstrap_servers,
-         topic=args.topic,
+        node_id=args.node_id,
+        peers=args.peer,
+        bootstrap_servers=bootstrap_servers,
+        topic=args.topic,
     )
 
     try:
