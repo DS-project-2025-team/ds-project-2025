@@ -33,6 +33,12 @@ def test(ctx: Context) -> None:
 
 
 @task
+def coverage(ctx: Context) -> None:
+    with ctx.cd(ROOT_DIR):
+        ctx.run("pytest --cov --cov-report xml -n auto", pty=True)
+
+
+@task
 def coverage_html(ctx: Context) -> None:
     with ctx.cd(ROOT_DIR):
         ctx.run("pytest --cov --cov-report html -n auto", pty=True)
