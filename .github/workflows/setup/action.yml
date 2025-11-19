@@ -6,7 +6,7 @@ runs:
   steps:
     - uses: actions/checkout@v4
 
-    - name: Load cached Poetry installation
+    - name: Setup uv
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
