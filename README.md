@@ -19,6 +19,8 @@
 
 ## Documentation
 
+- [Architecture](/docs/architecture.md)
+
 ## Invoke tasks
 
 Start program
