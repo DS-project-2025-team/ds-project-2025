@@ -11,7 +11,6 @@ SOURCE_DIR = ROOT_DIR / "src"
 def format(ctx: Context) -> None:
     with ctx.cd(ROOT_DIR):
         ctx.run("ruff format")
-        ctx.run("typstyle --inplace .")
 
 
 @task
