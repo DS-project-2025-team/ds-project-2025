@@ -1,5 +1,8 @@
 # ds-project-2025
 
+[![CI](https://github.com/DS-project-2025-team/ds-project-2025/actions/workflows/ci.yml/badge.svg)](https://github.com/DS-project-2025-team/ds-project-2025/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/github/DS-project-2025-team/ds-project-2025/graph/badge.svg?token=TRAX0PX9BL)](https://codecov.io/github/DS-project-2025-team/ds-project-2025)
+
 ## Installation
 
 1. Install [uv](https://docs.astral.sh/uv/)
