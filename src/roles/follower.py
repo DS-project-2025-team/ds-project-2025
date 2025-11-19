@@ -1,11 +1,9 @@
 import random
-from logging import getLogger
 from time import sleep
 from typing import Literal
 
 from roles.role import Role
-
-logger = getLogger(__name__)
+from services.logger_service import logger
 
 
 class Follower:

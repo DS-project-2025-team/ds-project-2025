@@ -1,9 +1,7 @@
-from logging import getLogger
 from typing import Literal
 
 from roles.role import Role
-
-logger = getLogger(__name__)
+from services.logger_service import logger
 
 
 class Leader:
