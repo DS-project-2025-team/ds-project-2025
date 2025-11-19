@@ -19,24 +19,6 @@
 
 ## Documentation
 
-For live preview and editing documentation, use [Tinymist](https://github.com/Myriad-Dreamin/tinymist) LSP, [extension](https://marketplace.visualstudio.com/items?itemName=myriad-dreamin.tinymist) for VS Code available.
-
-For compiling Typst documentation:
-
-1. Install cargo with a package manager or [rustup](https://rustup.rs/)
-
-2. Install Typst and Typstyle formatter
-
-   ```sh
-   cargo install --locked typst-cli typstyle
-   ```
-
-The documentation can be compiled with
-
-```sh
-typst compile path/to/file.typ
-```
-
 ## Invoke tasks
 
 Start program
