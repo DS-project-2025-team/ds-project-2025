@@ -44,10 +44,10 @@ namespace Raft {
 }
 
 class MessageService
-class Logger
+class LoggerService
 class Client
 
-note for Logger "Singleton, used everywhere"
+note for LoggerService "Singleton, used everywhere"
 note for MessageService "Singleton, Kafka client"
 note for Client "CLI client"
 
