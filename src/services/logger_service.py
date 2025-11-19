@@ -1,9 +1,9 @@
-from logging import Logger, getLogger
+from loguru import logger as _logger
 
 
 class LoggerService:
-    def __init__(self, logger: Logger) -> None:
-        self.__logger: Logger = logger
+    def __init__(self) -> None:
+        self.__logger = _logger.opt(depth=1, colors=True)
 
     def info(self, message: str) -> None:
         self.__logger.info(message)
@@ -18,4 +18,4 @@ class LoggerService:
         self.__logger.warning(message)
 
 
-logger = LoggerService(getLogger(__name__))
+logger = LoggerService()
