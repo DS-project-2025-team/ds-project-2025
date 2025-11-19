@@ -7,7 +7,7 @@ from services.logger_service import logger
 
 
 class Follower:
-    def __init__(self, election_timeout: int | None) -> None:
+    def __init__(self, election_timeout: int | None = None) -> None:
         self.__election_timeout = election_timeout or 1000 + random.randint(0, 1000)
 
     def run(self) -> Literal[Role.CANDIDATE]:
