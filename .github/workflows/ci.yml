@@ -15,8 +15,14 @@ jobs:
         uses: ./.github/workflows/setup
 
       - name: Run unit tests
-        run: uv run invoke test
+        run: uv run invoke coverage
 
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: ./coverage.xml
 
   format_lint:
     name: Format and lint
