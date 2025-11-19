@@ -1,2 +1,11 @@
+from typing import Literal
+
+from roles.role import Role
+from services.logger_service import logger
+
+
 class Candidate:
-    pass
+    @staticmethod
+    def elect() -> Literal[Role.LEADER, Role.CANDIDATE]:
+        logger.info("Changing role to LEADER")
+        return Role.LEADER

@@ -1,10 +1,6 @@
-def hello(name: str) -> str:
-    return f"Hello {name}!"
-
-
-def hello_world() -> None:
-    print(hello("world"))
-
+from entities.node import Node
 
 if __name__ == "__main__":
-    hello_world()
+    node = Node()
+
+    node.run()
