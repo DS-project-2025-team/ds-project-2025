@@ -47,3 +47,9 @@ def coverage_html(ctx: Context) -> None:
 def start(ctx: Context) -> None:
     with ctx.cd(ROOT_DIR):
         ctx.run(f"uv run python {SOURCE_DIR}/main.py")
+
+
+@task
+def install_kafka(ctx: Context) -> None:
+    with ctx.cd(ROOT_DIR):
+        ctx.run(f"uv run python {SOURCE_DIR}/install_kafka.py")
