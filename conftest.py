@@ -6,6 +6,7 @@ import modules using the project `src` layout (e.g. `entities.*`).
 It's a lightweight solution for local development and CI where the
 project root is the test collection root.
 """
+
 from __future__ import annotations
 
 import sys
