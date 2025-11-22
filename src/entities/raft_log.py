@@ -1,23 +1,25 @@
-from typing import Dict, Any, Optional
+from typing import Any
+
 from .log_entry import LogEntry
+
 
 class RaftLog:
     def __init__(self, node_id: str) -> None:
         self.node_id = node_id
-        
+
         # List of LogEntry
         self.entries: list[LogEntry] = []
 
         # Raft state
         self.commit_index: int = -1
         self.term: int = 0
-        self.leader_id: Optional[str] = None
+        self.leader_id: str | None = None
 
         # Shared system state
-        self.nodes: Dict[str, dict] = {}  # cluster members {node_id: {"status": "alive"}}
-        self.tasks: Dict[str, str] = {}  # {task_id: node_id}
+        self.nodes: dict[str, dict] = {}  # cluster members
+        self.tasks: dict[str, str] = {}  # {task_id: node_id}
         self.uncompleted_tasks: set[str] = set()  # task_ids not yet completed
-        self.formula: Optional[str] = None  # 3-SAT formula
+        self.formula: str | None = None  # 3-SAT formula
 
     def commit(self) -> None:
         # apply next uncommitted entry
@@ -26,7 +28,7 @@ class RaftLog:
             entry = self.entries[self.commit_index]
             self.apply_entry(entry.command)
 
-    def revert(self, index) -> None:
+    def revert(self, index: int) -> None:
         # Validate index bounds (allow reverting back to earlier entries)
         if index < -1 or index >= len(self.entries):
             raise IndexError("Index out of range")
@@ -35,7 +37,7 @@ class RaftLog:
         self.entries = self.entries[: index + 1]
         self.commit_index = index
 
-    def apply_entry(self, command: Dict[str, Any]) -> None:
+    def apply_entry(self, command: dict[str, Any]) -> None:
         match command["type"]:
             case "NODE_JOIN":
                 node_id = command["node_id"]
