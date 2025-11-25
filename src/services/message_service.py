@@ -10,8 +10,15 @@ class MessageService:
         await self.__producer.send_and_wait(topic, message)
 
     async def receive(self) -> list[str]:
-        return [str(message.value) async for message in self.__consumer]
+        async for message in self.__consumer:
+            print(message)
+
+        return []
 
     async def start(self) -> None:
         await self.__producer.start()
         await self.__consumer.start()
+
+    async def stop(self) -> None:
+        await self.__producer.stop()
+        await self.__consumer.stop()
