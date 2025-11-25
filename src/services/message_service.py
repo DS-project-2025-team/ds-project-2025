@@ -1,12 +1,17 @@
-from aiokafka import AIOKafkaProducer
+from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 
 class MessageService:
-    def __init__(self, producer: AIOKafkaProducer) -> None:
+    def __init__(self, producer: AIOKafkaProducer, consumer: AIOKafkaConsumer) -> None:
         self.__producer: AIOKafkaProducer = producer
+        self.__consumer: AIOKafkaConsumer = consumer
 
     async def send(self, topic: str, message: bytes) -> None:
         await self.__producer.send_and_wait(topic, message)
 
+    async def receive(self) -> list[str]:
+        return [str(message.value) async for message in self.__consumer]
+
     async def start(self) -> None:
         await self.__producer.start()
+        await self.__consumer.start()
