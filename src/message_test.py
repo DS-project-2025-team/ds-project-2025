@@ -1,15 +1,10 @@
 import asyncio
 
-from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
-
 from services.message_service import MessageService
 
 
 async def main() -> None:
-    producer = AIOKafkaProducer(bootstrap_servers="localhost:9092")
-    consumer = AIOKafkaConsumer("hello", bootstrap_servers="localhost:9092")
-
-    message_service = MessageService(producer=producer, consumer=consumer)
+    message_service = MessageService("localhost", 9092)
 
     # await message_service.stop()
 

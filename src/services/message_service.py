@@ -2,9 +2,17 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 
 class MessageService:
-    def __init__(self, producer: AIOKafkaProducer, consumer: AIOKafkaConsumer) -> None:
-        self.__producer: AIOKafkaProducer = producer
-        self.__consumer: AIOKafkaConsumer = consumer
+    def __init__(
+        self,
+        server: str,
+        port: int = 9092,
+    ) -> None:
+        self.__producer: AIOKafkaProducer = AIOKafkaProducer(
+            bootstrap_servers=f"{server}:{port}"
+        )
+        self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
+            "hello", bootstrap_servers=f"{server}:{port}"
+        )
 
     async def send(self, topic: str, message: bytes) -> None:
         await self.__producer.send_and_wait(topic, message)
