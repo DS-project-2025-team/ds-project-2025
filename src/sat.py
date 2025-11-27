@@ -1,5 +1,5 @@
-from types.clause import Clause
-from types.sat_formula import SatFormula
+from entities.clause import Clause
+from entities.sat_formula import SatFormula
 
 
 def check_cnf_formula_with_interval(clauses: SatFormula, begin: int, end: int) -> bool:
