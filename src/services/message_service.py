@@ -9,11 +9,10 @@ class MessageService:
     async def send(self, topic: str, message: bytes) -> None:
         await self.__producer.send_and_wait(topic, message)
 
-    async def receive(self) -> list[str]:
-        async for message in self.__consumer:
-            print(message)
+    async def receive(self) -> str:
+        message = await self.__consumer.getone()
 
-        return []
+        return str(message.value)
 
     async def start(self) -> None:
         await self.__producer.start()
