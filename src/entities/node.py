@@ -23,7 +23,7 @@ class Node:
     def __run_next_role(self) -> None:
         match self.__role:
             case Role.FOLLOWER:
-                follower = Follower()
+                follower = Follower(self.__message_service)
                 self.__role = follower.run()
 
             case Role.CANDIDATE:
