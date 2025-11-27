@@ -1,7 +1,11 @@
+from contextlib import AbstractAsyncContextManager
+from types import TracebackType
+from typing import Self
+
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 
-class MessageService:
+class MessageService(AbstractAsyncContextManager):
     def __init__(
         self,
         server: str,
@@ -22,10 +26,17 @@ class MessageService:
 
         return str(message.value)
 
-    async def start(self) -> None:
+    async def __aenter__(self) -> Self:
         await self.__producer.start()
         await self.__consumer.start()
 
-    async def stop(self) -> None:
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
         await self.__producer.stop()
         await self.__consumer.stop()

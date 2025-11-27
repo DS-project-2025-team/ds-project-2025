@@ -4,15 +4,9 @@ from services.message_service import MessageService
 
 
 async def main() -> None:
-    message_service = MessageService("localhost", 9092)
-
-    # await message_service.stop()
-
-    await message_service.start()
-
-    await message_service.send("hello", b"Hello, World!")
-    messages = await message_service.receive()
-    await message_service.stop()
+    async with MessageService("localhost", 9092) as message_service:
+        await message_service.send("hello", b"Hello, World!")
+        messages = await message_service.receive()
 
     print(messages)
 

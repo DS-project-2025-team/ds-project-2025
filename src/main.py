@@ -5,8 +5,8 @@ from services.message_service import MessageService
 
 
 async def main() -> None:
-    message_service = MessageService("localhost", 9092)
-    node = Node(message_service=message_service)
+    async with MessageService("localhost", 9092) as message_service:
+        node = Node(message_service=message_service)
 
     node.run()
 
