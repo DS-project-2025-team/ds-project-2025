@@ -1,3 +1,4 @@
+from entities.raft_log import RaftLog
 from roles.candidate import Candidate
 from roles.follower import Follower
 from roles.leader import Leader
@@ -12,9 +13,11 @@ class Node:
         self,
         message_service: MessageService,
         role: Role = Role.FOLLOWER,
+        log: RaftLog | None = None,
     ) -> None:
         self.__role: Role = role
         self.__message_service: MessageService = message_service
+        self.__log: RaftLog = log or RaftLog("1")
 
     def run(self) -> None:
         while True:
@@ -30,7 +33,7 @@ class Node:
                 self.__role = Candidate.elect()
 
             case Role.LEADER:
-                leader = Leader(self.__message_service)
+                leader = Leader(self.__message_service, self.__log)
                 self.__role = leader.run()
 
                 raise NotImplementedError("Last role")
