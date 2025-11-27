@@ -1,8 +1,7 @@
 from typing import Any
 
+from entities.log_entry import LogEntry
 from entities.sat_formula import SatFormula
-
-from .log_entry import LogEntry
 
 
 class RaftLog:
