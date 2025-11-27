@@ -30,3 +30,6 @@ convention = "google"
 
 [lint.pylint]
 max-statements = 20
+
+[lint.flake8-tidy-imports]
+ban-relative-imports = "all"
