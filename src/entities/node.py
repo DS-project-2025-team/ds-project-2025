@@ -30,7 +30,7 @@ class Node:
                 self.__role = Candidate.elect()
 
             case Role.LEADER:
-                leader = Leader()
+                leader = Leader(self.__message_service)
                 self.__role = leader.run()
 
                 raise NotImplementedError("Last role")
