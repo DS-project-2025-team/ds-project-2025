@@ -1,5 +1,7 @@
 from typing import Any
 
+from entities.sat_formula import SatFormula
+
 from .log_entry import LogEntry
 
 
@@ -19,7 +21,7 @@ class RaftLog:
         self.nodes: dict[str, dict] = {}  # cluster members
         self.tasks: dict[str, str] = {}  # {task_id: node_id}
         self.uncompleted_tasks: set[str] = set()  # task_ids not yet completed
-        self.formula: str | None = None  # 3-SAT formula
+        self.formula: SatFormula | None = None
 
     def commit(self) -> None:
         # apply next uncommitted entry
