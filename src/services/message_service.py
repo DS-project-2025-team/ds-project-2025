@@ -27,6 +27,10 @@ class MessageService(AbstractAsyncContextManager):
         return str(message.value)
 
     async def subscribe(self, *topics: str) -> None:
+        """
+        Override currently subscribed topics.
+        """
+
         self.__consumer.subscribe(topics)
 
     async def __aenter__(self) -> Self:
