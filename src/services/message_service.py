@@ -26,6 +26,12 @@ class MessageService(AbstractAsyncContextManager):
 
         return str(message.value)
 
+    async def subscribe(self, *topics: str) -> None:
+        self.__consumer.subscribe(topics)
+
+    async def unsubscribe(self) -> None:
+        self.__consumer.unsubscribe()
+
     async def __aenter__(self) -> Self:
         await self.__producer.start()
         await self.__consumer.start()
