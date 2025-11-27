@@ -1,9 +1,9 @@
 from collections.abc import Iterable
 
+from types.sat_formula import Clause, SatFormula
 
-def check_cnf_formula_with_interval(
-    clauses: Iterable[Iterable[int]], begin: int, end: int
-) -> bool:
+
+def check_cnf_formula_with_interval(clauses: SatFormula, begin: int, end: int) -> bool:
     """
     Check the CNF formula with all assignments in [begin, end).
 
@@ -23,11 +23,11 @@ def check_cnf_formula_with_interval(
     )
 
 
-def __check_cnf_formula(clauses: Iterable[Iterable[int]], assignment: int) -> bool:
+def __check_cnf_formula(clauses: SatFormula, assignment: int) -> bool:
     return all(__check_clause(clause, assignment) for clause in clauses)
 
 
-def __check_clause(literals: Iterable[int], assignment: int) -> bool:
+def __check_clause(literals: Clause, assignment: int) -> bool:
     return any(__check_literal(literal, assignment) for literal in literals)
 
 
