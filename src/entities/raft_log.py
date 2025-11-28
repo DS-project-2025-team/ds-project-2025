@@ -16,6 +16,10 @@ class RaftLog:
 
         self.leader_state: LeaderState = LeaderState()  # cluster members
 
+    @property
+    def completed_tasks(self) -> list[int]:
+        return self.leader_state.completed_tasks
+
     def commit(self) -> None:
         if self.commit_index + 1 >= len(self.entries):
             return
