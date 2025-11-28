@@ -6,6 +6,5 @@ from entities.sat_formula import SatFormula
 @dataclass
 class LeaderState:
     nodes: dict[str, dict] = {}
-    tasks: dict[str, str] = {}
-    uncompleted_tasks: set[str] = set()
+    completed_tasks: list[int] = []
     formula: SatFormula | None = None
