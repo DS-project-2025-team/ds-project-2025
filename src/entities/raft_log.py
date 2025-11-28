@@ -41,15 +41,6 @@ class RaftLog:
                 node_id = command["node_id"]
                 self.leader_state.nodes[node_id] = {"status": "alive"}
 
-            case "NODE_FAILS":
-                node_id = command["node_id"]
-                if node_id in self.leader_state.nodes:
-                    self.leader_state.nodes[node_id]["status"] = "failed"
-                for task_id, assigned_node in list(self.leader_state.tasks.items()):
-                    if assigned_node == node_id:
-                        del self.leader_state.tasks[task_id]
-                        self.leader_state.uncompleted_tasks.add(task_id)
-
             case "ASSIGN_TASK":
                 task_id = command["task_id"]
                 node_id = command["node_id"]
