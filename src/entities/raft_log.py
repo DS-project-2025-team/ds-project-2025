@@ -19,11 +19,12 @@ class RaftLog:
         self.leader_state: LeaderState = LeaderState()  # cluster members
 
     def commit(self) -> None:
-        # apply next uncommitted entry
-        if self.commit_index + 1 < len(self.entries):
-            self.commit_index += 1
-            entry = self.entries[self.commit_index]
-            self.apply_entry(entry.command)
+        if self.commit_index + 1 >= len(self.entries):
+            return
+
+        self.commit_index += 1
+        entry = self.entries[self.commit_index]
+        self.apply_entry(entry.command)
 
     def revert(self, index: int) -> None:
         # Validate index bounds (allow reverting back to earlier entries)
