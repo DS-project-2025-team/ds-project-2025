@@ -1,7 +1,7 @@
 from typing import Any
 
+from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
-from entities.sat_formula import SatFormula
 
 
 class RaftLog:
@@ -16,11 +16,7 @@ class RaftLog:
         self.term: int = 0
         self.leader_id: str | None = None
 
-        # Shared system state
-        self.nodes: dict[str, dict] = {}  # cluster members
-        self.tasks: dict[str, str] = {}  # {task_id: node_id}
-        self.uncompleted_tasks: set[str] = set()  # task_ids not yet completed
-        self.formula: SatFormula | None = None
+        self.leader_state: LeaderState = LeaderState()  # cluster members
 
     def commit(self) -> None:
         # apply next uncommitted entry
@@ -42,22 +38,22 @@ class RaftLog:
         match command["type"]:
             case "NODE_JOIN":
                 node_id = command["node_id"]
-                self.nodes[node_id] = {"status": "alive"}
+                self.leader_state.nodes[node_id] = {"status": "alive"}
 
             case "NODE_FAILS":
                 node_id = command["node_id"]
-                if node_id in self.nodes:
-                    self.nodes[node_id]["status"] = "failed"
-                for task_id, assigned_node in list(self.tasks.items()):
+                if node_id in self.leader_state.nodes:
+                    self.leader_state.nodes[node_id]["status"] = "failed"
+                for task_id, assigned_node in list(self.leader_state.tasks.items()):
                     if assigned_node == node_id:
-                        del self.tasks[task_id]
-                        self.uncompleted_tasks.add(task_id)
+                        del self.leader_state.tasks[task_id]
+                        self.leader_state.uncompleted_tasks.add(task_id)
 
             case "ASSIGN_TASK":
                 task_id = command["task_id"]
                 node_id = command["node_id"]
-                self.tasks[task_id] = node_id
-                self.uncompleted_tasks.add(task_id)
+                self.leader_state.tasks[task_id] = node_id
+                self.leader_state.uncompleted_tasks.add(task_id)
 
             case "REPORT_RESULT":
                 pass
