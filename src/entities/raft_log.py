@@ -24,7 +24,7 @@ class RaftLog:
 
         self.commit_index += 1
         entry = self.entries[self.commit_index]
-        self.apply_entry(entry.command)
+        self.leader_state = entry.operate(self.leader_state)
 
     def revert(self, index: int) -> None:
         # Validate index bounds (allow reverting back to earlier entries)
