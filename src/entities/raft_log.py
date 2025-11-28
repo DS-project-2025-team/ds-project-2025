@@ -22,7 +22,7 @@ class RaftLog:
 
         entry = self.entries[self.commit_index]
 
-        self.leader_state = entry.operate(self.leader_state)
+        entry.operate(self.leader_state)
         self.commit_index += 1
 
     def revert(self, index: int) -> None:
