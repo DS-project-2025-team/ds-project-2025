@@ -1,6 +1,8 @@
 from collections import deque
 from typing import Literal
 
+from entities.leader_state import LeaderState
+from entities.log_entry import LogEntry
 from entities.raft_log import RaftLog
 from roles.role import Role
 from services.logger_service import logger
@@ -33,3 +35,13 @@ class Leader:
                 break
 
         return task
+
+    def __complete_task(self, task: int) -> None:
+        entry = LogEntry(self.__log.term, lambda state: __complete_task(state, task))
+
+        self.__log.append(entry)
+        self.__log.commit()
+
+
+def __complete_task(state: LeaderState, task: int) -> None:
+    state.completed_tasks[task] = True
