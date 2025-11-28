@@ -33,9 +33,9 @@ class MessageService(AbstractAsyncContextManager):
         await self.__producer.send_and_wait(topic, payload)
 
     async def receive(self) -> dict:
-        message = await self.__consumer.getone()
+        message = await self.__consumer.getmany()
 
-        return message.value  # type: ignore
+        return message # type: ignore
 
     async def subscribe(self, *topics: str) -> None:
         """

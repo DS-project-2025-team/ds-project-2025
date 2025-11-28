@@ -7,7 +7,10 @@ async def main() -> None:
     async with MessageService("localhost", 9092) as message_service:
         await message_service.subscribe("hello")
 
+        await message_service.send("hello", {"data": "a"})
         await message_service.send("hello", {"data": "Hello, World!"})
+        await message_service.send("hello", {"data": "b"})
+        await message_service.send("hello", {"data": "c"})
 
         messages = await message_service.receive()
 
