@@ -21,3 +21,15 @@ class Leader:
     def run(self) -> Literal[Role.FOLLOWER]:
         logger.info("Changing role to FOLLOWER")
         return Role.FOLLOWER
+
+    def __next_task(self) -> int | None:
+        task = None
+
+        while self.__queue:
+            task = self.__queue.popleft()
+
+            if not self.__log.completed_tasks[task]:
+                self.__queue.append(task)
+                break
+
+        return task
