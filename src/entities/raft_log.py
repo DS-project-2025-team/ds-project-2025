@@ -5,16 +5,13 @@ from entities.log_entry import LogEntry
 class RaftLog:
     def __init__(self, node_id: str) -> None:
         self.node_id = node_id
-
-        # List of LogEntry
         self.entries: list[LogEntry] = []
 
-        # Raft state
         self.commit_index: int = -1
         self.term: int = 0
         self.leader_id: str | None = None
 
-        self.leader_state: LeaderState = LeaderState()  # cluster members
+        self.leader_state: LeaderState = LeaderState()
 
     @property
     def completed_tasks(self) -> list[int]:
