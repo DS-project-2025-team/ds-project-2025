@@ -1,8 +1,17 @@
+import json
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
 from typing import Self
 
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
+
+
+def serializer(value: dict) -> bytes:
+    return json.dumps(value).encode()
+
+
+def deserializer(serialized: str) -> dict:
+    return json.loads(serialized)
 
 
 class MessageService(AbstractAsyncContextManager):
@@ -12,19 +21,21 @@ class MessageService(AbstractAsyncContextManager):
         port: int = 9092,
     ) -> None:
         self.__producer: AIOKafkaProducer = AIOKafkaProducer(
-            bootstrap_servers=f"{server}:{port}"
+            bootstrap_servers=f"{server}:{port}",
+            value_serializer=serializer,
         )
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
-            bootstrap_servers=f"{server}:{port}"
+            bootstrap_servers=f"{server}:{port}",
+            value_deserializer=deserializer,
         )
 
-    async def send(self, topic: str, message: bytes) -> None:
-        await self.__producer.send_and_wait(topic, message)
+    async def send(self, topic: str, payload: dict) -> None:
+        await self.__producer.send_and_wait(topic, payload)
 
-    async def receive(self) -> str:
+    async def receive(self) -> dict:
         message = await self.__consumer.getone()
 
-        return str(message.value)
+        return message.value  # type: ignore
 
     async def subscribe(self, *topics: str) -> None:
         """
