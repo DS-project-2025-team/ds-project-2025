@@ -28,7 +28,6 @@ class RaftLog:
         self.commit_index += 1
 
     def revert(self, index: int) -> None:
-        # Validate index bounds (allow reverting back to earlier entries)
         if index < -1 or index >= len(self.entries):
             raise IndexError("Index out of range")
 
