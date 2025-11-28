@@ -20,6 +20,9 @@ class RaftLog:
     def completed_tasks(self) -> list[int]:
         return self.leader_state.completed_tasks
 
+    def append(self, entry: LogEntry) -> None:
+        self.entries.append(entry)
+
     def commit(self) -> None:
         if self.commit_index + 1 >= len(self.entries):
             return
