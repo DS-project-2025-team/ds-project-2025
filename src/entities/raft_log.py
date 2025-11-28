@@ -37,10 +37,6 @@ class RaftLog:
 
     def apply_entry(self, command: dict[str, Any]) -> None:
         match command["type"]:
-            case "NODE_JOIN":
-                node_id = command["node_id"]
-                self.leader_state.nodes[node_id] = {"status": "alive"}
-
             case "ASSIGN_TASK":
                 task_id = command["task_id"]
                 node_id = command["node_id"]
