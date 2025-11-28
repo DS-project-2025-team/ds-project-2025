@@ -1,5 +1,3 @@
-from typing import Any
-
 from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
 
@@ -34,14 +32,3 @@ class RaftLog:
         # Trim entries to the requested index and update commit_index
         self.entries = self.entries[: index + 1]
         self.commit_index = index
-
-    def apply_entry(self, command: dict[str, Any]) -> None:
-        match command["type"]:
-            case "ASSIGN_TASK":
-                task_id = command["task_id"]
-                node_id = command["node_id"]
-                self.leader_state.tasks[task_id] = node_id
-                self.leader_state.uncompleted_tasks.add(task_id)
-
-            case "REPORT_RESULT":
-                pass
