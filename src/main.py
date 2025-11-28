@@ -1,7 +1,7 @@
 import asyncio
 
 from entities.node import Node
-from services.message_service import MessageService
+from message_service import MessageService
 
 
 async def main() -> None:

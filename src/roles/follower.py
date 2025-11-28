@@ -3,8 +3,8 @@ from time import sleep
 from typing import Literal
 
 from roles.role import Role
-from services.logger_service import logger
-from services.message_service import MessageService
+from logger_service import logger
+from message_service import MessageService
 
 
 class Follower:

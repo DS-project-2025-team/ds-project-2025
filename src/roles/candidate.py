@@ -1,7 +1,7 @@
 from typing import Literal
 
 from roles.role import Role
-from services.logger_service import logger
+from logger_service import logger
 
 
 class Candidate:

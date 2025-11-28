@@ -5,8 +5,8 @@ from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
 from entities.raft_log import RaftLog
 from roles.role import Role
-from services.logger_service import logger
-from services.message_service import MessageService
+from logger_service import logger
+from message_service import MessageService
 
 
 class Leader:
