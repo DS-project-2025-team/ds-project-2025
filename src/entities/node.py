@@ -3,7 +3,7 @@ from roles.candidate import Candidate
 from roles.follower import Follower
 from roles.leader import Leader
 from roles.role import Role
-from message_service import (
+from network.message_service import (
     MessageService,
 )
 

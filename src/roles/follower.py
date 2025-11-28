@@ -4,7 +4,7 @@ from typing import Literal
 
 from roles.role import Role
 from logger_service import logger
-from message_service import MessageService
+from network.message_service import MessageService
 
 
 class Follower:

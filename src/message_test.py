@@ -1,6 +1,6 @@
 import asyncio
 
-from message_service import MessageService
+from network.message_service import MessageService
 
 
 async def main() -> None:

@@ -6,7 +6,7 @@ from entities.log_entry import LogEntry
 from entities.raft_log import RaftLog
 from roles.role import Role
 from logger_service import logger
-from message_service import MessageService
+from network.message_service import MessageService
 
 
 class Leader:
