@@ -36,7 +36,7 @@ class MessageService(AbstractAsyncContextManager):
     async def receive(self) -> dict:
         return await self.__consumer.getmany()
 
-    async def subscribe(self, *topics: str) -> None:
+    def subscribe(self, *topics: str) -> None:
         """
         Override currently subscribed topics.
         """

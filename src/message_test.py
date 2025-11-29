@@ -6,7 +6,7 @@ from network.message_service import MessageService
 async def main() -> None:
     async with MessageService("localhost", 9092, "hello_group") as message_service:
         # subscribe to topic
-        await message_service.subscribe("hello")
+        message_service.subscribe("hello")
         for i in range(1, 10):
             # produce
             await message_service.send("hello", {"data": "Hello, World!"})
