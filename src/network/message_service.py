@@ -25,11 +25,15 @@ class MessageService(AbstractAsyncContextManager):
             value_serializer=serializer,
         )
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
+            group_id='hello_group',
             bootstrap_servers=f"{server}:{port}",
             value_deserializer=deserializer,
             auto_offset_reset="earliest",
         )
 
+    async def commit(self) -> None:
+        await self.__consumer.commit()
+        
     async def send(self, topic: str, payload: dict) -> None:
         await self.__producer.send_and_wait(topic, payload)
 
