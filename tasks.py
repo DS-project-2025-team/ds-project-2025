@@ -62,7 +62,8 @@ def install_kafka(ctx: Context) -> None:
 
 @task
 def start_kafka(ctx: Context) -> None:
-    ctx.run(f"{KAFKA_DIR}/bin/kafka-server-start.sh kafka-config/server.properties")
+    with ctx.cd(ROOT_DIR):
+        ctx.run(f"{KAFKA_DIR}/bin/kafka-server-start.sh kafka-config/server.properties")
 
 
 @task
