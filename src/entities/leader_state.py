@@ -1,9 +1,6 @@
-from dataclasses import dataclass
-
 from entities.sat_formula import SatFormula
 
 
-@dataclass
 class LeaderState:
     nodes: dict[str, dict] = {}
     completed_tasks: list[int] = []
