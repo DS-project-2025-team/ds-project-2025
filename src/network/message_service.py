@@ -27,6 +27,7 @@ class MessageService(AbstractAsyncContextManager):
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
             bootstrap_servers=f"{server}:{port}",
             value_deserializer=deserializer,
+            auto_offset_reset="earliest",
         )
 
     async def send(self, topic: str, payload: dict) -> None:
