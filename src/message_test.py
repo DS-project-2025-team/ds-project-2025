@@ -4,10 +4,10 @@ from network.message_service import MessageService
 
 
 async def main() -> None:
-    async with MessageService("localhost", 9092, 'hello_group') as message_service:
+    async with MessageService("localhost", 9092, "hello_group") as message_service:
         # subscribe to topic
         await message_service.subscribe("hello")
-        for i in range (1, 10):
+        for i in range(1, 10):
             # produce
             await message_service.send("hello", {"data": "Hello, World!"})
             await message_service.send("hello", {"data": "a"})
@@ -27,6 +27,7 @@ async def main() -> None:
                         f"offset={msg.offset}, "
                         f"value={msg.value}"
                     )
+
 
 if __name__ == "__main__":
     asyncio.run(main())

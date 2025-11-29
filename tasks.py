@@ -64,7 +64,7 @@ def install_kafka(ctx: Context) -> None:
 def start_kafka(ctx: Context) -> None:
     ctx.run(f"{KAFKA_DIR}/bin/kafka-server-start.sh kafka-config/server.properties")
 
+
 @task
 def stop_kafka(ctx: Context) -> None:
     ctx.run(f"{KAFKA_DIR}/bin/kafka-server-stop.sh")
-

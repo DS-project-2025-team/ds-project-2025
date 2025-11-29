@@ -15,12 +15,7 @@ def deserializer(serialized: str) -> dict:
 
 
 class MessageService(AbstractAsyncContextManager):
-    def __init__(
-        self,
-        server: str,
-        port: int = 9092,
-        groupid: str = 'foo'
-    ) -> None:
+    def __init__(self, server: str, port: int = 9092, groupid: str = "foo") -> None:
         self.__producer: AIOKafkaProducer = AIOKafkaProducer(
             bootstrap_servers=f"{server}:{port}",
             value_serializer=serializer,
