@@ -5,7 +5,7 @@ import random
 from logger_service import logger
 from network.message_service import MessageService
 from entities.raft_log import RaftLog
-
+from roles.role import Role
 
 class Candidate:
     def __init__(self, message_service: MessageService, peers: List[str], log: RaftLog) -> None:

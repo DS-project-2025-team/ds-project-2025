@@ -6,7 +6,6 @@ from logger_service import logger
 from network.message_service import MessageService
 from roles.role import Role
 
-
 class Follower:
     def __init__(
         self, message_service: MessageService, election_timeout: int | None = None
