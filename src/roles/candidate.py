@@ -2,7 +2,6 @@ from typing import Literal, List
 import asyncio
 import random
 
-from roles.role import Role
 from logger_service import logger
 from network.message_service import MessageService
 from entities.raft_log import RaftLog

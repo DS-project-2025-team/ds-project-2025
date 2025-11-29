@@ -1,5 +1,8 @@
 import uuid
 from entities.raft_log import RaftLog
+from network.message_service import (
+    MessageService,
+)
 from roles.candidate import Candidate
 from roles.follower import Follower
 from roles.leader import Leader

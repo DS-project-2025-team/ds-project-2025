@@ -15,30 +15,28 @@ def deserializer(serialized: str) -> dict:
 
 
 class MessageService(AbstractAsyncContextManager):
-    def __init__(
-        self,
-        server: str,
-        port: int = 9092,
-    ) -> None:
+    def __init__(self, server: str, port: int = 9092, groupid: str = "foo") -> None:
         self.__producer: AIOKafkaProducer = AIOKafkaProducer(
             bootstrap_servers=f"{server}:{port}",
             value_serializer=serializer,
         )
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
+            group_id=f"{groupid}",
             bootstrap_servers=f"{server}:{port}",
             value_deserializer=deserializer,
             auto_offset_reset="earliest",
         )
 
+    async def commit(self) -> None:
+        await self.__consumer.commit()
+
     async def send(self, topic: str, payload: dict) -> None:
         await self.__producer.send_and_wait(topic, payload)
 
     async def receive(self) -> dict:
-        message = await self.__consumer.getmany()
+        return await self.__consumer.getmany()
 
-        return message # type: ignore
-
-    async def subscribe(self, *topics: str) -> None:
+    def subscribe(self, *topics: str) -> None:
         """
         Override currently subscribed topics.
         """
