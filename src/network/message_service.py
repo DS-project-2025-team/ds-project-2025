@@ -2,7 +2,9 @@ import json
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
 from typing import Self
+from logger_service import logger
 
+from aiokafka.structs import RecordMetadata
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 
@@ -33,8 +35,33 @@ class MessageService(AbstractAsyncContextManager):
     async def send(self, topic: str, payload: dict) -> None:
         await self.__producer.send_and_wait(topic, payload)
 
+    async def send_and_wait(self, topic: str, payload: dict) -> RecordMetadata:
+        assert self.__producer is not None
+        metadata: RecordMetadata = await self.__producer.send_and_wait(topic, payload)
+        logger.info(
+            "Sent message to %s: %r (partition=%s offset=%s)",
+            topic,
+            payload,
+            metadata.partition,
+            metadata.offset,
+        )
+        return metadata
+
     async def receive(self) -> dict:
-        return await self.__consumer.getmany()
+        messages = await self.__consumer.getmany()
+        await self.__consumer.commit()
+        for tp, msgs in messages.items():
+            for msg in msgs:
+                logger.info(
+                    "Received message to %s: %r (partition=%s offset=%s)",
+                    msg.topic,
+                    msg.value,
+                    msg.partition,
+                    msg.offset,
+                )
+
+        return messages
+        #return await self.__consumer.getmany()
 
     def subscribe(self, *topics: str) -> None:
         """
@@ -48,6 +75,10 @@ class MessageService(AbstractAsyncContextManager):
         await self.__consumer.start()
 
         return self
+
+    async def stop(self) -> None:
+        await self.__producer.stop()
+        await self.__consumer.stop()
 
     async def __aexit__(
         self,
