@@ -2,10 +2,11 @@ import json
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
 from typing import Self
-from logger_service import logger
 
-from aiokafka.structs import RecordMetadata
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
+from aiokafka.structs import RecordMetadata
+
+from logger_service import logger
 
 
 def serializer(value: dict) -> bytes:

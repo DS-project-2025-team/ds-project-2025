@@ -1,7 +1,7 @@
 import asyncio
 
-from network.message_service import MessageService
 from logger_service import logger
+from network.message_service import MessageService
 
 
 async def main() -> None:
@@ -21,7 +21,7 @@ async def consume_loop(message_service: MessageService) -> None:
                 logger.error("Error while consuming: %r", e)
                 await asyncio.sleep(1)
 
-    
+
     finally:
         logger.info("Consumer receive loop exiting")
         await message_service.stop()
