@@ -19,13 +19,14 @@ class MessageService(AbstractAsyncContextManager):
         self,
         server: str,
         port: int = 9092,
+        groupid: str = 'foo'
     ) -> None:
         self.__producer: AIOKafkaProducer = AIOKafkaProducer(
             bootstrap_servers=f"{server}:{port}",
             value_serializer=serializer,
         )
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
-            group_id='hello_group',
+            group_id=f"{groupid}",
             bootstrap_servers=f"{server}:{port}",
             value_deserializer=deserializer,
             auto_offset_reset="earliest",
