@@ -1,6 +1,6 @@
 import random
-from time import sleep
 from typing import Literal
+import asyncio
 
 from roles.role import Role
 from logger_service import logger
@@ -14,8 +14,19 @@ class Follower:
         self.__message_service = message_service
         self.__election_timeout = election_timeout or 1000 + random.randint(0, 1000)
 
-    def run(self) -> Literal[Role.CANDIDATE]:
-        sleep(self.__election_timeout / 1000)
+    async def run(self) -> Literal[Role.CANDIDATE, Role.FOLLOWER]:
+        try:
+            msg = await asyncio.wait_for(
+                self.__message_service.receive(),
+                self.__election_timeout / 1000
+            )
 
-        logger.info("Changing role to CANDIDATE")
-        return Role.CANDIDATE
+            if msg.get("type") == "heartbeat":
+                logger.debug("Received heartbeat from leader")
+                return Role.FOLLOWER
+            
+            return Role.FOLLOWER
+    
+        except asyncio.TimeoutError:
+            logger.info("Changing role to CANDIDATE")
+            return Role.CANDIDATE
