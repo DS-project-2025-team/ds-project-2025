@@ -34,14 +34,12 @@ class MessageService(AbstractAsyncContextManager):
 
     async def commit(self) -> None:
         await self.__consumer.commit()
-        
+
     async def send(self, topic: str, payload: dict) -> None:
         await self.__producer.send_and_wait(topic, payload)
 
     async def receive(self) -> dict:
-        message = await self.__consumer.getmany()
-
-        return message # type: ignore
+        await self.__consumer.getmany()
 
     async def subscribe(self, *topics: str) -> None:
         """

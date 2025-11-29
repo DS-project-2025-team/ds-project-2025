@@ -4,9 +4,9 @@ from typing import Literal
 from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
 from entities.raft_log import RaftLog
-from roles.role import Role
 from logger_service import logger
 from network.message_service import MessageService
+from roles.role import Role
 
 
 class Leader:

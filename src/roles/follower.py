@@ -2,9 +2,9 @@ import random
 from time import sleep
 from typing import Literal
 
-from roles.role import Role
 from logger_service import logger
 from network.message_service import MessageService
+from roles.role import Role
 
 
 class Follower:
