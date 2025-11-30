@@ -13,8 +13,11 @@ def deserializer(serialized: str) -> dict:
 
 
 class MessageConsumer(AbstractAsyncContextManager):
-    def __init__(self, server: str, port: int = 9092, groupid: str = "foo") -> None:
+    def __init__(
+        self, *topics: str, server: str, port: int = 9092, groupid: str
+    ) -> None:
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
+            *topics,
             group_id=groupid,
             bootstrap_servers=f"{server}:{port}",
             value_deserializer=deserializer,
