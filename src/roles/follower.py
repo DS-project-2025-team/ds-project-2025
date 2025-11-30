@@ -13,12 +13,16 @@ from roles.role import Role
 
 class Follower(AbstractAsyncContextManager):
     def __init__(
-        self, server: str, port: int, election_timeout: int | None = None
+        self,
+        server: str,
+        port: int,
+        # Base election timeout in seconds
+        election_timeout: int | None = None,
     ) -> None:
         self.__heartbeat_consumer = MessageConsumer(
             Topic.HEARTBEAT, server=server, port=port, groupid=str(uuid4())
         )
-        self.__election_timeout = election_timeout or 1000 + random.randint(0, 1000)
+        self.__election_timeout = election_timeout or 10 + random.randint(0, 5)
 
     async def __aenter__(self) -> Self:
         await self.__heartbeat_consumer.__aenter__()
@@ -37,7 +41,7 @@ class Follower(AbstractAsyncContextManager):
             try:
                 message = await asyncio.wait_for(
                     self.__heartbeat_consumer.receive(),
-                    self.__election_timeout / 1000.0,
+                    self.__election_timeout,
                 )
                 logger.info("Received heartbeat")
 
