@@ -8,7 +8,7 @@ async def main() -> None:
     async with MessageService("localhost", 9092) as message_service:
         node = Node(message_service=message_service)
 
-    node.run()
+    await node.run()
 
 
 if __name__ == "__main__":
