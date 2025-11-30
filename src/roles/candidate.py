@@ -1,6 +1,5 @@
 import asyncio
 import random
-from typing import Literal
 from uuid import UUID
 
 from entities.raft_log import RaftLog

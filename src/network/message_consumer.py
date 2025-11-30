@@ -1,9 +1,9 @@
 import json
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
-from typing import Any, Self
+from typing import Self
 
-from aiokafka import AIOKafkaConsumer, ConsumerRecord
+from aiokafka import AIOKafkaConsumer
 
 from entities.server_address import ServerAddress
 

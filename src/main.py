@@ -3,8 +3,6 @@ from argparse import ArgumentParser
 
 from entities.node import Node
 from entities.server_address import ServerAddress
-from network.message_service import MessageService
-from network.topic import Topic
 from roles.role import Role
 
 

@@ -2,7 +2,6 @@ from uuid import UUID, uuid4
 
 from entities.raft_log import RaftLog
 from entities.server_address import ServerAddress
-from roles.candidate import Candidate
 from roles.follower import Follower
 from roles.leader import Leader
 from roles.role import Role
