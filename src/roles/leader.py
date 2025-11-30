@@ -1,3 +1,4 @@
+import asyncio
 from collections import deque
 from typing import Literal
 
@@ -6,6 +7,7 @@ from entities.log_entry import LogEntry
 from entities.raft_log import RaftLog
 from logger_service import logger
 from network.message_service import MessageService
+from network.topic import Topic
 from roles.role import Role
 
 
@@ -21,6 +23,12 @@ class Leader:
         self.__log = log
 
     async def run(self) -> Literal[Role.FOLLOWER]:
+        while True:
+            await self.__message_service.send(Topic.HEARTBEAT, {})
+            logger.info("Sent heartbeat")
+
+            await asyncio.sleep(2)
+
         logger.info("Changing role to FOLLOWER")
         return Role.FOLLOWER
 
