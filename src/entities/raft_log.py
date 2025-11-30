@@ -1,10 +1,12 @@
+from uuid import UUID
+
 from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
 
 
 class RaftLog:
-    def __init__(self, node_id: str) -> None:
-        self.node_id = node_id
+    def __init__(self, node_id: UUID) -> None:
+        self.node_id: UUID = node_id
         self.entries: list[LogEntry] = []
 
         self.commit_index: int = -1

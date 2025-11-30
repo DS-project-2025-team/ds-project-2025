@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID, uuid4
 
 from entities.raft_log import RaftLog
 from roles.candidate import Candidate
@@ -12,12 +12,12 @@ class Node:
         self,
         server: str,
         port: int = 9092,
-        node_id: str | None = None,
+        node_id: UUID | None = None,
         peers: list[str] | None = None,
         role: Role = Role.FOLLOWER,
         log: RaftLog | None = None,
     ) -> None:
-        self.node_id: str = node_id or str(uuid.uuid4())
+        self.node_id: UUID = node_id or uuid4()
         self.peers: list[str] = peers or []
         self.__server = server
         self.__port = port
