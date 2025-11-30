@@ -56,7 +56,7 @@ class Candidate:
 
         logger.info(f"{self.__id} sent vote requests to peers")
 
-        while asyncio.get_event_loop().time() - begin_time > self.__vote_timeout:
+        while True:
             if self.__check_leader_existence():
                 logger.info("Detected existing leader, reverting to FOLLOWER")
                 break
@@ -67,6 +67,11 @@ class Candidate:
                 role = Role.LEADER
                 logger.info(f"{self.__id} won the election for term {current_term}")
 
+                break
+
+            if asyncio.get_event_loop().time() - begin_time > self.__vote_timeout:
+                role = Role.CANDIDATE
+                logger.info("Election timed out")
                 break
 
         return role
