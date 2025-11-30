@@ -1,7 +1,7 @@
 import json
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
-from typing import Self
+from typing import Any, Self
 
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from aiokafka.structs import RecordMetadata
@@ -33,7 +33,7 @@ class MessageService(AbstractAsyncContextManager):
     async def commit(self) -> None:
         await self.__consumer.commit()
 
-    async def send(self, topic: str, payload: dict) -> None:
+    async def send(self, topic: str, payload: dict[str, Any]) -> None:
         await self.__producer.send_and_wait(topic, payload)
 
     async def send_and_wait(self, topic: str, payload: dict) -> RecordMetadata:
