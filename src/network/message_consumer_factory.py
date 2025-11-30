@@ -21,3 +21,11 @@ class MessageConsumerFactory:
             server=server,
             groupid=str(node_id),
         )
+
+    @staticmethod
+    def vote_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
+        return MessageConsumer(
+            Topic.VOTE,
+            server=server,
+            groupid=str(node_id),
+        )

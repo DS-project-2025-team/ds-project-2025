@@ -25,7 +25,9 @@ class Candidate:
         self.__id = node_id
 
         self.__producer = MessageProducer(server=server)
-        self.__vote_consumer = MessageConsumer(Topic.VOTE, server=server)
+        self.__vote_consumer = MessageConsumerFactory.vote_consumer(
+            server=server, node_id=node_id
+        )
         self.__heartbeat_consumer: MessageConsumer = (
             MessageConsumerFactory.heartbeat_consumer(server=server, node_id=node_id)
         )
