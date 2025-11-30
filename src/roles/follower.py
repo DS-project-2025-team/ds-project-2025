@@ -1,26 +1,31 @@
 import asyncio
 import random
 from typing import Literal
+from uuid import uuid4
 
 from logger_service import logger
-from network.message_service import MessageService
+from network.message_consumer import MessageConsumer
 from network.topic import Topic
 from roles.role import Role
 
 
 class Follower:
     def __init__(
-        self, message_service: MessageService, election_timeout: int | None = None
+        self, server: str, port: int, election_timeout: int | None = None
     ) -> None:
-        self.__message_service = message_service
+        self.__heartbeat_consumer = MessageConsumer(
+            Topic.HEARTBEAT, server=server, port=port, groupid=str(uuid4())
+        )
         self.__election_timeout = election_timeout or 1000 + random.randint(0, 1000)
 
     async def run(self) -> Literal[Role.CANDIDATE]:
         while True:
             try:
                 message = await asyncio.wait_for(
-                    self.__message_service.receive(), self.__election_timeout / 1000
+                    self.__heartbeat_consumer.receive(),
+                    self.__election_timeout / 1000.0,
                 )
+                logger.info("Received heartbeat", message)
 
             except TimeoutError:
                 break

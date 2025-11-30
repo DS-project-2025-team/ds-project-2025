@@ -36,7 +36,7 @@ class Node:
     async def __run_next_role(self) -> None:
         match self.__role:
             case Role.FOLLOWER:
-                follower = Follower(self.__message_service)
+                follower = Follower(server=self.__server, port=self.__port)
                 self.__role = await follower.run()
 
             case Role.CANDIDATE:
