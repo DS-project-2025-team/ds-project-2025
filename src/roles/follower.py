@@ -1,6 +1,6 @@
+import asyncio
 import random
 from typing import Literal
-import asyncio
 
 from logger_service import logger
 from network.message_service import MessageService
@@ -26,6 +26,6 @@ class Follower:
 
             return Role.FOLLOWER
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.info("Changing role to CANDIDATE")
             return Role.CANDIDATE

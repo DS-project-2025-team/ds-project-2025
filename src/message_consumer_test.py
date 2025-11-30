@@ -18,6 +18,7 @@ async def consume_loop(message_service: MessageService) -> None:
         while True:
             try:
                 messages = await message_service.receive()
+                print(messages)
                 await asyncio.sleep(1)
 
             except Exception as e:

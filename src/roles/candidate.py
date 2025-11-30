@@ -1,16 +1,16 @@
-from typing import Literal, List
 import asyncio
 import random
+from typing import Literal
 
+from entities.raft_log import RaftLog
 from logger_service import logger
 from network.message_service import MessageService
-from entities.raft_log import RaftLog
 from roles.role import Role
 
 
 class Candidate:
     def __init__(
-        self, message_service: MessageService, peers: List[str], log: RaftLog
+        self, message_service: MessageService, peers: list[str], log: RaftLog
     ) -> None:
         self.__message_service = message_service
         self.__peers = peers
@@ -61,6 +61,6 @@ class Candidate:
                             )
                             return Role.LEADER
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.info(f"{self.__log.node_id} election timeout, restarting election")
             return Role.CANDIDATE
