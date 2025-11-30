@@ -46,6 +46,7 @@ class Follower(AbstractAsyncContextManager):
                 logger.info("Received heartbeat")
 
             except TimeoutError:
+                logger.warning("Missing heartbeat, election timeout elapsed.")
                 break
 
             self.__process_message(message)
