@@ -6,6 +6,7 @@ from entities.raft_log import RaftLog
 from entities.server_address import ServerAddress
 from logger_service import logger
 from network.message_consumer import MessageConsumer
+from network.message_producer import MessageProducer
 from network.message_service import MessageService
 from network.topic import Topic
 from roles.role import Role
@@ -24,6 +25,8 @@ class Candidate:
         self.__peers = peers
         self.__log = log
         self.__id = node_id
+
+        self.__producer = MessageProducer(server=server)
         self.__heartbeat_consumer = MessageConsumer(
             Topic.HEARTBEAT, server=server, groupid=str(self.__id)
         )
@@ -46,7 +49,7 @@ class Candidate:
         }
 
         for peer in self.__peers:
-            await self.__message_service.send(peer, request)
+            await self.__producer.send(peer, request)
 
         logger.info(f"{self.__id} sent vote requests to peers")
 
