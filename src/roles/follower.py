@@ -15,7 +15,7 @@ class Follower:
         self.__message_service = message_service
         self.__election_timeout = election_timeout or 1000 + random.randint(0, 1000)
 
-    async def run(self) -> Literal[Role.CANDIDATE, Role.FOLLOWER]:
+    async def run(self) -> Literal[Role.CANDIDATE]:
         while True:
             try:
                 message = await asyncio.wait_for(
