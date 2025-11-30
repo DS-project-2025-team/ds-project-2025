@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 
 from entities.node import Node
 from network.message_service import MessageService
+from network.topic import Topic
 from roles.role import Role
 
 
@@ -37,7 +38,7 @@ async def main() -> None:
     async with MessageService(server, 9092) as message_service:
         node = Node(message_service=message_service, role=role)
 
-    await node.run()
+        await node.run()
 
 
 if __name__ == "__main__":
