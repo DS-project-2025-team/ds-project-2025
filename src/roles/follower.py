@@ -39,7 +39,7 @@ class Follower(AbstractAsyncContextManager):
                     self.__heartbeat_consumer.receive(),
                     self.__election_timeout / 1000.0,
                 )
-                logger.info("Received heartbeat", message)
+                logger.info("Received heartbeat")
 
             except TimeoutError:
                 break
@@ -50,6 +50,4 @@ class Follower(AbstractAsyncContextManager):
         return Role.CANDIDATE
 
     def __process_message(self, message: dict) -> None:
-        match message["topic"]:
-            case Topic.HEARTBEAT:
-                logger.debug("Received heartbeat from leader")
+        pass
