@@ -1,9 +1,9 @@
 import json
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
-from typing import Self
+from typing import Any, Self
 
-from aiokafka import AIOKafkaConsumer
+from aiokafka import AIOKafkaConsumer, ConsumerRecord
 
 
 def deserializer(serialized: str) -> dict:
@@ -26,10 +26,10 @@ class MessageConsumer(AbstractAsyncContextManager):
         await self.__consumer.commit()
 
     async def receive(self) -> dict:
-        messages = await self.__consumer.getmany()
+        message = await self.__consumer.getone()
         await self.__consumer.commit()
 
-        return messages
+        return message.value # type: ignore
 
     async def __aenter__(self) -> Self:
         await self.__consumer.start()
