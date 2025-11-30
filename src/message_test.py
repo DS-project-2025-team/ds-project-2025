@@ -20,18 +20,12 @@ async def main() -> None:
             await producer.send("hello", {"data": "c"})
             await asyncio.sleep(1)
             # consume
-            messages = await consumer.receive()
+            message = await consumer.receive()
             # commit (save offset)
             await consumer.commit()
             # print
-            for tp, msgs in messages.items():
-                for msg in msgs:
-                    print(
-                        f"topic={msg.topic}, "
-                        f"partition={msg.partition}, "
-                        f"offset={msg.offset}, "
-                        f"value={msg.value}"
-                    )
+
+            print(message)
 
 
 if __name__ == "__main__":
