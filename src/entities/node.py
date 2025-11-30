@@ -32,15 +32,15 @@ class Node:
     async def __run_next_role(self) -> None:
         match self.__role:
             case Role.FOLLOWER:
-                follower = Follower(self.node_id, self.__message_service)
+                follower = Follower(self.__message_service)
                 self.__role = await follower.run()
 
             case Role.CANDIDATE:
                 candidate = Candidate(self.__message_service, self.peers, self.__log)
-                self.__role = await Candidate.elect()
+                self.__role = await candidate.elect()
 
             case Role.LEADER:
-                leader = Leader(self.node_id, self.__message_service, self.__log)
+                leader = Leader(self.__message_service, self.__log)
                 self.__role = await leader.run()
 
                 raise NotImplementedError("Last role")

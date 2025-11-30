@@ -20,7 +20,7 @@ class Leader:
         self.__queue: deque[int] = queue or deque()
         self.__log = log
 
-    def run(self) -> Literal[Role.FOLLOWER]:
+    async def run(self) -> Literal[Role.FOLLOWER]:
         logger.info("Changing role to FOLLOWER")
         return Role.FOLLOWER
 
