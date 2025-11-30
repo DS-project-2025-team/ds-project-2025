@@ -45,7 +45,9 @@ class Node:
                 self.__role = Role.LEADER
 
             case Role.LEADER:
-                leader = Leader(self.__message_service, self.__log)
-                self.__role = await leader.run()
+                async with Leader(
+                    log=self.__log, server=self.__server, port=self.__port
+                ) as leader:
+                    self.__role = await leader.run()
 
                 raise NotImplementedError("Last role")

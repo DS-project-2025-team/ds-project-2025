@@ -1,30 +1,45 @@
 import asyncio
 from collections import deque
+from contextlib import AbstractAsyncContextManager
+from types import TracebackType
 from typing import Literal
 
 from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
 from entities.raft_log import RaftLog
 from logger_service import logger
-from network.message_service import MessageService
+from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
 
 
-class Leader:
+class Leader(AbstractAsyncContextManager):
     def __init__(
         self,
-        message_service: MessageService,
         log: RaftLog,
+        server: str,
+        port: int,
         queue: deque[int] | None = None,
     ) -> None:
-        self.__message_service = message_service
+        self.__producer: MessageProducer = MessageProducer(server=server, port=port)
         self.__queue: deque[int] = queue or deque()
         self.__log = log
 
+    async def __aenter__(self) -> "Leader":
+        await self.__producer.__aenter__()
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        await self.__producer.__aexit__(exc_type, exc_value, traceback)
+
     async def run(self) -> Literal[Role.FOLLOWER]:
         while True:
-            await self.__message_service.send(Topic.HEARTBEAT, {})
+            await self.__producer.send(Topic.HEARTBEAT, {})
             logger.info("Sent heartbeat")
 
             await asyncio.sleep(2)
