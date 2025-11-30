@@ -5,3 +5,4 @@ class Topic(StrEnum):
     ASSIGN = auto()
     HEARTBEAT = auto()
     VOTE = auto()
+    VOTE_REQUEST = auto()

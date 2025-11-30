@@ -39,15 +39,13 @@ class Candidate:
         total_votes_needed = (len(self.__peers) + 1) // 2 + 1
 
         request = {
-            "type": "request_vote",
             "term": current_term,
             "candidate_id": self.__id,
             "last_log_index": len(self.__log.entries) - 1,
             "last_log_term": self.__log.entries[-1].term if self.__log.entries else 0,
         }
 
-        for peer in self.__peers:
-            await self.__producer.send(peer, request)
+        await self.__producer.send(Topic.VOTE_REQUEST, request)
 
         logger.info(f"{self.__id} sent vote requests to peers")
 
