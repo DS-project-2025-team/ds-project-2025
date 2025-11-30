@@ -1,6 +1,7 @@
 from uuid import UUID, uuid4
 
 from entities.raft_log import RaftLog
+from entities.server_address import ServerAddress
 from roles.candidate import Candidate
 from roles.follower import Follower
 from roles.leader import Leader
@@ -10,8 +11,7 @@ from roles.role import Role
 class Node:
     def __init__(
         self,
-        server: str,
-        port: int = 9092,
+        server: ServerAddress,
         node_id: UUID | None = None,
         peers: list[str] | None = None,
         role: Role = Role.FOLLOWER,
@@ -19,8 +19,7 @@ class Node:
     ) -> None:
         self.node_id: UUID = node_id or uuid4()
         self.peers: list[str] = peers or []
-        self.__server = server
-        self.__port = port
+        self.__server: ServerAddress = server
         self.__role: Role = role
         self.__log: RaftLog = log or RaftLog()
 
@@ -32,7 +31,7 @@ class Node:
         match self.__role:
             case Role.FOLLOWER:
                 async with Follower(
-                    server=self.__server, port=self.__port, node_id=self.node_id
+                    server=self.__server, node_id=self.node_id
                 ) as follower:
                     self.__role = await follower.run()
 
@@ -43,7 +42,8 @@ class Node:
 
             case Role.LEADER:
                 async with Leader(
-                    log=self.__log, server=self.__server, port=self.__port
+                    log=self.__log,
+                    server=self.__server,
                 ) as leader:
                     self.__role = await leader.run()
 

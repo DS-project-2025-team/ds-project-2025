@@ -5,6 +5,7 @@ from types import TracebackType
 from typing import Literal, Self
 from uuid import UUID
 
+from entities.server_address import ServerAddress
 from logger_service import logger
 from network.message_consumer import MessageConsumer
 from network.topic import Topic
@@ -14,14 +15,13 @@ from roles.role import Role
 class Follower(AbstractAsyncContextManager):
     def __init__(
         self,
-        server: str,
-        port: int,
+        server: ServerAddress,
         node_id: UUID,
         # Base election timeout in seconds
         election_timeout: int | None = None,
     ) -> None:
         self.__heartbeat_consumer = MessageConsumer(
-            Topic.HEARTBEAT, server=server, port=port, groupid=str(node_id)
+            Topic.HEARTBEAT, server=server, groupid=str(node_id)
         )
         self.__election_timeout = election_timeout or 10 + random.randint(0, 5)
 

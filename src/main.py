@@ -2,6 +2,7 @@ import asyncio
 from argparse import ArgumentParser
 
 from entities.node import Node
+from entities.server_address import ServerAddress
 from network.message_service import MessageService
 from network.topic import Topic
 from roles.role import Role
@@ -41,10 +42,9 @@ async def main() -> None:
     args = parser.parse_args()
 
     role = Role[args.role.upper()]
-    server: str = args.server
-    port: int = args.port
+    kafka_server = ServerAddress(host=args.server, port=args.port)
 
-    node = Node(server=server, port=port, role=role)
+    node = Node(server=kafka_server, role=role)
 
     await node.run()
 

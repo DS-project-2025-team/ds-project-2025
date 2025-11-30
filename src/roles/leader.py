@@ -7,6 +7,7 @@ from typing import Literal
 from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
 from entities.raft_log import RaftLog
+from entities.server_address import ServerAddress
 from logger_service import logger
 from network.message_producer import MessageProducer
 from network.topic import Topic
@@ -17,11 +18,10 @@ class Leader(AbstractAsyncContextManager):
     def __init__(
         self,
         log: RaftLog,
-        server: str,
-        port: int,
+        server: ServerAddress,
         queue: deque[int] | None = None,
     ) -> None:
-        self.__producer: MessageProducer = MessageProducer(server=server, port=port)
+        self.__producer: MessageProducer = MessageProducer(server=server)
         self.__queue: deque[int] = queue or deque()
         self.__log = log
 

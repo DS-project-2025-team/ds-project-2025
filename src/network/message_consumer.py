@@ -5,6 +5,8 @@ from typing import Any, Self
 
 from aiokafka import AIOKafkaConsumer, ConsumerRecord
 
+from entities.server_address import ServerAddress
+
 
 def deserializer(serialized: str) -> dict:
     return json.loads(serialized)
@@ -12,12 +14,12 @@ def deserializer(serialized: str) -> dict:
 
 class MessageConsumer(AbstractAsyncContextManager):
     def __init__(
-        self, *topics: str, server: str, port: int = 9092, groupid: str | None = None
+        self, *topics: str, server: ServerAddress, groupid: str | None = None
     ) -> None:
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
             *topics,
             group_id=groupid,
-            bootstrap_servers=f"{server}:{port}",
+            bootstrap_servers=f"{server.host}:{server.port}",
             value_deserializer=deserializer,
             auto_offset_reset="earliest",
         )
@@ -29,7 +31,7 @@ class MessageConsumer(AbstractAsyncContextManager):
         message = await self.__consumer.getone()
         await self.__consumer.commit()
 
-        return message.value # type: ignore
+        return message.value  # type: ignore
 
     async def __aenter__(self) -> Self:
         await self.__consumer.start()

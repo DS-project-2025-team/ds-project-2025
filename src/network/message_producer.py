@@ -6,6 +6,7 @@ from typing import Any, Self
 from aiokafka import AIOKafkaProducer
 from aiokafka.structs import RecordMetadata
 
+from entities.server_address import ServerAddress
 from logger_service import logger
 
 
@@ -14,9 +15,9 @@ def serializer(value: dict) -> bytes:
 
 
 class MessageProducer(AbstractAsyncContextManager):
-    def __init__(self, server: str, port: int = 9092) -> None:
+    def __init__(self, server: ServerAddress) -> None:
         self.__producer: AIOKafkaProducer = AIOKafkaProducer(
-            bootstrap_servers=f"{server}:{port}",
+            bootstrap_servers=f"{server.host}:{server.port}",
             value_serializer=serializer,
         )
 
