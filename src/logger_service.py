@@ -18,20 +18,20 @@ class LoggerService:
 
         self._logger.propagate = False
 
-    def debug(self, msg: str, *args: object, **kwargs: object) -> None:
-        self._logger.debug(msg, *args, **kwargs)
+    def debug(self, msg: str, *args: object) -> None:
+        self._logger.debug(msg, *args)
 
-    def info(self, msg: str, *args: object, **kwargs: object) -> None:
-        self._logger.info(msg, *args, **kwargs)
+    def info(self, msg: str, *args: object) -> None:
+        self._logger.info(msg, *args)
 
-    def warning(self, msg: str, *args: object, **kwargs: object) -> None:
-        self._logger.warning(msg, *args, **kwargs)
+    def warning(self, msg: str, *args: object) -> None:
+        self._logger.warning(msg, *args)
 
-    def error(self, msg: str, *args: object, **kwargs: object) -> None:
-        self._logger.error(msg, *args, **kwargs)
+    def error(self, msg: str, *args: object) -> None:
+        self._logger.error(msg, *args)
 
-    def exception(self, msg: str, *args: object, **kwargs: object) -> None:
-        self._logger.exception(msg, *args, **kwargs)
+    def exception(self, msg: str, *args: object) -> None:
+        self._logger.exception(msg, *args)
 
 
 logger = LoggerService()
