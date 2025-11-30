@@ -43,13 +43,6 @@ class MessageConsumer(AbstractAsyncContextManager):
         return messages
         # return await self.__consumer.getmany()
 
-    def subscribe(self, *topics: str) -> None:
-        """
-        Override currently subscribed topics.
-        """
-
-        self.__consumer.subscribe(topics)
-
     async def __aenter__(self) -> Self:
         await self.__consumer.start()
 
