@@ -5,8 +5,6 @@ from typing import Self
 
 from aiokafka import AIOKafkaConsumer
 
-from logger_service import logger
-
 
 def deserializer(serialized: str) -> dict:
     return json.loads(serialized)
@@ -30,18 +28,8 @@ class MessageConsumer(AbstractAsyncContextManager):
     async def receive(self) -> dict:
         messages = await self.__consumer.getmany()
         await self.__consumer.commit()
-        for tp, msgs in messages.items():
-            for msg in msgs:
-                logger.info(
-                    "Received message to %s: %r (partition=%s offset=%s)",
-                    msg.topic,
-                    msg.value,
-                    msg.partition,
-                    msg.offset,
-                )
 
         return messages
-        # return await self.__consumer.getmany()
 
     async def __aenter__(self) -> Self:
         await self.__consumer.start()
