@@ -8,6 +8,7 @@ from aiokafka.structs import RecordMetadata
 
 from entities.server_address import ServerAddress
 from logger_service import logger
+from network.topic import Topic
 
 
 def serializer(value: dict) -> bytes:
@@ -21,10 +22,10 @@ class MessageProducer(AbstractAsyncContextManager):
             value_serializer=serializer,
         )
 
-    async def send(self, topic: str, payload: dict[str, Any]) -> None:
+    async def send(self, topic: Topic, payload: dict[str, Any]) -> None:
         await self.__producer.send(topic, payload)
 
-    async def send_and_wait(self, topic: str, payload: dict) -> RecordMetadata:
+    async def send_and_wait(self, topic: Topic, payload: dict) -> RecordMetadata:
         metadata: RecordMetadata = await self.__producer.send_and_wait(topic, payload)
         logger.info(
             "Sent message to %s: %r (partition=%s offset=%s)",
