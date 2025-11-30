@@ -36,8 +36,9 @@ class Node:
                 self.__role = await follower.run()
 
             case Role.CANDIDATE:
-                candidate = Candidate(self.__message_service, self.peers, self.__log)
-                self.__role = await candidate.elect()
+                # candidate = Candidate(self.__message_service, self.peers, self.__log)
+                # self.__role = await candidate.elect()
+                self.__role = Role.LEADER
 
             case Role.LEADER:
                 leader = Leader(self.__message_service, self.__log)
