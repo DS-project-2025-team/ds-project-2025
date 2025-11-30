@@ -47,8 +47,16 @@ def coverage_html(ctx: Context) -> None:
 
 
 @task
-def start(ctx: Context, role: str, server: str = "localhost") -> None:
-    ctx.run(f"uv run python {SOURCE_DIR}/main.py --role {role} --server {server}")
+def start(ctx: Context, role: str | None = None, server: str | None = None) -> None:
+    command = " ".join(
+        [
+            f"uv run python {SOURCE_DIR}/main.py",
+            f"--role {role}" if role else "",
+            f"--server {server}" if server else "",
+        ]
+    )
+
+    ctx.run(command)
 
 
 @task

@@ -13,7 +13,7 @@ def init_parser() -> ArgumentParser:
         "--role",
         type=str,
         help="Node role",
-        default=Role.FOLLOWER,
+        default="FOLLOWER",
     )
 
     parser.add_argument(
@@ -33,8 +33,6 @@ async def main() -> None:
 
     role = Role[args.role.upper()]
     server: str = args.server
-
-    print(role)
 
     async with MessageService(server, 9092) as message_service:
         node = Node(message_service=message_service, role=role)
