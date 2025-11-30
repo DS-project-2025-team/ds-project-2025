@@ -29,7 +29,7 @@ class Candidate:
             Topic.HEARTBEAT, server=server, groupid=str(self.__id)
         )
 
-    async def elect(self) -> Literal[Role.LEADER, Role.CANDIDATE]:
+    async def elect(self) -> Role:
         self.__log.term += 1
         current_term = self.__log.term
         logger.info(f"{self.__id} starting election for term {current_term}")
@@ -52,6 +52,10 @@ class Candidate:
         logger.info(f"{self.__id} sent vote requests to peers")
 
         while True:
+            if self.__check_leader_existence():
+                logger.info("Detected existing leader, reverting to FOLLOWER")
+                return Role.FOLLOWER
+
             try:
                 msg = await asyncio.wait_for(
                     self.__message_service.receive(), timeout=election_timeout
@@ -59,10 +63,6 @@ class Candidate:
             except TimeoutError:
                 logger.info(f"{self.__id} election timeout, restarting election")
                 return Role.CANDIDATE
-
-            if msg.get("type") == "heartbeat":
-                logger.info(f"{self.__id} received heartbeat from leader")
-                return Role.FOLLOWER
 
             if msg.get("type") == "vote" and msg.get("term") == current_term:
                 if msg.get("vote_granted"):
@@ -74,3 +74,16 @@ class Candidate:
                             f"{self.__id} won the election for term {current_term}"
                         )
                         return Role.LEADER
+
+    async def __check_leader_existence(self) -> bool:
+        try:
+            await asyncio.wait_for(
+                self.__heartbeat_consumer.receive(),
+                timeout=1,
+            )
+            logger.info("Received heartbeat during election")
+
+            return True
+
+        except TimeoutError:
+            return False
