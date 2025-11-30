@@ -1,19 +1,20 @@
 import asyncio
 
+from entities.server_address import ServerAddress
 from logger_service import logger
-from network.message_service import MessageService
+from network.message_consumer import MessageConsumer
 
 
 async def main() -> None:
-    async with MessageService(
-        "svm-11.cs.helsinki.fi", 9092, "hello_group"
-    ) as message_service:
-        # subscribe to topic
-        message_service.subscribe("hello")
-        await consume_loop(message_service)
+    server = ServerAddress("svm-11.cs.helsinki.fi", 9092)
+
+    async with MessageConsumer(
+        "hello", server=server, groupid="hello_group"
+    ) as consumer:
+        await consume_loop(consumer)
 
 
-async def consume_loop(message_service: MessageService) -> None:
+async def consume_loop(message_service: MessageConsumer) -> None:
     try:
         while True:
             try:
