@@ -34,7 +34,7 @@ class MessageService(AbstractAsyncContextManager):
         await self.__consumer.commit()
 
     async def send(self, topic: str, payload: dict[str, Any]) -> None:
-        await self.__producer.send_and_wait(topic, payload)
+        await self.__producer.send(topic, payload)
 
     async def send_and_wait(self, topic: str, payload: dict) -> RecordMetadata:
         assert self.__producer is not None
