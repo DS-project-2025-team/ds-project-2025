@@ -6,6 +6,7 @@ from entities.raft_log import RaftLog
 from entities.server_address import ServerAddress
 from logger_service import logger
 from network.message_consumer import MessageConsumer
+from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
@@ -25,8 +26,8 @@ class Candidate:
 
         self.__producer = MessageProducer(server=server)
         self.__vote_consumer = MessageConsumer(Topic.VOTE, server=server)
-        self.__heartbeat_consumer = MessageConsumer(
-            Topic.HEARTBEAT, server=server, groupid=str(self.__id)
+        self.__heartbeat_consumer: MessageConsumer = (
+            MessageConsumerFactory.heartbeat_consumer(server=server, node_id=node_id)
         )
 
     async def elect(self) -> Role:

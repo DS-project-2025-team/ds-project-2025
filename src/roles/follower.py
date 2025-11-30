@@ -8,7 +8,7 @@ from uuid import UUID
 from entities.server_address import ServerAddress
 from logger_service import logger
 from network.message_consumer import MessageConsumer
-from network.topic import Topic
+from network.message_consumer_factory import MessageConsumerFactory
 from roles.role import Role
 
 
@@ -20,8 +20,8 @@ class Follower(AbstractAsyncContextManager):
         # Base election timeout in seconds
         election_timeout: int | None = None,
     ) -> None:
-        self.__heartbeat_consumer = MessageConsumer(
-            Topic.HEARTBEAT, server=server, groupid=str(node_id)
+        self.__heartbeat_consumer: MessageConsumer = (
+            MessageConsumerFactory.heartbeat_consumer(server=server, node_id=node_id)
         )
         self.__election_timeout = election_timeout or 10 + random.randint(0, 5)
 
