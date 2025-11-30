@@ -45,6 +45,9 @@ async def main() -> None:
     port: int = args.port
 
     async with MessageService(server, port) as message_service:
+        node = Node(
+            server=server, port=port, message_service=message_service, role=role
+        )
 
         await node.run()
 

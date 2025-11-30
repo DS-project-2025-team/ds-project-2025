@@ -14,6 +14,8 @@ class Node:
     def __init__(
         self,
         message_service: MessageService,
+        server: str,
+        port: int = 9092,
         node_id: str | None = None,
         peers: list[str] | None = None,
         role: Role = Role.FOLLOWER,
@@ -21,6 +23,8 @@ class Node:
     ) -> None:
         self.node_id: str = node_id or str(uuid.uuid4())
         self.peers: list[str] = peers or []
+        self.__server = server
+        self.__port = port
         self.__role: Role = role
         self.__message_service: MessageService = message_service
         self.__log: RaftLog = log or RaftLog(self.node_id)
