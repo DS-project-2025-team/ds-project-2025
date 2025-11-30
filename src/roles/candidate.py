@@ -51,29 +51,26 @@ class Candidate:
 
         logger.info(f"{self.__id} sent vote requests to peers")
 
-        try:
-            while True:
+        while True:
+            try:
                 msg = await asyncio.wait_for(
                     self.__message_service.receive(), timeout=election_timeout
                 )
+            except TimeoutError:
+                logger.info(f"{self.__id} election timeout, restarting election")
+                return Role.CANDIDATE
 
-                if msg.get("type") == "heartbeat":
-                    logger.info(f"{self.__id} received heartbeat from leader")
-                    return Role.FOLLOWER
+            if msg.get("type") == "heartbeat":
+                logger.info(f"{self.__id} received heartbeat from leader")
+                return Role.FOLLOWER
 
-                if msg.get("type") == "vote" and msg.get("term") == current_term:
-                    if msg.get("vote_granted"):
-                        votes_received += 1
+            if msg.get("type") == "vote" and msg.get("term") == current_term:
+                if msg.get("vote_granted"):
+                    votes_received += 1
+                    logger.info(f"{self.__id} received vote from {msg.get('voter_id')}")
+
+                    if votes_received > total_votes_needed:
                         logger.info(
-                            f"{self.__id} received vote from {msg.get('voter_id')}"
+                            f"{self.__id} won the election for term {current_term}"
                         )
-
-                        if votes_received > total_votes_needed:
-                            logger.info(
-                                f"{self.__id} won the election for term {current_term}"
-                            )
-                            return Role.LEADER
-
-        except TimeoutError:
-            logger.info(f"{self.__id} election timeout, restarting election")
-            return Role.CANDIDATE
+                        return Role.LEADER
