@@ -19,10 +19,13 @@ class Candidate:
         peers: list[str],
         log: RaftLog,
         node_id: UUID,
+        # Vote timeout in seconds
+        vote_timeout: int = 20,
     ) -> None:
         self.__peers = peers
         self.__log = log
         self.__id = node_id
+        self.__vote_timeout = vote_timeout
 
         self.__producer = MessageProducer(server=server)
         self.__vote_consumer = MessageConsumerFactory.vote_consumer(
@@ -38,7 +41,6 @@ class Candidate:
         logger.info(f"{self.__id} starting election for term {current_term}")
 
         votes_received = 1
-        election_timeout = random.uniform(0.150, 0.300)
         total_votes_needed = (len(self.__peers) + 1) // 2 + 1
 
         request = {
@@ -59,7 +61,7 @@ class Candidate:
 
             try:
                 msg = await asyncio.wait_for(
-                    self.__vote_consumer.receive(), timeout=election_timeout
+                    self.__vote_consumer.receive(), timeout=self.__vote_timeout
                 )
             except TimeoutError:
                 logger.info(f"{self.__id} election timeout, restarting election")
