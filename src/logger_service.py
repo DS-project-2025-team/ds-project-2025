@@ -1,6 +1,7 @@
 import logging
 import sys
 
+
 class LoggerService:
     def __init__(self) -> None:
         self._logger = logging.getLogger("ds-project-2025")

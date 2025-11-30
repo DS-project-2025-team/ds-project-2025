@@ -62,7 +62,7 @@ class MessageService(AbstractAsyncContextManager):
                 )
 
         return messages
-        #return await self.__consumer.getmany()
+        # return await self.__consumer.getmany()
 
     def subscribe(self, *topics: str) -> None:
         """

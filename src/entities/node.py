@@ -9,6 +9,7 @@ from roles.role import Role
 from network.message_service import MessageService
 import uuid
 
+
 class Node:
     def __init__(
         self,

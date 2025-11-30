@@ -5,10 +5,13 @@ from network.message_service import MessageService
 
 
 async def main() -> None:
-    async with MessageService("svm-11.cs.helsinki.fi", 9092, "hello_group") as message_service:
+    async with MessageService(
+        "svm-11.cs.helsinki.fi", 9092, "hello_group"
+    ) as message_service:
         # subscribe to topic
         message_service.subscribe("hello")
         await consume_loop(message_service)
+
 
 async def consume_loop(message_service: MessageService) -> None:
     try:
@@ -20,7 +23,6 @@ async def consume_loop(message_service: MessageService) -> None:
             except Exception as e:
                 logger.error("Error while consuming: %r", e)
                 await asyncio.sleep(1)
-
 
     finally:
         logger.info("Consumer receive loop exiting")

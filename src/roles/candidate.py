@@ -7,12 +7,15 @@ from network.message_service import MessageService
 from entities.raft_log import RaftLog
 from roles.role import Role
 
+
 class Candidate:
-    def __init__(self, message_service: MessageService, peers: List[str], log: RaftLog) -> None:
+    def __init__(
+        self, message_service: MessageService, peers: List[str], log: RaftLog
+    ) -> None:
         self.__message_service = message_service
         self.__peers = peers
         self.__log = log
-    
+
     async def elect(self) -> Literal[Role.LEADER, Role.CANDIDATE]:
         self.__log.term += 1
         current_term = self.__log.term
@@ -38,23 +41,26 @@ class Candidate:
         try:
             while True:
                 msg = await asyncio.wait_for(
-                    self.__message_service.receive(),
-                    timeout=election_timeout
+                    self.__message_service.receive(), timeout=election_timeout
                 )
 
                 if msg.get("type") == "heartbeat":
                     logger.info(f"{self.__log.node_id} received heartbeat from leader")
                     return Role.FOLLOWER
-                    
+
                 if msg.get("type") == "vote" and msg.get("term") == current_term:
                     if msg.get("vote_granted"):
                         votes_received += 1
-                        logger.info(f"{self.__log.node_id} received vote from {msg.get('voter_id')}")
+                        logger.info(
+                            f"{self.__log.node_id} received vote from {msg.get('voter_id')}"
+                        )
 
                         if votes_received > total_votes_needed:
-                            logger.info(f"{self.__log.node_id} won the election for term {current_term}")
+                            logger.info(
+                                f"{self.__log.node_id} won the election for term {current_term}"
+                            )
                             return Role.LEADER
-                        
+
         except asyncio.TimeoutError:
             logger.info(f"{self.__log.node_id} election timeout, restarting election")
             return Role.CANDIDATE
