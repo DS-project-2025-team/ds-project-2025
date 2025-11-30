@@ -23,10 +23,12 @@ class Follower:
                 )
 
             except TimeoutError:
-                logger.info("Changing role to CANDIDATE")
-                return Role.CANDIDATE
+                break
 
             self.__process_message(message)
+
+        logger.info("Changing role to CANDIDATE")
+        return Role.CANDIDATE
 
     def __process_message(self, message: dict) -> None:
         match message["topic"]:
