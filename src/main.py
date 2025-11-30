@@ -25,6 +25,14 @@ def init_parser() -> ArgumentParser:
         default="localhost",
     )
 
+    parser.add_argument(
+        "--port",
+        "-p",
+        type=int,
+        help="Kafka server port",
+        default=9092,
+    )
+
     return parser
 
 
@@ -34,9 +42,9 @@ async def main() -> None:
 
     role = Role[args.role.upper()]
     server: str = args.server
+    port: int = args.port
 
-    async with MessageService(server, 9092) as message_service:
-        node = Node(message_service=message_service, role=role)
+    async with MessageService(server, port) as message_service:
 
         await node.run()
 
