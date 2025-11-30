@@ -1,5 +1,4 @@
 import asyncio
-import random
 from uuid import UUID
 
 from entities.raft_log import RaftLog
