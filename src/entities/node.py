@@ -22,7 +22,7 @@ class Node:
         self.__server = server
         self.__port = port
         self.__role: Role = role
-        self.__log: RaftLog = log or RaftLog(self.node_id)
+        self.__log: RaftLog = log or RaftLog()
 
     async def run(self) -> None:
         while True:
