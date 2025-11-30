@@ -40,6 +40,9 @@ class Candidate:
         current_term = self.__log.term
         logger.info(f"{self.__id} starting election for term {current_term}")
 
+        begin_time = asyncio.get_event_loop().time()
+        role = Role.FOLLOWER
+
         votes_received = 1
         total_votes_needed = (len(self.__peers) + 1) // 2 + 1
 
@@ -54,29 +57,34 @@ class Candidate:
 
         logger.info(f"{self.__id} sent vote requests to peers")
 
-        while True:
+        while asyncio.get_event_loop().time() - begin_time > self.__vote_timeout:
             if self.__check_leader_existence():
                 logger.info("Detected existing leader, reverting to FOLLOWER")
-                return Role.FOLLOWER
+                break
 
-            try:
-                msg = await asyncio.wait_for(
-                    self.__vote_consumer.receive(), timeout=self.__vote_timeout
-                )
-            except TimeoutError:
-                logger.info(f"{self.__id} election timeout, restarting election")
-                return Role.CANDIDATE
+            votes_received += await self.__receive_vote(current_term)
 
-            if msg.get("type") == "vote" and msg.get("term") == current_term:
-                if msg.get("vote_granted"):
-                    votes_received += 1
-                    logger.info(f"{self.__id} received vote from {msg.get('voter_id')}")
+            if votes_received >= total_votes_needed:
+                role = Role.LEADER
+                logger.info(f"{self.__id} won the election for term {current_term}")
 
-                    if votes_received > total_votes_needed:
-                        logger.info(
-                            f"{self.__id} won the election for term {current_term}"
-                        )
-                        return Role.LEADER
+                break
+
+        return role
+
+    async def __receive_vote(self, current_term: int, timeout: float = 0.5) -> int:
+        try:
+            vote = await asyncio.wait_for(
+                self.__vote_consumer.receive(), timeout=timeout
+            )
+        except TimeoutError:
+            return 0
+
+        if vote["term"] != current_term and vote["recipient_id"] != self.__id:
+            return 0
+
+        logger.info("Received a vote")
+        return 1
 
     async def __check_leader_existence(self) -> bool:
         try:
