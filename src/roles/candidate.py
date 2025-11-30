@@ -7,7 +7,6 @@ from entities.server_address import ServerAddress
 from logger_service import logger
 from network.message_consumer import MessageConsumer
 from network.message_producer import MessageProducer
-from network.message_service import MessageService
 from network.topic import Topic
 from roles.role import Role
 
@@ -16,17 +15,16 @@ class Candidate:
     def __init__(
         self,
         server: ServerAddress,
-        message_service: MessageService,
         peers: list[str],
         log: RaftLog,
         node_id: UUID,
     ) -> None:
-        self.__message_service = message_service
         self.__peers = peers
         self.__log = log
         self.__id = node_id
 
         self.__producer = MessageProducer(server=server)
+        self.__vote_consumer = MessageConsumer(Topic.VOTE, server=server)
         self.__heartbeat_consumer = MessageConsumer(
             Topic.HEARTBEAT, server=server, groupid=str(self.__id)
         )
@@ -60,7 +58,7 @@ class Candidate:
 
             try:
                 msg = await asyncio.wait_for(
-                    self.__message_service.receive(), timeout=election_timeout
+                    self.__vote_consumer.receive(), timeout=election_timeout
                 )
             except TimeoutError:
                 logger.info(f"{self.__id} election timeout, restarting election")
