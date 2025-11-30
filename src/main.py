@@ -44,12 +44,9 @@ async def main() -> None:
     server: str = args.server
     port: int = args.port
 
-    async with MessageService(server, port) as message_service:
-        node = Node(
-            server=server, port=port, message_service=message_service, role=role
-        )
+    node = Node(server=server, port=port, role=role)
 
-        await node.run()
+    await node.run()
 
 
 if __name__ == "__main__":

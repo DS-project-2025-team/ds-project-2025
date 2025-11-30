@@ -13,7 +13,6 @@ from roles.role import Role
 class Node:
     def __init__(
         self,
-        message_service: MessageService,
         server: str,
         port: int = 9092,
         node_id: str | None = None,
@@ -26,7 +25,6 @@ class Node:
         self.__server = server
         self.__port = port
         self.__role: Role = role
-        self.__message_service: MessageService = message_service
         self.__log: RaftLog = log or RaftLog(self.node_id)
 
     async def run(self) -> None:
