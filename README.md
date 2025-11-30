@@ -26,8 +26,12 @@
 Start program
 
 ```sh
-uv run invoke start
+uv run invoke start --role leader --server test.com --port 9092
 ```
+
+- `--role`: optional, defaults to `follower`
+- `--server`: optional, defaults to `localhost`
+- `--port`: optional, defaults to `9092`
 
 See `tasks.py` for other tasks:
 
