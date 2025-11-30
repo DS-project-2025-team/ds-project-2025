@@ -3,7 +3,7 @@ import random
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
 from typing import Literal, Self
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from logger_service import logger
 from network.message_consumer import MessageConsumer
