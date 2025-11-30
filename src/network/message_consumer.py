@@ -14,7 +14,7 @@ def deserializer(serialized: str) -> dict:
 
 class MessageConsumer(AbstractAsyncContextManager):
     def __init__(
-        self, *topics: str, server: str, port: int = 9092, groupid: str
+        self, *topics: str, server: str, port: int = 9092, groupid: str | None = None
     ) -> None:
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
             *topics,
