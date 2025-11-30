@@ -2,6 +2,7 @@ import json
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
 from typing import Self
+from logger_service import logger
 
 from aiokafka import AIOKafkaConsumer
 
@@ -32,6 +33,21 @@ class MessageConsumer(AbstractAsyncContextManager):
         await self.__consumer.commit()
 
         return message.value  # type: ignore
+
+    async def receive_many_and_log(self) -> dict:
+        messages = await self.__consumer.getmany()
+        await self.__consumer.commit()
+        for tp, msgs in messages.items():
+            for msg in msgs:
+                logger.debug(
+                    "Received message to %s: %r (partition=%s offset=%s)",
+                    msg.topic,
+                    msg.value,
+                    msg.partition,
+                    msg.offset,
+                )
+
+        return messages
 
     async def __aenter__(self) -> Self:
         await self.__consumer.start()
