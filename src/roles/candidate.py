@@ -4,14 +4,18 @@ from typing import Literal
 from uuid import UUID
 
 from entities.raft_log import RaftLog
+from entities.server_address import ServerAddress
 from logger_service import logger
+from network.message_consumer import MessageConsumer
 from network.message_service import MessageService
+from network.topic import Topic
 from roles.role import Role
 
 
 class Candidate:
     def __init__(
         self,
+        server: ServerAddress,
         message_service: MessageService,
         peers: list[str],
         log: RaftLog,
@@ -21,6 +25,9 @@ class Candidate:
         self.__peers = peers
         self.__log = log
         self.__id = node_id
+        self.__heartbeat_consumer = MessageConsumer(
+            Topic.HEARTBEAT, server=server, groupid=str(self.__id)
+        )
 
     async def elect(self) -> Literal[Role.LEADER, Role.CANDIDATE]:
         self.__log.term += 1
