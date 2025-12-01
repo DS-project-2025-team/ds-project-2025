@@ -32,7 +32,7 @@ uv run invoke start --role leader --server test.com --port 9092 --log-level [DEB
 - `--role`: optional, defaults to `follower`
 - `--server`: optional, defaults to `localhost`
 - `--port`: optional, defaults to `9092`
-- `--log-level`: optional, default is INFO
+- `--log-level`: optional, defaults to `INFO`
 
 See `tasks.py` for other tasks:
 
