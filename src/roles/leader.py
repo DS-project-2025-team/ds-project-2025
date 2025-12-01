@@ -39,7 +39,7 @@ class Leader(AbstractAsyncContextManager):
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         while True:
-            await self.__producer.send(Topic.HEARTBEAT, {})
+            await self.__producer.send_and_wait(Topic.HEARTBEAT, {})
             logger.info("Sent heartbeat")
 
             await asyncio.sleep(2)

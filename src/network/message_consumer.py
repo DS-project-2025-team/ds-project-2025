@@ -31,6 +31,13 @@ class MessageConsumer(AbstractAsyncContextManager):
     async def receive(self) -> dict:
         message = await self.__consumer.getone()
         await self.__consumer.commit()
+        logger.debug(
+            "Received message to %s: %r (partition=%s offset=%s)",
+            message.topic,
+            message.value,
+            message.partition,
+            message.offset,
+        )
 
         return message.value  # type: ignore
 

@@ -52,6 +52,7 @@ def start(
     role: str | None = None,
     server: str | None = None,
     port: int | None = None,
+    log_level: int | None = None,
 ) -> None:
     command = " ".join(
         [
@@ -59,6 +60,7 @@ def start(
             f"--role {role}" if role else "",
             f"--server {server}" if server else "",
             f"--port {port}" if port else "",
+	    f"--log-level {log_level}" if log_level else "", 
         ]
     )
 

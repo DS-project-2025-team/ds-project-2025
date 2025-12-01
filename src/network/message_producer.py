@@ -24,6 +24,11 @@ class MessageProducer(AbstractAsyncContextManager):
 
     async def send(self, topic: Topic, payload: dict[str, Any]) -> None:
         await self.__producer.send(topic, payload)
+        logger.debug(
+            "Sent message to %s: %r",
+            topic,
+            payload,
+        )
 
     async def send_and_wait(self, topic: Topic, payload: dict) -> None:
         metadata: RecordMetadata = await self.__producer.send_and_wait(topic, payload)
@@ -34,7 +39,6 @@ class MessageProducer(AbstractAsyncContextManager):
             metadata.partition,
             metadata.offset,
         )
-        return metadata
 
     async def __aenter__(self) -> Self:
         await self.__producer.start()

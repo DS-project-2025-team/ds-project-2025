@@ -12,12 +12,16 @@ class LoggerService:
             )
             handler.setFormatter(formatter)
 
-            handler.setLevel(logging.DEBUG)
-            self._logger.setLevel(logging.DEBUG)
+            handler.setLevel(logging.INFO)
+            self._logger.setLevel(logging.INFO)
 
             self._logger.addHandler(handler)
 
-        self._logger.propagate = False
+    def set_level(self, level: int) -> None:
+        """Set logger and handlers to given level."""
+        self._logger.setLevel(level)
+        for handler in self._logger.handlers:
+            handler.setLevel(level)
 
     def debug(self, msg: str, *args: object) -> None:
         self._logger.debug(msg, *args)
