@@ -26,12 +26,13 @@
 Start program
 
 ```sh
-uv run invoke start --role leader --server test.com --port 9092
+uv run invoke start --role leader --server test.com --port 9092 --log-level [DEBUG|INFO|WARNING|ERROR|CRITICAL]
 ```
 
 - `--role`: optional, defaults to `follower`
 - `--server`: optional, defaults to `localhost`
 - `--port`: optional, defaults to `9092`
+- `--log-level`: optional, default is INFO
 
 See `tasks.py` for other tasks:
 
