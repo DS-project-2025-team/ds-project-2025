@@ -1,5 +1,6 @@
 from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
+from entities.sat_formula import SatFormula
 
 
 class RaftLog:
@@ -15,6 +16,13 @@ class RaftLog:
     @property
     def completed_tasks(self) -> list[int]:
         return self.leader_state.completed_tasks
+
+    @property
+    def current_formula(self) -> SatFormula | None:
+        if not self.leader_state.formulas:
+            return None
+
+        return self.leader_state.formulas[0]
 
     def append(self, entry: LogEntry) -> None:
         self.entries.append(entry)
