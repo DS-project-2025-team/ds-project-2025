@@ -69,7 +69,3 @@ class Leader(AbstractAsyncContextManager):
 
         self.__log.append(entry)
         self.__log.commit()
-
-
-def __complete_task(state: LeaderState, task: int) -> None:
-    state.completed_tasks[task] = True
