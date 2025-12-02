@@ -7,6 +7,8 @@ from typing import Literal, Self
 from entities.leader_state import LeaderState
 from entities.log_entry_factory import LogEntryFactory
 from entities.raft_log import RaftLog
+from entities.sat_formula import SatFormula
+from entities.second import Second
 from entities.server_address import ServerAddress
 from logger_service import logger
 from network.message_consumer import MessageConsumer
@@ -50,6 +52,8 @@ class Leader(AbstractAsyncContextManager):
             await self.__producer.send_and_wait(Topic.HEARTBEAT, {})
             logger.info("Sent heartbeat")
 
+            input_ = await self.__receive_input(Second(1))
+
             await asyncio.sleep(2)
 
         logger.info("Changing role to FOLLOWER")
@@ -72,3 +76,12 @@ class Leader(AbstractAsyncContextManager):
 
         self.__log.append(entry)
         self.__log.commit()
+
+    async def __receive_input(self, timeout: Second) -> SatFormula | None:
+        try:
+            input_ = await self.__input_consumer.receive(timeout)
+        except TimeoutError:
+            return None
+
+        formula: SatFormula = input_["data"]
+        logger.info("Received new SAT formula", formula)
