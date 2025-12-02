@@ -35,3 +35,10 @@ class Client(AbstractAsyncContextManager):
 
     async def __send(self, formula: SatFormula) -> None:
         await self.__producer.send_and_wait(Topic.INPUT, {"data": formula})
+
+    async def __wait_for_result(self, id_: int) -> bool:
+        while True:
+            message = await self.__consumer.receive()
+
+            if message["hash"] == id_:
+                return message["result"]
