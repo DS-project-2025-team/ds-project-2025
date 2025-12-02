@@ -6,3 +6,5 @@ class Topic(StrEnum):
     HEARTBEAT = auto()
     VOTE = auto()
     VOTE_REQUEST = auto()
+    OUTPUT = auto()
+    INPUT = auto()
