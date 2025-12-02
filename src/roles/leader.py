@@ -27,7 +27,7 @@ class Leader(AbstractAsyncContextManager):
         self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
             server
         )
-        self.__queue: deque[int] = queue or deque()
+        self.__tasks: deque[int] = queue or deque()
         self.__log = log
 
     async def __aenter__(self) -> Self:
@@ -55,11 +55,11 @@ class Leader(AbstractAsyncContextManager):
     def __next_task(self) -> int | None:
         task = None
 
-        while self.__queue:
-            task = self.__queue.popleft()
+        while self.__tasks:
+            task = self.__tasks.popleft()
 
             if not self.__log.completed_tasks[task]:
-                self.__queue.append(task)
+                self.__tasks.append(task)
                 break
 
         return task
