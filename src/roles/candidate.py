@@ -2,6 +2,7 @@ import asyncio
 from uuid import UUID
 
 from entities.raft_log import RaftLog
+from entities.second import Second
 from entities.server_address import ServerAddress
 from logger_service import logger
 from network.message_consumer import MessageConsumer
@@ -19,7 +20,7 @@ class Candidate:
         log: RaftLog,
         node_id: UUID,
         # Vote timeout in seconds
-        vote_timeout: int = 20,
+        vote_timeout: Second = Second(20),
     ) -> None:
         self.__peers = peers
         self.__log = log
