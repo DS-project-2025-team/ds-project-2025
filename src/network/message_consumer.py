@@ -1,3 +1,4 @@
+import asyncio
 import json
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
@@ -5,6 +6,7 @@ from typing import Self
 
 from aiokafka import AIOKafkaConsumer
 
+from entities.second import Second
 from entities.server_address import ServerAddress
 from logger_service import logger
 
@@ -28,8 +30,27 @@ class MessageConsumer(AbstractAsyncContextManager):
     async def commit(self) -> None:
         await self.__consumer.commit()
 
-    async def receive(self) -> dict:
-        message = await self.__consumer.getone()
+    async def receive(self, timeout: Second | None = None) -> dict:
+        """
+        Receives a message from message broker.
+
+        Args:
+            timeout (Second | None, optional): Timeout. Defaults to None.
+
+        Returns:
+            dict: Message payload
+
+        Raises:
+            TimeoutError: Timeout exceeded
+        """
+
+        if timeout is not None:
+            message = await asyncio.wait_for(
+                self.__consumer.getone(), timeout=float(timeout)
+            )
+        else:
+            message = await self.__consumer.getone()
+
         await self.__consumer.commit()
         logger.debug(
             "Received message to %s: %r (partition=%s offset=%s)",
