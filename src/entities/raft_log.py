@@ -9,13 +9,13 @@ from entities.sat_formula import SatFormula
 class RaftLog:
     def __init__(
         self,
-        entries: Iterable[LogEntry],
+        entries: Iterable[LogEntry] | None = None,
         commit_index: int = -1,
         term: int = 0,
         leader_id: UUID | None = None,
         leader_state: LeaderState | None = None,
     ) -> None:
-        self.entries: list[LogEntry] = list(entries) or []
+        self.entries: list[LogEntry] = list(entries or [])
 
         self.commit_index: int = commit_index
         self.term: int = term
