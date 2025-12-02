@@ -42,10 +42,10 @@ class Follower(AbstractAsyncContextManager):
     async def run(self) -> Literal[Role.CANDIDATE]:
         while True:
             try:
-                message = await asyncio.wait_for(
-                    self.__heartbeat_consumer.receive(),
-                    self.__election_timeout,
+                message = await self.__heartbeat_consumer.receive(
+                    self.__election_timeout
                 )
+
                 logger.info("Received heartbeat")
 
             except TimeoutError:

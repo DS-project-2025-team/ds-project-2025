@@ -79,9 +79,7 @@ class Candidate:
 
     async def __receive_vote(self, current_term: int, timeout: float = 0.5) -> int:
         try:
-            vote = await asyncio.wait_for(
-                self.__vote_consumer.receive(), timeout=timeout
-            )
+            vote = await self.__vote_consumer.receive(Second(timeout))
         except TimeoutError:
             return 0
 
@@ -93,10 +91,8 @@ class Candidate:
 
     async def __check_leader_existence(self) -> bool:
         try:
-            await asyncio.wait_for(
-                self.__heartbeat_consumer.receive(),
-                timeout=1,
-            )
+            await self.__heartbeat_consumer.receive(timeout=Second(1))
+
             logger.info("Received heartbeat during election")
 
             return True
