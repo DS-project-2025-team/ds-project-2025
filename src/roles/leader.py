@@ -2,7 +2,7 @@ import asyncio
 from collections import deque
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
-from typing import Literal
+from typing import Literal, Self
 
 from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
@@ -25,7 +25,7 @@ class Leader(AbstractAsyncContextManager):
         self.__queue: deque[int] = queue or deque()
         self.__log = log
 
-    async def __aenter__(self) -> "Leader":
+    async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
         return self
 
