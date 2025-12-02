@@ -33,3 +33,7 @@ class MessageConsumerFactory:
         return MessageConsumerFactory.multicast_consumer(
             Topic.VOTE, server=server, node_id=node_id
         )
+
+    @staticmethod
+    def input_consumer(server: ServerAddress) -> MessageConsumer:
+        return MessageConsumer(Topic.INPUT, server=server)
