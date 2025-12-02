@@ -7,6 +7,16 @@ from network.topic import Topic
 
 class MessageConsumerFactory:
     @staticmethod
+    def multicast_consumer(
+        *topics: Topic, server: ServerAddress, node_id: UUID
+    ) -> MessageConsumer:
+        return MessageConsumer(
+            *topics,
+            server=server,
+            groupid=str(node_id),
+        )
+
+    @staticmethod
     def heartbeat_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
         return MessageConsumer(
             Topic.HEARTBEAT,
