@@ -1,15 +1,23 @@
+from collections.abc import Iterable
+
 from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
 from entities.sat_formula import SatFormula
 
 
 class RaftLog:
-    def __init__(self) -> None:
-        self.entries: list[LogEntry] = []
+    def __init__(
+        self,
+        entries: Iterable[LogEntry],
+        commit_index: int = -1,
+        term: int = 0,
+        leader_id: str | None = None,
+    ) -> None:
+        self.entries: list[LogEntry] = list(entries) or []
 
-        self.commit_index: int = -1
-        self.term: int = 0
-        self.leader_id: str | None = None
+        self.commit_index: int = commit_index
+        self.term: int = term
+        self.leader_id: str = leader_id or ""
 
         self.leader_state: LeaderState = LeaderState()
 
