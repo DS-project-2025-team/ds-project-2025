@@ -1,5 +1,4 @@
 from collections.abc import Iterable
 
-from entities.clause import Clause
-
+Clause = Iterable[int]
 SatFormula = Iterable[Clause]
