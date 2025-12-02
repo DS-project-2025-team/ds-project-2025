@@ -2,6 +2,7 @@ from contextlib import AbstractAsyncContextManager
 from types import TracebackType
 from typing import Self
 
+from entities.sat_formula import SatFormula
 from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_producer import MessageProducer
@@ -31,3 +32,6 @@ class Client(AbstractAsyncContextManager):
     ) -> None:
         await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__consumer.__aexit__(exc_type, exc_value, traceback)
+
+    async def __send(self, formula: SatFormula) -> None:
+        await self.__producer.send_and_wait(Topic.INPUT, {"data": formula})
