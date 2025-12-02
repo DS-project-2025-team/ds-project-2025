@@ -38,7 +38,7 @@ async def main() -> None:
             """ Just flood and quit """
             #await asyncio.sleep(1)
 
-        print("sent ", i,"messages\n")
+            print("sent ", i,"messages\n")
 
 if __name__ == "__main__":
     asyncio.run(main())
