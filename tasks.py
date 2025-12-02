@@ -68,6 +68,23 @@ def start(
 
 
 @task
+def start_client(
+    ctx: Context,
+    server: str | None = None,
+    port: int | None = None,
+) -> None:
+    command = " ".join(
+        [
+            f"uv run python {SOURCE_DIR}/client.py",
+            f"--server {server}" if server else "",
+            f"--port {port}" if port else "",
+        ]
+    )
+
+    ctx.run(command)
+
+
+@task
 def install_kafka(ctx: Context) -> None:
     ctx.run(f"uv run python {SOURCE_DIR}/install_kafka.py")
 
