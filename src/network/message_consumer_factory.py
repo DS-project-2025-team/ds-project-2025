@@ -18,24 +18,18 @@ class MessageConsumerFactory:
 
     @staticmethod
     def heartbeat_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
-        return MessageConsumer(
-            Topic.HEARTBEAT,
-            server=server,
-            groupid=str(node_id),
+        return MessageConsumerFactory.multicast_consumer(
+            Topic.HEARTBEAT, server=server, node_id=node_id
         )
 
     @staticmethod
     def vote_request_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
-        return MessageConsumer(
-            Topic.VOTE_REQUEST,
-            server=server,
-            groupid=str(node_id),
+        return MessageConsumerFactory.multicast_consumer(
+            Topic.VOTE_REQUEST, server=server, node_id=node_id
         )
 
     @staticmethod
     def vote_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
-        return MessageConsumer(
-            Topic.VOTE,
-            server=server,
-            groupid=str(node_id),
+        return MessageConsumerFactory.multicast_consumer(
+            Topic.VOTE, server=server, node_id=node_id
         )
