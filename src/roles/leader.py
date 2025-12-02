@@ -6,6 +6,7 @@ from typing import Literal, Self
 
 from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
+from entities.log_entry_factory import LogEntryFactory
 from entities.raft_log import RaftLog
 from entities.server_address import ServerAddress
 from logger_service import logger
@@ -65,7 +66,7 @@ class Leader(AbstractAsyncContextManager):
         return task
 
     def __complete_task(self, task: int) -> None:
-        entry = LogEntry(self.__log.term, lambda state: __complete_task(state, task))
+        entry = LogEntryFactory.complete_task(self.__log.term, task)
 
         self.__log.append(entry)
         self.__log.commit()
