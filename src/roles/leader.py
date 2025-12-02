@@ -82,5 +82,5 @@ class Leader(AbstractAsyncContextManager):
         except TimeoutError:
             return None
 
-        formula: SatFormula = input_["data"]
+        formula = SatFormula(input_["data"])
         logger.info("Received new SAT formula", formula)
