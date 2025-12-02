@@ -42,3 +42,18 @@ class Client(AbstractAsyncContextManager):
 
             if message["hash"] == id_:
                 return message["result"]
+
+    async def input(self, formula: SatFormula) -> bool:
+        """
+        Sends SAT formula as input and returns the result.
+
+        Args:
+            formula (SatFormula): SAT formula
+
+        Returns:
+            bool: Satisfiability of the formula
+        """
+        id_ = hash(formula)
+
+        await self.__send(formula)
+        return await self.__wait_for_result(id_)
