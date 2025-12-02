@@ -32,6 +32,8 @@ class Leader(AbstractAsyncContextManager):
 
     async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
+        await self.__input_consumer.__aenter__()
+
         return self
 
     async def __aexit__(
@@ -41,6 +43,7 @@ class Leader(AbstractAsyncContextManager):
         traceback: TracebackType | None,
     ) -> None:
         await self.__producer.__aexit__(exc_type, exc_value, traceback)
+        await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         while True:
