@@ -28,7 +28,7 @@ class Leader(AbstractAsyncContextManager):
             server
         )
         self.__tasks: deque[int] = queue or deque()
-        self.__log = log
+        self.__log: RaftLog = log
 
     async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
