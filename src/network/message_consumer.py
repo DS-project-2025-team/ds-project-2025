@@ -1,10 +1,10 @@
 import asyncio
 import json
-from contextlib import AbstractAsyncContextManager
+from contextlib import AbstractAsyncContextManager, suppress
 from types import TracebackType
 from typing import Self
 
-from aiokafka import AIOKafkaConsumer
+from aiokafka import AIOKafkaConsumer, IllegalOperation
 
 from entities.second import Second
 from entities.server_address import ServerAddress
@@ -44,14 +44,11 @@ class MessageConsumer(AbstractAsyncContextManager):
             TimeoutError: Timeout exceeded
         """
 
-        if timeout is not None:
-            message = await asyncio.wait_for(
-                self.__consumer.getone(), timeout=float(timeout)
-            )
-        else:
-            message = await self.__consumer.getone()
+        message = await asyncio.wait_for(self.__consumer.getone(), timeout=timeout)
 
-        await self.__consumer.commit()
+        with suppress(IllegalOperation):
+            await self.__consumer.commit()
+
         logger.debug(
             "Received message to %s: %r (partition=%s offset=%s)",
             message.topic,
