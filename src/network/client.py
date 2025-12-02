@@ -7,6 +7,7 @@ from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_producer import MessageProducer
 from network.topic import Topic
+from utils.hash_sat_formula import hash_sat_formula
 
 
 class Client(AbstractAsyncContextManager):
@@ -53,7 +54,7 @@ class Client(AbstractAsyncContextManager):
         Returns:
             bool: Satisfiability of the formula
         """
-        id_ = hash(formula)
+        id_ = hash_sat_formula(formula)
 
         await self.__send(formula)
         return await self.__wait_for_result(id_)
