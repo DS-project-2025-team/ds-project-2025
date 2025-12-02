@@ -13,6 +13,7 @@ class RaftLog:
         commit_index: int = -1,
         term: int = 0,
         leader_id: UUID | None = None,
+        leader_state: LeaderState | None = None,
     ) -> None:
         self.entries: list[LogEntry] = list(entries) or []
 
@@ -20,7 +21,7 @@ class RaftLog:
         self.term: int = term
         self.leader_id: UUID = leader_id or uuid4()
 
-        self.leader_state: LeaderState = LeaderState()
+        self.leader_state: LeaderState = leader_state or LeaderState()
 
     @property
     def completed_tasks(self) -> list[int]:
