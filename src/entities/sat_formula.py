@@ -1,4 +1,4 @@
 from collections.abc import Iterable
 
-Clause = Iterable[int]
+Clause = tuple[int, int, int]
 SatFormula = Iterable[Clause]
