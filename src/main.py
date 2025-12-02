@@ -4,8 +4,8 @@ from argparse import ArgumentParser
 
 from entities.node import Node
 from entities.server_address import ServerAddress
-from roles.role import Role
 from logger_service import logger
+from roles.role import Role
 
 
 def init_parser() -> ArgumentParser:

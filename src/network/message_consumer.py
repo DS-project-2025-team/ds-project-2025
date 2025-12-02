@@ -2,11 +2,11 @@ import json
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
 from typing import Self
-from logger_service import logger
 
 from aiokafka import AIOKafkaConsumer
 
 from entities.server_address import ServerAddress
+from logger_service import logger
 
 
 def deserializer(serialized: str) -> dict:

@@ -1,11 +1,12 @@
 import asyncio
 import logging
+from argparse import ArgumentParser
 
 from entities.server_address import ServerAddress
-from network.message_producer import MessageProducer
-from main import init_parser
-from argparse import ArgumentParser
 from logger_service import logger
+from main import init_parser
+from network.message_producer import MessageProducer
+
 
 def init_parser() -> ArgumentParser:
     parser = ArgumentParser()
