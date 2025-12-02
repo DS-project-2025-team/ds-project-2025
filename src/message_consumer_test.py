@@ -4,7 +4,6 @@ from argparse import ArgumentParser
 
 from entities.server_address import ServerAddress
 from logger_service import logger
-from main import init_parser
 from network.message_consumer import MessageConsumer
 
 

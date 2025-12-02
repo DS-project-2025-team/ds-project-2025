@@ -5,7 +5,6 @@ from types import TracebackType
 from typing import Literal, Self
 
 from entities.leader_state import LeaderState
-from entities.log_entry import LogEntry
 from entities.log_entry_factory import LogEntryFactory
 from entities.raft_log import RaftLog
 from entities.server_address import ServerAddress
