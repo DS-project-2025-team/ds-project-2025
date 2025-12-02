@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from uuid import UUID, uuid4
 
 from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
@@ -11,13 +12,13 @@ class RaftLog:
         entries: Iterable[LogEntry],
         commit_index: int = -1,
         term: int = 0,
-        leader_id: str | None = None,
+        leader_id: UUID | None = None,
     ) -> None:
         self.entries: list[LogEntry] = list(entries) or []
 
         self.commit_index: int = commit_index
         self.term: int = term
-        self.leader_id: str = leader_id or ""
+        self.leader_id: UUID = leader_id or uuid4()
 
         self.leader_state: LeaderState = LeaderState()
 
