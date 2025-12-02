@@ -14,3 +14,9 @@ class LeaderState:
         self.nodes: dict[str, dict] = nodes or {}
         self.completed_tasks: list[int] = completed_tasks or []
         self.formulas: deque[SatFormula] = deque(formulas or [])
+
+    def mark_done(self, task: int) -> None:
+        if task >= len(self.completed_tasks):
+            return
+
+        self.completed_tasks[task] = True
