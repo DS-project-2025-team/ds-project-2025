@@ -15,9 +15,9 @@ def test_get_completed_tasks():
 
 
 def test_get_current_formula():
-    formula1 = [(1, 2, 3), (-1, -2, 3)]
-    formula2 = [(4, -5, 7), (-4, 5, 6)]
-    formula3 = [(4, -5, 7), (-4, 5, 6), (1, -3, 2)]
+    formula1 = SatFormula([(1, 2, 3), (-1, -2, 3)])
+    formula2 = SatFormula([(4, -5, 7), (-4, 5, 6)])
+    formula3 = SatFormula([(4, -5, 7), (-4, 5, 6), (1, -3, 2)])
 
     formulas: deque[SatFormula] = deque(
         [
