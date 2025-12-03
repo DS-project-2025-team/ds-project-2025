@@ -39,7 +39,7 @@ class Client(AbstractAsyncContextManager):
         await self.__consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def __send(self, formula: SatFormula) -> None:
-        await self.__producer.send_and_wait(Topic.INPUT, {"data": formula})
+        await self.__producer.send_and_wait(Topic.INPUT, {"data": formula.to_list()})
 
     async def __wait_for_result(self, id_: int) -> bool:
         while True:

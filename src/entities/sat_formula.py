@@ -22,3 +22,6 @@ class SatFormula(UserList):
 
     def __str__(self) -> str:
         return self.__repr__()
+
+    def to_list(self) -> list[list[int]]:
+        return [list(clause) for clause in self.data]
