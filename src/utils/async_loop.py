@@ -1,17 +1,12 @@
-from collections.abc import Awaitable, Callable
+from collections.abc import Callable
+from types import CoroutineType
 
 
 def async_loop(
-    function: Callable[..., Awaitable],
-) -> Callable[..., Awaitable]:
+    function: Callable[..., CoroutineType],
+) -> Callable[..., CoroutineType]:
     """
-    Runs given function in loop.
-
-    Args:
-        function (Callable[..., Awaitable]): Async function to run
-
-    Returns:
-        Callable[..., Awaitable]: Wrapped function
+    Wraps an async function into a loop.
     """
 
     async def decorated(*args: tuple, **kwargs: dict) -> None:
