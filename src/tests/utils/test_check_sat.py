@@ -4,7 +4,7 @@ from utils.check_sat import (
     __check_clause,
     __check_cnf_formula,
     __check_literal,
-    check_cnf_formula_with_interval,
+    check_sat_formula,
 )
 
 
@@ -75,4 +75,4 @@ def test_check_cnf_formula(formula, assignment, expected):
     ],
 )
 def test_check_cnf_formula_with_interval(formula, begin, end, expected):
-    assert check_cnf_formula_with_interval(formula, begin, end) == expected
+    assert check_sat_formula(formula, begin, end) == expected

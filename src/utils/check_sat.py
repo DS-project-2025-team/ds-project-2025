@@ -1,7 +1,7 @@
 from entities.sat_formula import Clause, SatFormula
 
 
-def check_cnf_formula_with_interval(clauses: SatFormula, begin: int, end: int) -> bool:
+def check_sat_formula(clauses: SatFormula, begin: int, end: int) -> bool:
     """
     Check the CNF formula with all assignments in [begin, end).
 
