@@ -18,7 +18,8 @@ class Message:
     partition: int
     offset: int
 
-    def __new__(cls, record: ConsumerRecord) -> Self:
+    @classmethod
+    def from_record(cls, record: ConsumerRecord) -> Self:
         return cls(
             topic=Topic(record.topic),
             data=record.value,  # type: ignore
