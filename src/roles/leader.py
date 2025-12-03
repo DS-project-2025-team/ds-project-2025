@@ -11,6 +11,7 @@ from entities.sat_formula import SatFormula
 from entities.second import Second
 from entities.server_address import ServerAddress
 from logger_service import logger
+from network.message import Message
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
@@ -103,8 +104,8 @@ class Leader(AbstractAsyncContextManager):
             logger.exception("Leader consumer loop crashed")
             raise
 
-    async def __handle_message(self, msg) -> None:
-        logger.debug('Received "%s"', msg.topic)
+    async def __handle_message(self, message: Message) -> None:
+        logger.debug('Received "%s"', message.topic)
 
     def __next_task(self) -> int | None:
         task = None
