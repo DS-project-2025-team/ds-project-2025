@@ -77,8 +77,8 @@ class Leader(AbstractAsyncContextManager):
             await self.__producer.send_and_wait(
                 Topic.HEARTBEAT, {"sender": str(self.__node_id)}
             )
-            if logger.get_level() > 10:  # 10 is DEBUG
-                logger.info('Sent "%s"', Topic.HEARTBEAT)
+
+            logger.debug('Sent "%s"', Topic.HEARTBEAT)
 
             input_ = await self.__receive_input(Second(1))
 
@@ -103,9 +103,7 @@ class Leader(AbstractAsyncContextManager):
             raise
 
     async def __handle_message(self, msg) -> None:
-        if logger.get_level() > 10:  # 10 is DEBUG
-            logger.info('Received "%s"', msg.topic)
-        pass
+        logger.debug('Received "%s"', msg.topic)
 
     def __next_task(self) -> int | None:
         task = None

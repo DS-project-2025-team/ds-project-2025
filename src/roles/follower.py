@@ -52,8 +52,7 @@ class Follower(AbstractAsyncContextManager):
                 )
                 await self.__heartbeat_consumer.commit()
 
-                if logger.get_level() > 10:  # 10 is DEBUG
-                    logger.info('Received "%s"', message.topic)
+                logger.debug('Received "%s"', message.topic)
 
                 # send response with received message offset
                 await self.__producer.send(
