@@ -29,6 +29,9 @@ class MessageProducer(AbstractAsyncContextManager):
             topic,
             payload,
         )
+        if logger.get_level() > 10:
+            logger.info("Sent \"%s\"", topic)
+
 
     async def send_and_wait(self, topic: Topic, payload: dict) -> None:
         metadata: RecordMetadata = await self.__producer.send_and_wait(topic, payload)

@@ -30,7 +30,7 @@ class Leader(AbstractAsyncContextManager):
     ) -> None:
         self.__producer: MessageProducer = MessageProducer(server=server)
         self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
-            server
+            server, node_id, 
         )
         self.__tasks: deque[int] = queue or deque()
         self.__log: RaftLog = log
@@ -77,7 +77,7 @@ class Leader(AbstractAsyncContextManager):
             # send heartbeat
             await self.__producer.send_and_wait(Topic.HEARTBEAT, {"sender": str(self.__node_id)})
             if logger.get_level() > 10: # 10 is DEBUG
-            logger.info("Sent heartbeat")
+                logger.info("Sent \"%s\"", Topic.HEARTBEAT)
 
             input_ = await self.__receive_input(Second(1))
 
@@ -102,6 +102,8 @@ class Leader(AbstractAsyncContextManager):
             raise
 
     async def __handle_message(self, msg) -> None:
+        if logger.get_level() > 10: # 10 is DEBUG
+            logger.info("Received \"%s\"", msg.topic)
         pass
 
     def __next_task(self) -> int | None:
@@ -124,9 +126,10 @@ class Leader(AbstractAsyncContextManager):
 
     async def __receive_input(self, timeout: Second) -> SatFormula | None:
         try:
-            input_ = await self.__input_consumer.receive(timeout)
+            message = await self.__input_consumer.receive(timeout)
+            input_ = message.value
         except TimeoutError:
             return None
 
         formula = SatFormula(input_["data"])
-        logger.info("Received new SAT formula", formula)
+        logger.info("Received new SAT formula: %r", formula)

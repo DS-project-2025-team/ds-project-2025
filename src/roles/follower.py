@@ -26,14 +26,10 @@ class Follower(AbstractAsyncContextManager):
         self.__heartbeat_consumer: MessageConsumer = (
             MessageConsumerFactory.heartbeat_consumer(server=server, node_id=node_id)
         )
-<<<<<<< HEAD
         self.__election_timeout: Second = election_timeout or Second(
             10 + random.randint(0, 5)
         )
-=======
-        self.__election_timeout = election_timeout or 10 + random.randint(0, 5)
         self.__node_id = node_id
->>>>>>> e3e5809 (New Added MessageConsumerFactory:)
 
     async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
@@ -55,14 +51,10 @@ class Follower(AbstractAsyncContextManager):
                 message = await self.__heartbeat_consumer.receive(
                     self.__election_timeout
                 )
-<<<<<<< HEAD
-
-=======
                 await self.__heartbeat_consumer.commit()
 
                 if logger.get_level() > 10: # 10 is DEBUG
->>>>>>> e3e5809 (New Added MessageConsumerFactory:)
-                logger.info("Received heartbeat")
+                    logger.info("Received \"%s\"", message.topic)
 
                 # send response with received message offset
                 await self.__producer.send(

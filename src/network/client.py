@@ -1,10 +1,11 @@
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
 from typing import Self
+from uuid import UUID, uuid4
 
 from entities.sat_formula import SatFormula
 from entities.server_address import ServerAddress
-from network.message_consumer import MessageConsumer
+from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
 from utils.hash_sat_formula import hash_sat_formula
@@ -15,9 +16,12 @@ class Client(AbstractAsyncContextManager):
     Class for sending SAT formulas into the system and receiving the result.
     """
 
-    def __init__(self, server: ServerAddress) -> None:
+    def __init__(self, 
+        server: ServerAddress, 
+        node_id: UUID | None = None) -> None:
+        self.node_id: UUID = node_id or uuid4
         self.__producer = MessageProducer(server)
-        self.__consumer = MessageConsumer(Topic.OUTPUT, server=server)
+        self.__consumer = MessageConsumerFactory.client_consumer(server=server, node_id=node_id)
 
     async def __aenter__(self) -> Self:
         await self.__consumer.__aenter__()
