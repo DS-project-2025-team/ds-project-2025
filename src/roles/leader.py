@@ -61,7 +61,6 @@ class Leader(AbstractAsyncContextManager):
         await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
 
-    # Leader main
     async def run(self) -> Literal[Role.FOLLOWER]:
         async with asyncio.TaskGroup() as group:
             group.create_task(self.__consume_loop())
