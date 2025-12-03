@@ -95,6 +95,8 @@ class Candidate:
         if asyncio.get_event_loop().time() - begin_time > self.__vote_timeout:
             raise TimeoutError()
 
+        await asyncio.sleep(1)
+
     @async_loop
     async def __check_leader_existence(self) -> bool:
         try:
