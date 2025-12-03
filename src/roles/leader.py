@@ -80,7 +80,7 @@ class Leader(AbstractAsyncContextManager):
                 Topic.HEARTBEAT, {"sender": str(self.__node_id)}
             )
 
-            logger.debug('Sent "%s"', Topic.HEARTBEAT)
+            logger.debug(f"Sent {Topic.HEARTBEAT}")
 
             input_ = await self.__receive_input(Second(1))
 
