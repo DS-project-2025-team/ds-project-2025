@@ -58,7 +58,6 @@ class Leader(AbstractAsyncContextManager):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        self.__running = False
         # cancel consumer task
         if self.__consumer_task is not None:
             self.__consumer_task.cancel()
