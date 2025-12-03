@@ -17,6 +17,7 @@ from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
+from utils.async_loop import async_loop
 
 
 class Leader(AbstractAsyncContextManager):
@@ -71,23 +72,26 @@ class Leader(AbstractAsyncContextManager):
 
     # Leader main
     async def run(self) -> Literal[Role.FOLLOWER]:
-        self.__consumer_task = asyncio.create_task(self.__consume_loop())
-        # heartbeat loop
-        while self.__running:
-            # send heartbeat
-            await self.__producer.send_and_wait(
-                Topic.HEARTBEAT, {"sender": str(self.__node_id)}
-            )
+        async with asyncio.TaskGroup() as group:
+            group.create_task(self.__consume_loop())
 
-            logger.debug(f"Sent {Topic.HEARTBEAT}")
+            # heartbeat loop
+            while self.__running:
+                # send heartbeat
+                await self.__producer.send_and_wait(
+                    Topic.HEARTBEAT, {"sender": str(self.__node_id)}
+                )
 
-            input_ = await self.__receive_input(Second(1))
+                logger.debug(f"Sent {Topic.HEARTBEAT}")
 
-            await asyncio.sleep(2)
+                input_ = await self.__receive_input(Second(1))
+
+                await asyncio.sleep(2)
 
         logger.info("Changing role to FOLLOWER")
         return Role.FOLLOWER
 
+    @async_loop
     async def __consume_loop(self) -> None:
         """
         Read messages via heartbeat_response_consumer
@@ -95,16 +99,8 @@ class Leader(AbstractAsyncContextManager):
 
         logger.info("Leader consumer loop started")
 
-        try:
-            while self.__running:
-                msg = await self.__heartbeat_consumer.receive()
-                await self.__handle_message(msg)
-        except asyncio.CancelledError:
-            logger.debug("Leader consumer loop cancelled")
-            raise
-        except Exception:
-            logger.exception("Leader consumer loop crashed")
-            raise
+        message = await self.__heartbeat_consumer.receive()
+        await self.__handle_message(message)
 
     async def __handle_message(self, message: Message) -> None:
         logger.debug(f"Received {message.topic}")
