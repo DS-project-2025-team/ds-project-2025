@@ -18,6 +18,8 @@ from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
 from utils.async_loop import async_loop
+from utils.check_sat import check_sat_formula
+from utils.hash_sat_formula import hash_sat_formula
 
 
 class Leader(AbstractAsyncContextManager):
@@ -75,6 +77,21 @@ class Leader(AbstractAsyncContextManager):
             formula = await self.__receive_input(timeout)
 
             logger.info(f"Received new SAT formula: {formula}")
+
+            hash_ = hash_sat_formula(formula)
+            n = formula.max_variable()
+
+            result = check_sat_formula(formula, 0, 2**n)
+
+            logger.info(f"Computed result for formula {formula}: {result}")
+
+            await self.__producer.send_and_wait(
+                Topic.OUTPUT,
+                {
+                    "hash": hash_,
+                    "result": result,
+                },
+            )
 
     @async_loop
     async def __send_heartbeat(self) -> None:
