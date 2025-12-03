@@ -17,10 +17,10 @@ class Client(AbstractAsyncContextManager):
     """
 
     def __init__(self, server: ServerAddress, node_id: UUID | None = None) -> None:
-        self.node_id: UUID = node_id or uuid4
+        self.node_id: UUID = node_id or uuid4()
         self.__producer = MessageProducer(server)
         self.__consumer = MessageConsumerFactory.client_consumer(
-            server=server, node_id=node_id
+            server=server, node_id=self.node_id
         )
 
     async def __aenter__(self) -> Self:
@@ -45,8 +45,8 @@ class Client(AbstractAsyncContextManager):
         while True:
             message = await self.__consumer.receive()
 
-            if message["hash"] == id_:
-                return message["result"]
+            if message.data["hash"] == id_:
+                return message.data["result"]
 
     async def input(self, formula: SatFormula) -> bool:
         """
