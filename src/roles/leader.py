@@ -1,6 +1,6 @@
 import asyncio
 from collections import deque
-from contextlib import AbstractAsyncContextManager
+from contextlib import AbstractAsyncContextManager, suppress
 from types import TracebackType
 from typing import Literal, Self
 from uuid import UUID
@@ -60,10 +60,8 @@ class Leader(AbstractAsyncContextManager):
         # cancel consumer task
         if self.__consumer_task is not None:
             self.__consumer_task.cancel()
-            try:
+            with suppress(asyncio.CancelledError):
                 await self.__consumer_task
-            except asyncio.CancelledError:
-                pass
 
         # close connections
         await self.__consumer.__aexit__(exc_type, exc_value, traceback)
