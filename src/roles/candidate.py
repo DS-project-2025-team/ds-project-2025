@@ -14,7 +14,7 @@ from roles.role import Role
 from utils.async_loop import async_loop
 
 
-class SufficientVotes(Exception):
+class SufficientVotes(Exception):  # noqa: N818
     pass
 
 
