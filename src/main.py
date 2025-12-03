@@ -13,8 +13,9 @@ def init_parser() -> ArgumentParser:
 
     parser.add_argument(
         "--role",
-        type=str,
+        type=Role,
         help="Node role",
+        choices=[Role.FOLLOWER, Role.CANDIDATE, Role.LEADER],
         default="FOLLOWER",
     )
 
@@ -49,10 +50,9 @@ async def main() -> None:
     args = parser.parse_args()
     level = getattr(logging, args.log_level.upper())
     logger.set_level(level)
-    role = Role[args.role.upper()]
     kafka_server = ServerAddress(host=args.server, port=args.port)
 
-    node = Node(server=kafka_server, role=role)
+    node = Node(server=kafka_server, role=args.role)
 
     await node.run()
 

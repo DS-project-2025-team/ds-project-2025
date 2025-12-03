@@ -1,7 +1,7 @@
-from enum import Enum, auto
+from enum import StrEnum, auto
 
 
-class Role(Enum):
+class Role(StrEnum):
     LEADER = auto()
     FOLLOWER = auto()
     CANDIDATE = auto()
