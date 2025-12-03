@@ -9,6 +9,7 @@ from aiokafka import AIOKafkaConsumer, ConsumerRecord, IllegalOperation
 from entities.second import Second
 from entities.server_address import ServerAddress
 from logger_service import logger
+from network.message import Message
 
 
 def deserializer(serialized: str) -> dict:
@@ -30,7 +31,7 @@ class MessageConsumer(AbstractAsyncContextManager):
     async def commit(self) -> None:
         await self.__consumer.commit()
 
-    async def receive(self, timeout: Second | None = None) -> ConsumerRecord:
+    async def receive(self, timeout: Second | None = None) -> Message:
         """
         Receives a message from message broker.
 
@@ -57,7 +58,7 @@ class MessageConsumer(AbstractAsyncContextManager):
             message.offset,
         )
 
-        return message
+        return Message.from_record(message)
 
     async def receive_many_and_log(self) -> dict:
         messages = await self.__consumer.getmany()

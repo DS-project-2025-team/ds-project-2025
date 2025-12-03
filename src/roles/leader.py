@@ -127,7 +127,7 @@ class Leader(AbstractAsyncContextManager):
     async def __receive_input(self, timeout: Second) -> SatFormula | None:
         try:
             message = await self.__input_consumer.receive(timeout)
-            input_ = message.value
+            input_ = message.data
         except TimeoutError:
             return None
 
