@@ -63,9 +63,9 @@ class Candidate:
 
         try:
             async with asyncio.TaskGroup() as group:
-                group.create_task(self.__check_leader_existence())
-                group.create_task(self.__check_timeout(begin_time))
-                group.create_task(self.__check_votes())
+                _task1 = group.create_task(self.__check_leader_existence())
+                _task2 = group.create_task(self.__check_timeout(begin_time))
+                _task3 = group.create_task(self.__check_votes())
 
         except LeaderExistsError:
             logger.info("Detected existing leader, aborting election.")
