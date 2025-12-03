@@ -45,15 +45,13 @@ class Candidate:
         )
 
     async def elect(self) -> Role:
-        self.__log.term += 1
-        current_term = self.__log.term
-        logger.info(f"{self.__id} starting election for term {current_term}")
+        logger.info(f"Starting election for term {self.__term}")
 
         begin_time = asyncio.get_event_loop().time()
         role = Role.FOLLOWER
 
         request = {
-            "term": current_term,
+            "term": self.__term,
             "candidate_id": self.__id,
             "last_log_index": len(self.__log.entries) - 1,
             "last_log_term": self.__log.entries[-1].term if self.__log.entries else 0,
