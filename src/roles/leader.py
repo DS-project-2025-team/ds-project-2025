@@ -48,7 +48,6 @@ class Leader(AbstractAsyncContextManager):
         await self.__input_consumer.__aenter__()
         await self.__heartbeat_consumer.__aenter__()  # heartbeat response
 
-        self.__running = True
         return self
 
     async def __aexit__(
