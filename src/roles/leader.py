@@ -135,4 +135,4 @@ class Leader(AbstractAsyncContextManager):
             return None
 
         formula = SatFormula(input_["data"])
-        logger.info("Received new SAT formula: %r", formula)
+        logger.info(f"Received new SAT formula: {formula}")

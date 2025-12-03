@@ -45,20 +45,18 @@ class MessageConsumer(AbstractAsyncContextManager):
             TimeoutError: Timeout exceeded
         """
 
-        message = await asyncio.wait_for(self.__consumer.getone(), timeout=timeout)
+        message = Message.from_record(
+            await asyncio.wait_for(self.__consumer.getone(), timeout=timeout)
+        )
 
         with suppress(IllegalOperation):
             await self.__consumer.commit()
 
         logger.debug(
-            'Received message "%s" : %r (partition=%s offset=%s)',
-            message.topic,
-            message.value,
-            message.partition,
-            message.offset,
+            f"Received message {message})",
         )
 
-        return Message.from_record(message)
+        return message
 
     async def receive_many_and_log(self) -> dict:
         messages = await self.__consumer.getmany()
