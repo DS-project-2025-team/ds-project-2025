@@ -81,17 +81,14 @@ class Leader(AbstractAsyncContextManager):
         return Role.FOLLOWER
 
     @async_loop
-    async def __handle_input(self, timeout: Second) -> SatFormula | None:
-        try:
+    async def __handle_input(self, timeout: Second) -> None:
+        with suppress(TimeoutError):
             message = await self.__input_consumer.receive(timeout)
+
             input_ = message.data
-        except TimeoutError:
-            return None
 
-        formula = SatFormula(input_["data"])
-        logger.info(f"Received new SAT formula: {formula}")
-
-        return formula
+            formula = SatFormula(input_["data"])
+            logger.info(f"Received new SAT formula: {formula}")
 
     @async_loop
     async def __send_heartbeat(self) -> None:
