@@ -1,2 +1,2 @@
 [run]
-omit = **/tests/**, config.py, **/__init__.py
+omit = **/tests/**, config.py, **/__init__.py, src/examples/**
