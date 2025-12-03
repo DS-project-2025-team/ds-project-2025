@@ -19,7 +19,6 @@ class Candidate:
         peers: list[str],
         log: RaftLog,
         node_id: UUID,
-        # Vote timeout in seconds
         vote_timeout: Second = Second(20),
     ) -> None:
         self.__peers = peers
