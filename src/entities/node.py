@@ -5,6 +5,7 @@ from entities.server_address import ServerAddress
 from roles.follower import Follower
 from roles.leader import Leader
 from roles.role import Role
+from utils.async_loop import async_loop
 
 
 class Node:
@@ -22,11 +23,8 @@ class Node:
         self.__role: Role = role
         self.__log: RaftLog = log or RaftLog()
 
+    @async_loop
     async def run(self) -> None:
-        while True:
-            await self.__run_next_role()
-
-    async def __run_next_role(self) -> None:
         match self.__role:
             case Role.FOLLOWER:
                 async with Follower(
