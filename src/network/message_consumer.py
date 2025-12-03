@@ -9,7 +9,6 @@ from aiokafka import AIOKafkaConsumer, ConsumerRecord, IllegalOperation
 from entities.second import Second
 from entities.server_address import ServerAddress
 from logger_service import logger
-from typing import Any
 
 
 def deserializer(serialized: str) -> dict:

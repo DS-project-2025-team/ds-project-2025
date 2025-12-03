@@ -1,4 +1,3 @@
-import asyncio
 import random
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
@@ -8,9 +7,9 @@ from uuid import UUID
 from entities.second import Second
 from entities.server_address import ServerAddress
 from logger_service import logger
-from network.message_producer import MessageProducer
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
+from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
 
@@ -65,7 +64,7 @@ class Follower(AbstractAsyncContextManager):
                     },
                 )
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 logger.warning("Missing heartbeat, election timeout elapsed.")
                 break
 
