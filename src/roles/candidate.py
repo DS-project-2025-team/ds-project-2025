@@ -10,6 +10,7 @@ from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
+from utils.async_loop import async_loop
 
 
 class Candidate:
@@ -69,10 +70,11 @@ class Candidate:
 
                 break
 
-            if asyncio.get_event_loop().time() - begin_time > self.__vote_timeout:
-                role = Role.CANDIDATE
+            try:
+                await self.__check_timeout(begin_time)
                 logger.info("Election timed out")
-                break
+            except TimeoutError:
+                return Role.CANDIDATE
 
         return role
 
@@ -88,6 +90,11 @@ class Candidate:
 
         logger.info("Received a vote")
         return 1
+
+    @async_loop
+    async def __check_timeout(self, begin_time: float) -> None:
+        if asyncio.get_event_loop().time() - begin_time > self.__vote_timeout:
+            raise TimeoutError()
 
     async def __check_leader_existence(self) -> bool:
         try:
