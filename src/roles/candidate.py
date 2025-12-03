@@ -4,6 +4,7 @@ from uuid import UUID
 from entities.raft_log import RaftLog
 from entities.second import Second
 from entities.server_address import ServerAddress
+from error import LeaderExistsError
 from logger_service import logger
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
@@ -58,9 +59,7 @@ class Candidate:
         logger.info(f"{self.__id} sent vote requests to peers")
 
         while True:
-            if self.__check_leader_existence():
-                logger.info("Detected existing leader, reverting to FOLLOWER")
-                break
+            await self.__check_leader_existence()
 
             votes_received += await self.__receive_vote(current_term)
 
@@ -96,13 +95,14 @@ class Candidate:
         if asyncio.get_event_loop().time() - begin_time > self.__vote_timeout:
             raise TimeoutError()
 
+    @async_loop
     async def __check_leader_existence(self) -> bool:
         try:
             await self.__heartbeat_consumer.receive(timeout=Second(1))
 
-            logger.info("Received heartbeat during election")
+            logger.info("Detected existing leader via heartbeat")
 
-            return True
+            raise LeaderExistsError()
 
         except TimeoutError:
             return False

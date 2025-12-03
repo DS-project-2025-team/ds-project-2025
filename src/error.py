@@ -1,0 +1,2 @@
+class LeaderExistsError(Exception):
+    pass
