@@ -63,7 +63,7 @@ class Leader(AbstractAsyncContextManager):
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         async with asyncio.TaskGroup() as group:
-            group.create_task(self.__consume_loop())
+            group.create_task(self.__receive_heartbeat_response())
             group.create_task(self.__send_heartbeat())
             group.create_task(self.__handle_input(Second(1)))
 
@@ -89,7 +89,7 @@ class Leader(AbstractAsyncContextManager):
         logger.debug(f"Sent {Topic.HEARTBEAT}")
 
     @async_loop
-    async def __consume_loop(self) -> None:
+    async def __receive_heartbeat_response(self) -> None:
         """
         Read messages via heartbeat_response_consumer
         """
