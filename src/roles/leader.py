@@ -63,8 +63,8 @@ class Leader(AbstractAsyncContextManager):
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         async with asyncio.TaskGroup() as group:
-            group.create_task(self.__receive_heartbeat_response())
             group.create_task(self.__send_heartbeat())
+            group.create_task(self.__receive_heartbeat_response())
             group.create_task(self.__handle_input(Second(1)))
 
         logger.info("Changing role to FOLLOWER")
