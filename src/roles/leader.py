@@ -41,8 +41,6 @@ class Leader(AbstractAsyncContextManager):
 
         self.__tasks: deque[int] = queue or deque()
         self.__log: RaftLog = log
-        self.__consumer_task: asyncio.Task[None] | None = None
-        self.__running = False
         self.__node_id = node_id
 
     async def __aenter__(self) -> Self:
@@ -59,13 +57,6 @@ class Leader(AbstractAsyncContextManager):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        # cancel consumer task
-        if self.__consumer_task is not None:
-            self.__consumer_task.cancel()
-            with suppress(asyncio.CancelledError):
-                await self.__consumer_task
-
-        # close connections
         await self.__heartbeat_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
