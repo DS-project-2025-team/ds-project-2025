@@ -1,6 +1,6 @@
 import pytest
 
-from utils.sat import (
+from utils.check_sat import (
     __check_clause,
     __check_cnf_formula,
     __check_literal,
