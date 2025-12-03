@@ -57,10 +57,20 @@ class Candidate:
         await self.__producer.send(Topic.VOTE_REQUEST, request)
 
         logger.info(f"{self.__id} sent vote requests to peers")
+        try:
+            async with asyncio.TaskGroup() as group:
+                group.create_task(self.__check_leader_existence())
+                group.create_task(self.__check_timeout(begin_time))
+
+        except LeaderExistsError:
+            logger.info("Detected existing leader, aborting election.")
+            return Role.FOLLOWER
+
+        except TimeoutError:
+            logger.info("Election timed out.")
+            return Role.CANDIDATE
 
         while True:
-            await self.__check_leader_existence()
-
             votes_received += await self.__receive_vote(current_term)
 
             if votes_received >= total_votes_needed:
