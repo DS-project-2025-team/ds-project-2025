@@ -4,7 +4,7 @@ from contextlib import AbstractAsyncContextManager, suppress
 from types import TracebackType
 from typing import Self
 
-from aiokafka import AIOKafkaConsumer, ConsumerRecord, IllegalOperation
+from aiokafka import AIOKafkaConsumer, IllegalOperation
 
 from entities.second import Second
 from entities.server_address import ServerAddress
