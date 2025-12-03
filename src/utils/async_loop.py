@@ -6,7 +6,7 @@ def async_loop(
     function: Callable[..., CoroutineType],
 ) -> Callable[..., CoroutineType]:
     """
-    Wraps an async function into a loop.
+    Wraps an async function into an infinite loop.
     """
 
     async def decorated(*args: tuple, **kwargs: dict) -> None:
