@@ -73,11 +73,8 @@ class Leader(AbstractAsyncContextManager):
     @async_loop
     async def __handle_input(self, timeout: Second) -> None:
         with suppress(TimeoutError):
-            message = await self.__input_consumer.receive(timeout)
+            formula = await self.__receive_input(timeout)
 
-            input_ = message.data
-
-            formula = SatFormula(input_["data"])
             logger.info(f"Received new SAT formula: {formula}")
 
     @async_loop
@@ -120,12 +117,15 @@ class Leader(AbstractAsyncContextManager):
         self.__log.append(entry)
         self.__log.commit()
 
-    async def __receive_input(self, timeout: Second) -> SatFormula | None:
-        try:
-            message = await self.__input_consumer.receive(timeout)
-            input_ = message.data
-        except TimeoutError:
-            return None
+    async def __receive_input(self, timeout: Second) -> SatFormula:
+        """
+        Receives one SAT formula.
 
-        formula = SatFormula(input_["data"])
-        logger.info(f"Received new SAT formula: {formula}")
+        Raises:
+            TimeoutError: If timeout is exceeded.
+        """
+
+        message = await self.__input_consumer.receive(timeout)
+        input_ = message.data
+
+        return SatFormula(input_["data"])
