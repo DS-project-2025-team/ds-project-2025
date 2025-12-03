@@ -1,5 +1,6 @@
 from collections import UserList
 from collections.abc import Iterable, Sequence
+from itertools import chain
 from typing import Self
 
 
@@ -25,3 +26,14 @@ class SatFormula(UserList):
 
     def to_list(self) -> list[list[int]]:
         return [list(clause) for clause in self.data]
+
+    def max_variable(self) -> int:
+        """
+        Return the maximum variable index.
+        For example, the maximum index of [(1, -2, 3), (-1, 4, -5)] is 5.
+
+        Returns:
+            int: The maximum index of variables.
+        """
+
+        return max(map(abs, chain.from_iterable(self.data)))
