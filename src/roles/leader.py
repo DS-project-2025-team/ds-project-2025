@@ -31,13 +31,14 @@ class Leader(AbstractAsyncContextManager):
             server,
             node_id,
         )
-        self.__tasks: deque[int] = queue or deque()
-        self.__log: RaftLog = log
-        self.__consumer: MessageConsumer = (
+        self.__heartbeat_consumer: MessageConsumer = (
             MessageConsumerFactory.heartbeat_response_consumer(
                 server=server, node_id=node_id
             )
         )
+
+        self.__tasks: deque[int] = queue or deque()
+        self.__log: RaftLog = log
         self.__consumer_task: asyncio.Task[None] | None = None
         self.__running = False
         self.__node_id = node_id
@@ -45,7 +46,7 @@ class Leader(AbstractAsyncContextManager):
     async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
         await self.__input_consumer.__aenter__()
-        await self.__consumer.__aenter__()  # heartbeat response
+        await self.__heartbeat_consumer.__aenter__()  # heartbeat response
 
         self.__running = True
         return self
@@ -64,7 +65,7 @@ class Leader(AbstractAsyncContextManager):
                 await self.__consumer_task
 
         # close connections
-        await self.__consumer.__aexit__(exc_type, exc_value, traceback)
+        await self.__heartbeat_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
 
@@ -93,7 +94,7 @@ class Leader(AbstractAsyncContextManager):
 
         try:
             while self.__running:
-                msg = await self.__consumer.receive()
+                msg = await self.__heartbeat_consumer.receive()
                 await self.__handle_message(msg)
         except asyncio.CancelledError:
             logger.debug("Leader consumer loop cancelled")
