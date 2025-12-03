@@ -18,18 +18,14 @@ def deserializer(serialized: str) -> dict:
 
 class MessageConsumer(AbstractAsyncContextManager):
     def __init__(
-        self, 
-        *topics: str, 
-        server: ServerAddress, 
-        groupid: str, 
-        offset_reset: str
+        self, *topics: str, server: ServerAddress, groupid: str, offset_reset: str
     ) -> None:
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
             *topics,
             group_id=groupid,
             bootstrap_servers=f"{server.host}:{server.port}",
             value_deserializer=deserializer,
-            auto_offset_reset=offset_reset
+            auto_offset_reset=offset_reset,
         )
 
     async def commit(self) -> None:
@@ -55,7 +51,7 @@ class MessageConsumer(AbstractAsyncContextManager):
             await self.__consumer.commit()
 
         logger.debug(
-            "Received message \"%s\" : %r (partition=%s offset=%s)",
+            'Received message "%s" : %r (partition=%s offset=%s)',
             message.topic,
             message.value,
             message.partition,
@@ -70,7 +66,7 @@ class MessageConsumer(AbstractAsyncContextManager):
         for tp, msgs in messages.items():
             for msg in msgs:
                 logger.debug(
-                    "Received message \"%s\": %r (partition=%s offset=%s)",
+                    'Received message "%s": %r (partition=%s offset=%s)',
                     msg.topic,
                     msg.value,
                     msg.partition,

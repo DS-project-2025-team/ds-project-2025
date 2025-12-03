@@ -30,21 +30,24 @@ class Leader(AbstractAsyncContextManager):
     ) -> None:
         self.__producer: MessageProducer = MessageProducer(server=server)
         self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
-            server, node_id, 
+            server,
+            node_id,
         )
         self.__tasks: deque[int] = queue or deque()
         self.__log: RaftLog = log
         self.__consumer: MessageConsumer = (
-            MessageConsumerFactory.heartbeat_response_consumer(server=server, node_id=node_id)
+            MessageConsumerFactory.heartbeat_response_consumer(
+                server=server, node_id=node_id
+            )
         )
-        self.__consumer_task: asyncio.Task[None] | None= None
+        self.__consumer_task: asyncio.Task[None] | None = None
         self.__running = False
         self.__node_id = node_id
 
     async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
         await self.__input_consumer.__aenter__()
-        await self.__consumer.__aenter__() # heartbeat response
+        await self.__consumer.__aenter__()  # heartbeat response
 
         self.__running = True
         return self
@@ -75,9 +78,11 @@ class Leader(AbstractAsyncContextManager):
         # heartbeat loop
         while self.__running:
             # send heartbeat
-            await self.__producer.send_and_wait(Topic.HEARTBEAT, {"sender": str(self.__node_id)})
-            if logger.get_level() > 10: # 10 is DEBUG
-                logger.info("Sent \"%s\"", Topic.HEARTBEAT)
+            await self.__producer.send_and_wait(
+                Topic.HEARTBEAT, {"sender": str(self.__node_id)}
+            )
+            if logger.get_level() > 10:  # 10 is DEBUG
+                logger.info('Sent "%s"', Topic.HEARTBEAT)
 
             input_ = await self.__receive_input(Second(1))
 
@@ -92,8 +97,8 @@ class Leader(AbstractAsyncContextManager):
 
         try:
             while self.__running:
-                msg = await self.__consumer.receive() 
-                await self.__handle_message(msg)  
+                msg = await self.__consumer.receive()
+                await self.__handle_message(msg)
         except asyncio.CancelledError:
             logger.debug("Leader consumer loop cancelled")
             raise
@@ -102,8 +107,8 @@ class Leader(AbstractAsyncContextManager):
             raise
 
     async def __handle_message(self, msg) -> None:
-        if logger.get_level() > 10: # 10 is DEBUG
-            logger.info("Received \"%s\"", msg.topic)
+        if logger.get_level() > 10:  # 10 is DEBUG
+            logger.info('Received "%s"', msg.topic)
         pass
 
     def __next_task(self) -> int | None:

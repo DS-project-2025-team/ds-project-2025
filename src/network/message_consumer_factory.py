@@ -11,19 +11,18 @@ class MessageConsumerFactory:
         *topics: Topic, server: ServerAddress, node_id: UUID
     ) -> MessageConsumer:
         return MessageConsumer(
-            *topics,
-            server=server,
-            groupid=str(node_id),
-            offset_reset="latest"
+            *topics, server=server, groupid=str(node_id), offset_reset="latest"
         )
-    
+
     @staticmethod
-    def heartbeat_response_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
+    def heartbeat_response_consumer(
+        server: ServerAddress, node_id: UUID
+    ) -> MessageConsumer:
         return MessageConsumer(
             Topic.HEARTBEAT_RESPONSE,
             server=server,
             groupid=str(node_id),
-            offset_reset="latest"
+            offset_reset="latest",
         )
 
     @staticmethod
@@ -46,8 +45,12 @@ class MessageConsumerFactory:
 
     @staticmethod
     def input_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
-        return MessageConsumer(Topic.INPUT, server=server, groupid=str(node_id), offset_reset="earliest")
+        return MessageConsumer(
+            Topic.INPUT, server=server, groupid=str(node_id), offset_reset="earliest"
+        )
 
     @staticmethod
     def client_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
-        return MessageConsumer(Topic.OUTPUT, server=server, groupid=str(node_id), offset_reset="earliest")
+        return MessageConsumer(
+            Topic.OUTPUT, server=server, groupid=str(node_id), offset_reset="earliest"
+        )

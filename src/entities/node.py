@@ -41,8 +41,7 @@ class Node:
 
             case Role.LEADER:
                 async with Leader(
-                    log=self.__log,
-                    server=self.__server,node_id=self.node_id
+                    log=self.__log, server=self.__server, node_id=self.node_id
                 ) as leader:
                     self.__role = await leader.run()
 

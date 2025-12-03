@@ -28,7 +28,7 @@ async def main() -> None:
     server = ServerAddress("svm-11.cs.helsinki.fi", 9092)
 
     async with MessageProducer(server=server) as producer:
-        #while True:
+        # while True:
         for i in range(10000):
             # produce
             await producer.send("hello", {"data": "Hello, World!"})
@@ -36,9 +36,10 @@ async def main() -> None:
             await producer.send("hello", {"data": "b"})
             await producer.send("hello", {"data": "c"})
             """ Just flood and quit """
-            #await asyncio.sleep(1)
+            # await asyncio.sleep(1)
 
-            print("sent ", i,"messages\n")
+            print("sent ", i, "messages\n")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

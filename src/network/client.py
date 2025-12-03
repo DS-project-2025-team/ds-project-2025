@@ -16,12 +16,12 @@ class Client(AbstractAsyncContextManager):
     Class for sending SAT formulas into the system and receiving the result.
     """
 
-    def __init__(self, 
-        server: ServerAddress, 
-        node_id: UUID | None = None) -> None:
+    def __init__(self, server: ServerAddress, node_id: UUID | None = None) -> None:
         self.node_id: UUID = node_id or uuid4
         self.__producer = MessageProducer(server)
-        self.__consumer = MessageConsumerFactory.client_consumer(server=server, node_id=node_id)
+        self.__consumer = MessageConsumerFactory.client_consumer(
+            server=server, node_id=node_id
+        )
 
     async def __aenter__(self) -> Self:
         await self.__consumer.__aenter__()

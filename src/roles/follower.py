@@ -53,8 +53,8 @@ class Follower(AbstractAsyncContextManager):
                 )
                 await self.__heartbeat_consumer.commit()
 
-                if logger.get_level() > 10: # 10 is DEBUG
-                    logger.info("Received \"%s\"", message.topic)
+                if logger.get_level() > 10:  # 10 is DEBUG
+                    logger.info('Received "%s"', message.topic)
 
                 # send response with received message offset
                 await self.__producer.send(
@@ -63,7 +63,7 @@ class Follower(AbstractAsyncContextManager):
                         "responder_uuid": str(self.__node_id),
                         "original_offset": message.offset,
                     },
-                )   
+                )
 
             except asyncio.TimeoutError:
                 logger.warning("Missing heartbeat, election timeout elapsed.")
