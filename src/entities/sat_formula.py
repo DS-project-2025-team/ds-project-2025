@@ -11,6 +11,9 @@ class Clause(tuple):
         if len(literals) != cls.CLAUSE_LENGTH:
             raise ValueError("Only 3-literal clauses are supported")
 
+        if 0 in literals:
+            raise ValueError("Literal cannot be zero")
+
         return super().__new__(cls, tuple(literals))
 
 
