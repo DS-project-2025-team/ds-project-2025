@@ -14,6 +14,10 @@ from roles.role import Role
 from utils.async_loop import async_loop
 
 
+class SufficientVotes(Exception):
+    pass
+
+
 class Candidate:
     def __init__(
         self,
@@ -27,6 +31,10 @@ class Candidate:
         self.__log = log
         self.__id = node_id
         self.__vote_timeout = vote_timeout
+
+        self.__votes: int = 0
+        self.__required_votes: int = (len(peers) + 1) // 2 + 1
+        self.__term = log.term + 1
 
         self.__producer = MessageProducer(server=server)
         self.__vote_consumer = MessageConsumerFactory.vote_consumer(
@@ -44,9 +52,6 @@ class Candidate:
         begin_time = asyncio.get_event_loop().time()
         role = Role.FOLLOWER
 
-        votes_received = 1
-        total_votes_needed = (len(self.__peers) + 1) // 2 + 1
-
         request = {
             "term": current_term,
             "candidate_id": self.__id,
@@ -57,33 +62,23 @@ class Candidate:
         await self.__producer.send(Topic.VOTE_REQUEST, request)
 
         logger.info(f"{self.__id} sent vote requests to peers")
+
         try:
             async with asyncio.TaskGroup() as group:
                 group.create_task(self.__check_leader_existence())
                 group.create_task(self.__check_timeout(begin_time))
+                group.create_task(self.__check_votes())
 
         except LeaderExistsError:
             logger.info("Detected existing leader, aborting election.")
-            return Role.FOLLOWER
 
         except TimeoutError:
             logger.info("Election timed out.")
-            return Role.CANDIDATE
+            role = Role.CANDIDATE
 
-        while True:
-            votes_received += await self.__receive_vote(current_term)
-
-            if votes_received >= total_votes_needed:
-                role = Role.LEADER
-                logger.info(f"{self.__id} won the election for term {current_term}")
-
-                break
-
-            try:
-                await self.__check_timeout(begin_time)
-                logger.info("Election timed out")
-            except TimeoutError:
-                return Role.CANDIDATE
+        except SufficientVotes:
+            logger.info(f"Won the election for term {self.__term}")
+            role = Role.LEADER
 
         return role
 
@@ -118,3 +113,11 @@ class Candidate:
 
         except TimeoutError:
             return False
+
+    async def __check_votes(self) -> None:
+        self.__votes += await self.__receive_vote(self.__term)
+
+        if self.__votes < self.__required_votes:
+            return
+
+        raise SufficientVotes()
