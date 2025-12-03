@@ -89,8 +89,11 @@ class Leader(AbstractAsyncContextManager):
         logger.info("Changing role to FOLLOWER")
         return Role.FOLLOWER
 
-    # read messages via heartbeat_response_consumer
     async def __consume_loop(self) -> None:
+        """
+        Read messages via heartbeat_response_consumer
+        """
+
         logger.info("Leader consumer loop started")
 
         try:
