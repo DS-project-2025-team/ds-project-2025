@@ -74,22 +74,32 @@ class Leader(AbstractAsyncContextManager):
     async def run(self) -> Literal[Role.FOLLOWER]:
         async with asyncio.TaskGroup() as group:
             group.create_task(self.__consume_loop())
-
-            # heartbeat loop
-            while self.__running:
-                # send heartbeat
-                await self.__producer.send_and_wait(
-                    Topic.HEARTBEAT, {"sender": str(self.__node_id)}
-                )
-
-                logger.debug(f"Sent {Topic.HEARTBEAT}")
-
-                input_ = await self.__receive_input(Second(1))
-
-                await asyncio.sleep(2)
+            group.create_task(self.__send_heartbeat())
+            group.create_task(self.__handle_input(Second(1)))
 
         logger.info("Changing role to FOLLOWER")
         return Role.FOLLOWER
+
+    @async_loop
+    async def __handle_input(self, timeout: Second) -> SatFormula | None:
+        try:
+            message = await self.__input_consumer.receive(timeout)
+            input_ = message.data
+        except TimeoutError:
+            return None
+
+        formula = SatFormula(input_["data"])
+        logger.info(f"Received new SAT formula: {formula}")
+
+        return formula
+
+    @async_loop
+    async def __send_heartbeat(self) -> None:
+        await self.__producer.send_and_wait(
+            Topic.HEARTBEAT, {"sender": str(self.__node_id)}
+        )
+
+        logger.debug(f"Sent {Topic.HEARTBEAT}")
 
     @async_loop
     async def __consume_loop(self) -> None:
