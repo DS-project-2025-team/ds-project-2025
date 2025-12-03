@@ -14,6 +14,16 @@ class MessageConsumerFactory:
             *topics,
             server=server,
             groupid=str(node_id),
+            offset_reset="latest"
+        )
+    
+    @staticmethod
+    def heartbeat_response_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
+        return MessageConsumer(
+            Topic.HEARTBEAT_RESPONSE,
+            server=server,
+            groupid=str(node_id),
+            offset_reset="latest"
         )
 
     @staticmethod

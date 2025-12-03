@@ -4,7 +4,7 @@ from contextlib import AbstractAsyncContextManager, suppress
 from types import TracebackType
 from typing import Self
 
-from aiokafka import AIOKafkaConsumer, IllegalOperation
+from aiokafka import AIOKafkaConsumer, ConsumerRecord, IllegalOperation
 
 from entities.second import Second
 from entities.server_address import ServerAddress
@@ -17,14 +17,14 @@ def deserializer(serialized: str) -> dict:
 
 class MessageConsumer(AbstractAsyncContextManager):
     def __init__(
-        self, *topics: str, server: ServerAddress, groupid: str | None = None
+        self, *topics: str, server: ServerAddress, groupid: str, offset_reset: str | None = None
     ) -> None:
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
             *topics,
             group_id=groupid,
             bootstrap_servers=f"{server.host}:{server.port}",
             value_deserializer=deserializer,
-            auto_offset_reset="earliest",
+            auto_offset_reset=offset_reset
         )
 
     async def commit(self) -> None:
@@ -50,14 +50,14 @@ class MessageConsumer(AbstractAsyncContextManager):
             await self.__consumer.commit()
 
         logger.debug(
-            "Received message to %s: %r (partition=%s offset=%s)",
+            "Received message \"%s\" : %r (partition=%s offset=%s)",
             message.topic,
             message.value,
             message.partition,
             message.offset,
         )
 
-        return message.value  # type: ignore
+        return message
 
     async def receive_many_and_log(self) -> dict:
         messages = await self.__consumer.getmany()
@@ -65,7 +65,7 @@ class MessageConsumer(AbstractAsyncContextManager):
         for tp, msgs in messages.items():
             for msg in msgs:
                 logger.debug(
-                    "Received message to %s: %r (partition=%s offset=%s)",
+                    "Received message \"%s\": %r (partition=%s offset=%s)",
                     msg.topic,
                     msg.value,
                     msg.partition,

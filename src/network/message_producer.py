@@ -25,7 +25,7 @@ class MessageProducer(AbstractAsyncContextManager):
     async def send(self, topic: Topic, payload: dict[str, Any]) -> None:
         await self.__producer.send(topic, payload)
         logger.debug(
-            "Sent message to %s: %r",
+            "Sent message \"%s\": %r",
             topic,
             payload,
         )
@@ -33,7 +33,7 @@ class MessageProducer(AbstractAsyncContextManager):
     async def send_and_wait(self, topic: Topic, payload: dict) -> None:
         metadata: RecordMetadata = await self.__producer.send_and_wait(topic, payload)
         logger.debug(
-            "Sent message to %s: %r (partition=%s offset=%s)",
+            "Sent message \"%s\": %r (partition=%s offset=%s)",
             topic,
             payload,
             metadata.partition,

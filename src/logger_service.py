@@ -23,6 +23,9 @@ class LoggerService:
         for handler in self._logger.handlers:
             handler.setLevel(level)
 
+    def get_level(self) -> int:
+        return self._logger.getEffectiveLevel()
+
     def debug(self, msg: str, *args: object) -> None:
         self._logger.debug(msg, *args)
 

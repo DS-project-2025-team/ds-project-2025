@@ -3,6 +3,7 @@ from collections import deque
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
 from typing import Literal, Self
+from uuid import UUID
 
 from entities.log_entry_factory import LogEntryFactory
 from entities.raft_log import RaftLog
@@ -13,6 +14,8 @@ from logger_service import logger
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
+from network.message_consumer import MessageConsumer
+from network.message_consumer_factory import MessageConsumerFactory
 from network.topic import Topic
 from roles.role import Role
 
@@ -22,6 +25,7 @@ class Leader(AbstractAsyncContextManager):
         self,
         log: RaftLog,
         server: ServerAddress,
+        node_id: UUID,
         queue: deque[int] | None = None,
     ) -> None:
         self.__producer: MessageProducer = MessageProducer(server=server)
@@ -30,11 +34,19 @@ class Leader(AbstractAsyncContextManager):
         )
         self.__tasks: deque[int] = queue or deque()
         self.__log: RaftLog = log
+        self.__consumer: MessageConsumer = (
+            MessageConsumerFactory.heartbeat_response_consumer(server=server, node_id=node_id)
+        )
+        self.__consumer_task: asyncio.Task[None] | None= None
+        self.__running = False
+        self.__node_id = node_id
 
     async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
         await self.__input_consumer.__aenter__()
+        await self.__consumer.__aenter__() # heartbeat response
 
+        self.__running = True
         return self
 
     async def __aexit__(
@@ -43,12 +55,28 @@ class Leader(AbstractAsyncContextManager):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
+        self.__running = False
+        # cancel consumer task
+        if self.__consumer_task is not None:
+            self.__consumer_task.cancel()
+            try:
+                await self.__consumer_task
+            except asyncio.CancelledError:
+                pass
+
+        # close connections
+        await self.__consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
 
+    # Leader main
     async def run(self) -> Literal[Role.FOLLOWER]:
-        while True:
-            await self.__producer.send_and_wait(Topic.HEARTBEAT, {})
+        self.__consumer_task = asyncio.create_task(self.__consume_loop())
+        # heartbeat loop
+        while self.__running:
+            # send heartbeat
+            await self.__producer.send_and_wait(Topic.HEARTBEAT, {"sender": str(self.__node_id)})
+            if logger.get_level() > 10: # 10 is DEBUG
             logger.info("Sent heartbeat")
 
             input_ = await self.__receive_input(Second(1))
@@ -57,6 +85,24 @@ class Leader(AbstractAsyncContextManager):
 
         logger.info("Changing role to FOLLOWER")
         return Role.FOLLOWER
+
+    # read messages via heartbeat_response_consumer
+    async def __consume_loop(self) -> None:
+        logger.info("Leader consumer loop started")
+
+        try:
+            while self.__running:
+                msg = await self.__consumer.receive() 
+                await self.__handle_message(msg)  
+        except asyncio.CancelledError:
+            logger.debug("Leader consumer loop cancelled")
+            raise
+        except Exception:
+            logger.exception("Leader consumer loop crashed")
+            raise
+
+    async def __handle_message(self, msg) -> None:
+        pass
 
     def __next_task(self) -> int | None:
         task = None

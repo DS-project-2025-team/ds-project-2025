@@ -83,6 +83,7 @@ class Candidate:
         except TimeoutError:
             return 0
 
+        logger.debug("Received a vote: %r", vote)
         if vote["term"] != current_term and vote["recipient_id"] != self.__id:
             return 0
 
