@@ -41,4 +41,6 @@ async def main(formula: SatFormula) -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main([(1, 2, 3), (-1, -2, 4), (-3, -4, -5)]))
+    formula = SatFormula([(1, 2, 3), (-1, -2, 4), (-3, -4, -5)])
+
+    asyncio.run(main(formula))
