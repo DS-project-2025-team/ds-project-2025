@@ -15,7 +15,7 @@ class Clause(tuple):
 
 class SatFormula(UserList):
     def __init__(self, clauses: Iterable[Sequence[int]]) -> None:
-        super().__init__(Clause(clause) for clause in clauses)
+        super().__init__(map(Clause, clauses))
 
     def __repr__(self) -> str:
         return f"SatFormula({list(self.data)})"
