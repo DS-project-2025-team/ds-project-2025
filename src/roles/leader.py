@@ -107,7 +107,7 @@ class Leader(AbstractAsyncContextManager):
             raise
 
     async def __handle_message(self, message: Message) -> None:
-        logger.debug('Received "%s"', message.topic)
+        logger.debug(f"Received {message.topic}")
 
     def __next_task(self) -> int | None:
         task = None

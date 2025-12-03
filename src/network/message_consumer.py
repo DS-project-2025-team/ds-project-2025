@@ -63,13 +63,9 @@ class MessageConsumer(AbstractAsyncContextManager):
         await self.__consumer.commit()
         for tp, msgs in messages.items():
             for msg in msgs:
-                logger.debug(
-                    'Received message "%s": %r (partition=%s offset=%s)',
-                    msg.topic,
-                    msg.value,
-                    msg.partition,
-                    msg.offset,
-                )
+                message = Message.from_record(msg)
+
+                logger.debug(f"Received message {message}")
 
         return messages
 
