@@ -8,11 +8,11 @@ class LeaderState:
     def __init__(
         self,
         nodes: dict[str, dict] | None = None,
-        completed_tasks: list[int] | None = None,
+        completed_tasks: list[bool] | None = None,
         formulas: Iterable[SatFormula] | None = None,
     ) -> None:
         self.nodes: dict[str, dict] = nodes or {}
-        self.completed_tasks: list[int] = completed_tasks or []
+        self.completed_tasks: list[bool] = completed_tasks or []
         self.formulas: deque[SatFormula] = deque(formulas or [])
 
     def mark_done(self, task: int) -> None:
