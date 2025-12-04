@@ -101,6 +101,8 @@ class Leader(AbstractAsyncContextManager):
 
         logger.debug(f"Sent {Topic.HEARTBEAT}")
 
+        await asyncio.sleep(2)
+
     @async_loop
     async def __receive_heartbeat_response(self) -> None:
         """
