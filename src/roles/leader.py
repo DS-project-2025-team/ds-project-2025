@@ -40,7 +40,7 @@ class Leader(AbstractAsyncContextManager):
             )
         )
         self.__report_consumer: MessageConsumer = (
-            MessageConsumerFactory.report_consumer(server=server, node_id=node_id)
+            MessageConsumerFactory.report_consumer(server=server)
         )
 
         self.__scheduler: TaskSchedulerService | None = task_scheduler
