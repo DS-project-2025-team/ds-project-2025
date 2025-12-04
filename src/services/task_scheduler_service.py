@@ -33,10 +33,8 @@ class TaskSchedulerService:
 
         return task
 
-    def complete_task(self, task: int, result: bool) -> bool:
+    def complete_task(self, task: int) -> None:
         if not self.__completed_tasks[task]:
             self.__tasks_remaining -= 1
 
         self.__completed_tasks[task] = True
-
-        return result or self.__tasks_remaining == 0
