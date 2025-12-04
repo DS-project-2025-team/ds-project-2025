@@ -12,7 +12,6 @@ class TaskSchedulerService:
         exponent: int,
         tasks: Iterable[int] | None = None,
         completed_tasks: Sequence[bool] | None = None,
-        tasks_remaining: int = 0,
     ) -> None:
         self.__tasks: deque[int] = deque(
             tasks or get_tasks_from_formula(formula, exponent)
@@ -20,7 +19,7 @@ class TaskSchedulerService:
         self.__completed_tasks: list[bool] = list(
             completed_tasks or [False] * len(self.__tasks)
         )
-        self.__tasks_remaining: int = tasks_remaining
+        self.__tasks_remaining: int = len(self.__tasks)
 
     def next_task(self) -> int | None:
         task = None
