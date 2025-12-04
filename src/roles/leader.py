@@ -63,10 +63,15 @@ class Leader(AbstractAsyncContextManager):
         await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.FOLLOWER]:
-        async with asyncio.TaskGroup() as group:
-            _task1 = group.create_task(self.__send_heartbeat())
-            _task2 = group.create_task(self.__receive_heartbeat_response())
-            _task3 = group.create_task(self.__handle_input(Second(1)))
+        try:
+            async with asyncio.TaskGroup() as group:
+                _task1 = group.create_task(self.__send_heartbeat())
+                _task2 = group.create_task(self.__receive_heartbeat_response())
+                _task3 = group.create_task(self.__handle_input(Second(1)))
+        except Exception as error:
+            raise NotImplementedError(
+                "Leader failure handling not implemented"
+            ) from error
 
         logger.info("Changing role to FOLLOWER")
         return Role.FOLLOWER
