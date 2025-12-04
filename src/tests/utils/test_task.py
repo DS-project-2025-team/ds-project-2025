@@ -1,7 +1,7 @@
 import pytest
 
 from entities.sat_formula import SatFormula
-from utils.task import get_interval, get_subinterval
+from utils.task import get_interval, get_subinterval, get_tasks
 
 
 @pytest.mark.parametrize(
@@ -26,3 +26,17 @@ def test_get_interval(formula, expected):
 )
 def test_get_subinterval(interval_size, i, expected):
     assert get_subinterval(interval_size, i) == expected
+
+
+@pytest.mark.parametrize(
+    ("max_variable", "power", "expected"),
+    [
+        (4, 2, [0, 1, 2, 3]),
+        (8, 1, list(range(0, 2**7))),
+        (4, 0, list(range(0, 16))),
+        (4, 4, [0]),
+        (9, 9, [0]),
+    ],
+)
+def test_get_tasks(max_variable, power, expected):
+    assert get_tasks(max_variable, power) == expected

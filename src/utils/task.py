@@ -33,3 +33,20 @@ def get_subinterval(interval_size: int, i: int) -> tuple[int, int]:
     end = (i + 1) * interval_size
 
     return (begin, end)
+
+
+def get_tasks(max_variable: int, power: int) -> list[int]:
+    """
+    Splits the assignment interval into subintervals of size 2**power.
+
+    Args:
+        variables (int): The maximum index of variables in a formula.
+        power (int): log(interval_size)
+
+    Returns:
+        list[int]: The tasks as indexes of subintervals.
+    """
+
+    intervals = max_variable - power
+
+    return list(range(0, 2**intervals))
