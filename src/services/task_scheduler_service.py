@@ -38,3 +38,9 @@ class TaskSchedulerService:
             self.__tasks_remaining -= 1
 
         self.__completed_tasks[task] = True
+
+    def done(self) -> bool:
+        """
+        Returns whether all tasks are done.
+        """
+        return self.__tasks_remaining == 0
