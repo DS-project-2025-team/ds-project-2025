@@ -123,8 +123,6 @@ class Leader(AbstractAsyncContextManager):
         Read messages via heartbeat_response_consumer
         """
 
-        logger.info("Leader consumer loop started")
-
         message = await self.__heartbeat_consumer.receive()
         await self.__handle_message(message)
 
