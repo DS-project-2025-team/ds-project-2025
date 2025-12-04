@@ -16,7 +16,7 @@ def init_parser() -> ArgumentParser:
         type=Role,
         help="Node role",
         choices=[Role.FOLLOWER, Role.CANDIDATE, Role.LEADER],
-        default="FOLLOWER",
+        default=Role.FOLLOWER,
     )
 
     parser.add_argument(
