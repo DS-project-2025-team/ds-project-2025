@@ -23,6 +23,10 @@ class TaskSchedulerService(Hashable):
         )
         self.__tasks_remaining: int = len(self.__tasks)
 
+    @property
+    def completed_tasks(self) -> list[bool]:
+        return self.__completed_tasks
+
     def next_task(self) -> int | None:
         task = None
 
