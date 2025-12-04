@@ -1,11 +1,12 @@
 from collections import deque
-from collections.abc import Iterable, Sequence
+from collections.abc import Hashable, Iterable, Sequence
 
 from entities.sat_formula import SatFormula
+from utils.hash_sat_formula import hash_sat_formula
 from utils.task import get_tasks_from_formula
 
 
-class TaskSchedulerService:
+class TaskSchedulerService(Hashable):
     def __init__(
         self,
         formula: SatFormula,
@@ -13,6 +14,7 @@ class TaskSchedulerService:
         tasks: Iterable[int] | None = None,
         completed_tasks: Sequence[bool] | None = None,
     ) -> None:
+        self.__formula: SatFormula = formula
         self.__tasks: deque[int] = deque(
             tasks or get_tasks_from_formula(formula, exponent)
         )
@@ -44,3 +46,6 @@ class TaskSchedulerService:
         Returns whether all tasks are done.
         """
         return self.__tasks_remaining == 0
+
+    def __hash__(self) -> int:
+        return hash_sat_formula(self.__formula)
