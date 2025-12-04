@@ -9,3 +9,4 @@ class Topic(StrEnum):
     VOTE_REQUEST = auto()
     OUTPUT = auto()
     INPUT = auto()
+    REPORT = auto()

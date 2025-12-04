@@ -39,6 +39,9 @@ class Leader(AbstractAsyncContextManager):
                 server=server, node_id=node_id
             )
         )
+        self.__report_consumer: MessageConsumer = (
+            MessageConsumerFactory.report_consumer(server=server, node_id=node_id)
+        )
 
         self.__scheduler: TaskSchedulerService | None = task_scheduler
         self.__log: RaftLog = log
@@ -68,6 +71,7 @@ class Leader(AbstractAsyncContextManager):
                 _task2 = group.create_task(self.__receive_heartbeat_response())
                 _task3 = group.create_task(self.__handle_input(Second(1)))
                 _task4 = group.create_task(self.__assign_task())
+                _task5 = group.create_task(self.__handle_report())
         except Exception as error:
             raise NotImplementedError(
                 "Leader failure handling not implemented"
@@ -127,6 +131,27 @@ class Leader(AbstractAsyncContextManager):
 
         await self.__producer.send(Topic.ASSIGN, payload)
         logger.info(f"Assigned task {task} of formula {formula}")
+
+    @async_loop
+    async def __handle_report(self) -> None:
+        message = await self.__report_consumer.receive()
+
+        data = message.data
+
+        if data["hash"] != hash(self.__scheduler):
+            logger.debug(f"Received outdated REPORT with hash {data['hash']}")
+            return
+
+        self.__complete_task(data["task"])
+
+        satisfiable: bool = message.data["result"]
+
+        if satisfiable:
+            await self.__send_output(satisfiable)
+            return
+
+        if self.__scheduler and self.__scheduler.done():
+            await self.__send_output(False)
 
     @async_loop
     async def __handle_input(self, timeout: Second) -> None:
