@@ -109,12 +109,15 @@ class Leader(AbstractAsyncContextManager):
         if (formula := self.__log.current_formula) is None:
             return
 
+        await self.__send_task(formula, task, exponent)
+
+        await asyncio.sleep(1)
+
+    async def __send_task(self, formula: SatFormula, task: int, exponent: int) -> None:
         payload = {"formula": formula.to_list(), "task": task, "exponent": exponent}
 
         await self.__producer.send(Topic.ASSIGN, payload)
         logger.info(f"Assigned task {task} of formula {formula}")
-
-        await asyncio.sleep(1)
 
     async def __next_formula(self, exponent: int) -> None:
         formula = self.__log.current_formula
