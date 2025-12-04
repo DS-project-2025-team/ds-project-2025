@@ -163,5 +163,10 @@ class Leader(AbstractAsyncContextManager):
     def __complete_task(self, task: int) -> None:
         entry = LogEntryFactory.complete_task(self.__log.term, task)
 
+        if not self.__scheduler:
+            return
+
+        self.__scheduler.complete_task(task)
+
         self.__log.append(entry)
         self.__log.commit()
