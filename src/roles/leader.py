@@ -19,9 +19,7 @@ from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
 from utils.async_loop import async_loop
-from utils.check_sat import check_sat_formula
-from utils.hash_sat_formula import hash_sat_formula
-from utils.task import get_interval, get_tasks_from_formula
+from utils.task import get_tasks_from_formula
 
 
 class Leader(AbstractAsyncContextManager):
@@ -86,20 +84,12 @@ class Leader(AbstractAsyncContextManager):
 
             logger.info(f"Received new SAT formula: {formula}")
 
-            hash_ = hash_sat_formula(formula)
-            begin, end = get_interval(formula)
+            entry = LogEntryFactory.add_formula(self.__log.term, formula)
 
-            result = check_sat_formula(formula, begin, end)
+            self.__log.append(entry)
+            self.__log.commit()
 
-            logger.info(f"Computed result for formula {formula}: {result}")
-
-            await self.__producer.send_and_wait(
-                Topic.OUTPUT,
-                {
-                    "hash": hash_,
-                    "result": result,
-                },
-            )
+            logger.info(f"Committed new formula {formula} to log")
 
     @async_loop
     async def __assign_task(self, exponent: int = SUBINTERVAL_EXPONENT) -> None:
