@@ -5,6 +5,7 @@ from types import TracebackType
 from typing import Literal, Self
 from uuid import UUID
 
+from config import SUBINTERVAL_EXPONENT
 from entities.log_entry_factory import LogEntryFactory
 from entities.raft_log import RaftLog
 from entities.sat_formula import SatFormula
@@ -98,6 +99,22 @@ class Leader(AbstractAsyncContextManager):
                     "result": result,
                 },
             )
+
+    @async_loop
+    async def __assign_task(self, exponent: int = SUBINTERVAL_EXPONENT) -> None:
+        if (task := self.__next_task()) is None:
+            await self.__next_formula(exponent)
+            return
+
+        if (formula := self.__log.current_formula) is None:
+            return
+
+        payload = {"formula": formula.to_list(), "task": task, "exponent": exponent}
+
+        await self.__producer.send(Topic.ASSIGN, payload)
+        logger.info(f"Assigned task {task} of formula {formula}")
+
+        await asyncio.sleep(1)
 
     async def __next_formula(self, exponent: int) -> None:
         formula = self.__log.current_formula
