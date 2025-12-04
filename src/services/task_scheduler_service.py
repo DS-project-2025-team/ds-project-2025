@@ -14,7 +14,7 @@ class TaskSchedulerService(Hashable):
         tasks: Iterable[int] | None = None,
         completed_tasks: Sequence[bool] | None = None,
     ) -> None:
-        self.__formula: SatFormula = formula
+        self.__hash: int = hash_sat_formula(formula)
         self.__tasks: deque[int] = deque(
             tasks or get_tasks_from_formula(formula, exponent)
         )
@@ -48,4 +48,4 @@ class TaskSchedulerService(Hashable):
         return self.__tasks_remaining == 0
 
     def __hash__(self) -> int:
-        return hash_sat_formula(self.__formula)
+        return self.__hash
