@@ -3,7 +3,13 @@ from entities.sat_formula import SatFormula
 
 def get_interval(formula: SatFormula) -> tuple[int, int]:
     """
-    Return the interval [begin, end) of all possible assignments for the given formula.
+    Return the interval of all possible assignments for the given formula.
+
+    Args:
+        formula (SatFormula): SAT formula
+
+    Returns:
+        tuple[int, int]: Interval as [begin, end)
     """
     n = formula.max_variable()
 
