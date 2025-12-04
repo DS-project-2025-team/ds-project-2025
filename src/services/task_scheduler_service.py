@@ -28,3 +28,9 @@ class TaskSchedulerService:
                 break
 
         return task
+
+    def complete_task(self, task: int) -> None:
+        if not self.__completed_tasks[task]:
+            self.__tasks_remaining -= 1
+
+        self.__completed_tasks[task] = True
