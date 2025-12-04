@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 
 from entities.sat_formula import SatFormula
 from entities.server_address import ServerAddress
-from logger_service import logger
+from services.logger_service import logger
 from network.client import Client
 
 

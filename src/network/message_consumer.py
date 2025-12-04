@@ -8,7 +8,7 @@ from aiokafka import AIOKafkaConsumer, IllegalOperation
 
 from entities.second import Second
 from entities.server_address import ServerAddress
-from logger_service import logger
+from services.logger_service import logger
 from network.message import Message
 
 

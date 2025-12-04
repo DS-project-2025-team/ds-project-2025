@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 
 from entities.node import Node
 from entities.server_address import ServerAddress
-from logger_service import logger
+from services.logger_service import logger
 from roles.role import Role
 
 
