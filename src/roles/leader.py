@@ -90,11 +90,11 @@ class Leader(AbstractAsyncContextManager):
 
         return SatFormula(input_["data"])
 
-    async def __send_output(self, formula: SatFormula, result: bool) -> None:
-        logger.info(f"Computed result for formula {formula}: {result}")
+    async def __send_output(self, result: bool) -> None:
+        logger.info(f"Computed result: {result}")
 
         payload = {
-            "hash": hash_sat_formula(formula),
+            "hash": hash(self.__scheduler),
             "result": result,
         }
 
