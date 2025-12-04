@@ -91,7 +91,7 @@ class Follower(AbstractAsyncContextManager):
 
         data = message.data
 
-        logger.debug(f"Received work: {data}")
+        logger.info(f"Received work: {data}")
 
         formula: SatFormula = SatFormula(data["formula"])
         task: int = data["task"]
@@ -114,4 +114,4 @@ class Follower(AbstractAsyncContextManager):
 
         await self.__producer.send(Topic.REPORT, payload)
 
-        logger.debug(f"Sent result for task {task}: {result}")
+        logger.info(f"Sent result for task {task}: {result}")
