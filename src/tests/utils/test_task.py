@@ -29,7 +29,7 @@ def test_get_subinterval(interval_size, i, expected):
 
 
 @pytest.mark.parametrize(
-    ("max_variable", "power", "expected"),
+    ("max_variable", "exponent", "expected"),
     [
         (4, 2, [0, 1, 2, 3]),
         (8, 1, list(range(0, 2**7))),
@@ -38,5 +38,5 @@ def test_get_subinterval(interval_size, i, expected):
         (9, 9, [0]),
     ],
 )
-def test_get_tasks(max_variable, power, expected):
-    assert get_tasks(max_variable, power) == expected
+def test_get_tasks(max_variable, exponent, expected):
+    assert get_tasks(max_variable, exponent) == expected
