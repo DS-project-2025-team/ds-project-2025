@@ -8,8 +8,8 @@ from aiokafka import AIOKafkaConsumer, IllegalOperation
 
 from entities.second import Second
 from entities.server_address import ServerAddress
-from services.logger_service import logger
 from network.message import Message
+from services.logger_service import logger
 
 
 def deserializer(serialized: str) -> dict:

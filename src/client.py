@@ -3,8 +3,8 @@ from argparse import ArgumentParser
 
 from entities.sat_formula import SatFormula
 from entities.server_address import ServerAddress
-from services.logger_service import logger
 from network.client import Client
+from services.logger_service import logger
 
 
 def init_parser() -> ArgumentParser:

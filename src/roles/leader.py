@@ -11,13 +11,13 @@ from entities.raft_log import RaftLog
 from entities.sat_formula import SatFormula
 from entities.second import Second
 from entities.server_address import ServerAddress
-from services.logger_service import logger
 from network.message import Message
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
+from services.logger_service import logger
 from utils.async_loop import async_loop
 from utils.hash_sat_formula import hash_sat_formula
 from utils.task import get_tasks_from_formula

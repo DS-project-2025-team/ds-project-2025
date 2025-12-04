@@ -3,8 +3,8 @@ import logging
 from argparse import ArgumentParser
 
 from entities.server_address import ServerAddress
-from services.logger_service import logger
 from network.message_producer import MessageProducer
+from services.logger_service import logger
 
 
 def init_parser() -> ArgumentParser:

@@ -7,8 +7,8 @@ from aiokafka import AIOKafkaProducer
 from aiokafka.structs import RecordMetadata
 
 from entities.server_address import ServerAddress
-from services.logger_service import logger
 from network.topic import Topic
+from services.logger_service import logger
 
 
 def serializer(value: dict) -> bytes:
