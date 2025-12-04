@@ -54,3 +54,9 @@ class MessageConsumerFactory:
         return MessageConsumer(
             Topic.OUTPUT, server=server, groupid=str(node_id), offset_reset="earliest"
         )
+
+    @staticmethod
+    def report_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
+        return MessageConsumer(
+            Topic.REPORT, server=server, groupid="LEADER", offset_reset="earliest"
+        )
