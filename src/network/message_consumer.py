@@ -2,7 +2,7 @@ import asyncio
 import json
 from contextlib import AbstractAsyncContextManager, suppress
 from types import TracebackType
-from typing import Self
+from typing import Literal, Self
 
 from aiokafka import AIOKafkaConsumer, IllegalOperation
 
@@ -18,7 +18,11 @@ def deserializer(serialized: str) -> dict:
 
 class MessageConsumer(AbstractAsyncContextManager):
     def __init__(
-        self, *topics: str, server: ServerAddress, groupid: str, offset_reset: str
+        self,
+        *topics: str,
+        server: ServerAddress,
+        groupid: str,
+        offset_reset: Literal["earliest", "latest"],
     ) -> None:
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
             *topics,
