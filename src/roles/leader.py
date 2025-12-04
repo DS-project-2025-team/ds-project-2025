@@ -51,6 +51,7 @@ class Leader(AbstractAsyncContextManager):
         await self.__producer.__aenter__()
         await self.__input_consumer.__aenter__()
         await self.__heartbeat_consumer.__aenter__()
+        await self.__report_consumer.__aenter__()
 
         return self
 
@@ -63,6 +64,7 @@ class Leader(AbstractAsyncContextManager):
         await self.__heartbeat_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
+        await self.__report_consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
