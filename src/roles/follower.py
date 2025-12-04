@@ -62,6 +62,7 @@ class Follower(AbstractAsyncContextManager):
         try:
             async with asyncio.TaskGroup() as group:
                 group.create_task(self.__handle_heartbeat())
+                group.create_task(self.__handle_assign())
 
         except TimeoutError:
             logger.warning("Missing heartbeat, election timeout elapsed.")
