@@ -55,6 +55,6 @@ def get_tasks(max_variable: int, exponent: int) -> list[int]:
         list[int]: The tasks as indexes of subintervals.
     """
 
-    intervals = max_variable - exponent
+    intervals = max(max_variable - exponent, 0)
 
     return list(range(0, 2**intervals))

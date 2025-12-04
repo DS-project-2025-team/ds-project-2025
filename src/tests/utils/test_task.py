@@ -40,3 +40,14 @@ def test_get_subinterval(interval_size, i, expected):
 )
 def test_get_tasks(max_variable, exponent, expected):
     assert get_tasks(max_variable, exponent) == expected
+
+
+@pytest.mark.parametrize(
+    ("max_variable", "exponent", "expected"),
+    [
+        (4, 5, [0]),
+        (10, 50, [0]),
+    ],
+)
+def test_get_tasks_with_too_large_exponent(max_variable, exponent, expected):
+    assert get_tasks(max_variable, exponent) == expected
