@@ -171,13 +171,13 @@ class Leader(AbstractAsyncContextManager):
 
     @async_loop
     async def __assign_task(self, exponent: int = SUBINTERVAL_EXPONENT) -> None:
+        await asyncio.sleep(1)
+
         if (formula := self.__log.current_formula) is None:
             return
 
         if not self.__scheduler:
             self.__scheduler = TaskSchedulerService(formula, exponent)
-
-        await asyncio.sleep(1)
 
         if (task := self.__scheduler.next_task()) is None:
             return
