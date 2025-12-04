@@ -20,6 +20,7 @@ from roles.role import Role
 from utils.async_loop import async_loop
 from utils.check_sat import check_sat_formula
 from utils.hash_sat_formula import hash_sat_formula
+from utils.task import get_interval
 
 
 class Leader(AbstractAsyncContextManager):
@@ -84,9 +85,9 @@ class Leader(AbstractAsyncContextManager):
             logger.info(f"Received new SAT formula: {formula}")
 
             hash_ = hash_sat_formula(formula)
-            n = formula.max_variable()
+            begin, end = get_interval(formula)
 
-            result = check_sat_formula(formula, 0, 2**n)
+            result = check_sat_formula(formula, begin, end)
 
             logger.info(f"Computed result for formula {formula}: {result}")
 
