@@ -145,9 +145,7 @@ class Leader(AbstractAsyncContextManager):
 
     @async_loop
     async def __assign_task(self, exponent: int = SUBINTERVAL_EXPONENT) -> None:
-        formula = self.__log.current_formula
-
-        if formula is None:
+        if (formula := self.__log.current_formula) is None:
             return
 
         if not self.__scheduler:
