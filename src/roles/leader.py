@@ -18,9 +18,9 @@ from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
 from services.logger_service import logger
+from services.task_scheduler_service import TaskSchedulerService
 from utils.async_loop import async_loop
 from utils.hash_sat_formula import hash_sat_formula
-from utils.task import get_tasks_from_formula
 
 
 class Leader(AbstractAsyncContextManager):
@@ -29,8 +29,7 @@ class Leader(AbstractAsyncContextManager):
         log: RaftLog,
         server: ServerAddress,
         node_id: UUID,
-        queue: deque[int] | None = None,
-        tasks_remaining: int = 0,
+        task_scheduler: TaskSchedulerService | None = None,
     ) -> None:
         self.__producer: MessageProducer = MessageProducer(server=server)
         self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
@@ -43,7 +42,7 @@ class Leader(AbstractAsyncContextManager):
             )
         )
 
-        self.__tasks: deque[int] = queue or deque()
+        self.__scheduler: TaskSchedulerService | None = task_scheduler
         self.__log: RaftLog = log
         self.__node_id: UUID = node_id
 
@@ -147,39 +146,23 @@ class Leader(AbstractAsyncContextManager):
 
     @async_loop
     async def __assign_task(self, exponent: int = SUBINTERVAL_EXPONENT) -> None:
-        if (task := self.__next_task()) is None:
-            await self.__next_formula(exponent)
-            return
-
-        if (formula := self.__log.current_formula) is None:
-            return
-
-        await self.__send_task(formula, task, exponent)
-
-        await asyncio.sleep(1)
-
-    async def __next_formula(self, exponent: int) -> None:
         formula = self.__log.current_formula
 
         if formula is None:
             return
 
-        self.__tasks = deque(get_tasks_from_formula(formula, exponent))
+        if not self.__scheduler:
+            self.__scheduler = TaskSchedulerService(formula)
+
+        await asyncio.sleep(1)
+
+        if (task := self.__scheduler.next_task()) is None:
+            return
+
+        await self.__send_task(formula, task, exponent)
 
     async def __handle_message(self, message: Message) -> None:
         logger.debug(f"Received {message.topic}")
-
-    def __next_task(self) -> int | None:
-        task = None
-
-        while self.__tasks:
-            task = self.__tasks.popleft()
-
-            if not self.__log.completed_tasks[task]:
-                self.__tasks.append(task)
-                break
-
-        return task
 
     def __complete_task(self, task: int) -> None:
         entry = LogEntryFactory.complete_task(self.__log.term, task)
