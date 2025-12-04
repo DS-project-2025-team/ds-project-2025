@@ -43,7 +43,7 @@ class Leader(AbstractAsyncContextManager):
 
         self.__tasks: deque[int] = queue or deque()
         self.__log: RaftLog = log
-        self.__node_id = node_id
+        self.__node_id: UUID = node_id
 
     async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
