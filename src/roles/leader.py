@@ -20,7 +20,7 @@ from roles.role import Role
 from utils.async_loop import async_loop
 from utils.check_sat import check_sat_formula
 from utils.hash_sat_formula import hash_sat_formula
-from utils.task import get_interval
+from utils.task import get_interval, get_tasks_from_formula
 
 
 class Leader(AbstractAsyncContextManager):
@@ -98,6 +98,14 @@ class Leader(AbstractAsyncContextManager):
                     "result": result,
                 },
             )
+
+    async def __next_formula(self, exponent: int) -> None:
+        formula = self.__log.current_formula
+
+        if formula is None:
+            return
+
+        self.__tasks = deque(get_tasks_from_formula(formula, exponent))
 
     @async_loop
     async def __send_heartbeat(self) -> None:
