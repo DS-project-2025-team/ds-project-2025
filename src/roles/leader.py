@@ -1,5 +1,4 @@
 import asyncio
-from collections import deque
 from contextlib import AbstractAsyncContextManager, suppress
 from types import TracebackType
 from typing import Literal, Self
