@@ -19,6 +19,7 @@ from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
 from utils.async_loop import async_loop
+from utils.hash_sat_formula import hash_sat_formula
 from utils.task import get_tasks_from_formula
 
 
@@ -29,6 +30,7 @@ class Leader(AbstractAsyncContextManager):
         server: ServerAddress,
         node_id: UUID,
         queue: deque[int] | None = None,
+        tasks_remaining: int = 0,
     ) -> None:
         self.__producer: MessageProducer = MessageProducer(server=server)
         self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
@@ -109,6 +111,18 @@ class Leader(AbstractAsyncContextManager):
 
         await self.__producer.send(Topic.ASSIGN, payload)
         logger.info(f"Assigned task {task} of formula {formula}")
+
+    async def __send_output(self, formula: SatFormula, result: bool) -> None:
+        logger.info(f"Computed result for formula {formula}: {result}")
+
+        payload = {
+            "hash": hash_sat_formula(formula),
+            "result": result,
+        }
+
+        await self.__producer.send(Topic.OUTPUT, payload)
+
+        logger.info(f"Sent result {result}")
 
     async def __next_formula(self, exponent: int) -> None:
         formula = self.__log.current_formula
