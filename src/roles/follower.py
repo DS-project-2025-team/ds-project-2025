@@ -1,7 +1,6 @@
 import asyncio
 import random
 from contextlib import AbstractAsyncContextManager
-from re import S
 from types import TracebackType
 from typing import Literal, Self
 from uuid import UUID
