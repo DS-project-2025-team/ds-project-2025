@@ -70,6 +70,7 @@ class Leader(AbstractAsyncContextManager):
                 _task1 = group.create_task(self.__send_heartbeat())
                 _task2 = group.create_task(self.__receive_heartbeat_response())
                 _task3 = group.create_task(self.__handle_input(Second(1)))
+                _task4 = group.create_task(self.__assign_task())
         except Exception as error:
             raise NotImplementedError(
                 "Leader failure handling not implemented"
