@@ -79,6 +79,58 @@ class Leader(AbstractAsyncContextManager):
         logger.info("Changing role to FOLLOWER")
         return Role.FOLLOWER
 
+    async def __receive_input(self, timeout: Second) -> SatFormula:
+        """
+        Receives one SAT formula.
+
+        Raises:
+            TimeoutError: If timeout is exceeded.
+        """
+
+        message = await self.__input_consumer.receive(timeout)
+        input_ = message.data
+
+        return SatFormula(input_["data"])
+
+    async def __send_output(self, formula: SatFormula, result: bool) -> None:
+        logger.info(f"Computed result for formula {formula}: {result}")
+
+        payload = {
+            "hash": hash_sat_formula(formula),
+            "result": result,
+        }
+
+        await self.__producer.send(Topic.OUTPUT, payload)
+
+        logger.info(f"Sent result {result}")
+
+    @async_loop
+    async def __send_heartbeat(self) -> None:
+        await self.__producer.send_and_wait(
+            Topic.HEARTBEAT, {"sender": str(self.__node_id)}
+        )
+
+        logger.debug(f"Sent {Topic.HEARTBEAT}")
+
+        await asyncio.sleep(2)
+
+    @async_loop
+    async def __receive_heartbeat_response(self) -> None:
+        """
+        Read messages via heartbeat_response_consumer
+        """
+
+        logger.info("Leader consumer loop started")
+
+        message = await self.__heartbeat_consumer.receive()
+        await self.__handle_message(message)
+
+    async def __send_task(self, formula: SatFormula, task: int, exponent: int) -> None:
+        payload = {"formula": formula.to_list(), "task": task, "exponent": exponent}
+
+        await self.__producer.send(Topic.ASSIGN, payload)
+        logger.info(f"Assigned task {task} of formula {formula}")
+
     @async_loop
     async def __handle_input(self, timeout: Second) -> None:
         with suppress(TimeoutError):
@@ -106,24 +158,6 @@ class Leader(AbstractAsyncContextManager):
 
         await asyncio.sleep(1)
 
-    async def __send_task(self, formula: SatFormula, task: int, exponent: int) -> None:
-        payload = {"formula": formula.to_list(), "task": task, "exponent": exponent}
-
-        await self.__producer.send(Topic.ASSIGN, payload)
-        logger.info(f"Assigned task {task} of formula {formula}")
-
-    async def __send_output(self, formula: SatFormula, result: bool) -> None:
-        logger.info(f"Computed result for formula {formula}: {result}")
-
-        payload = {
-            "hash": hash_sat_formula(formula),
-            "result": result,
-        }
-
-        await self.__producer.send(Topic.OUTPUT, payload)
-
-        logger.info(f"Sent result {result}")
-
     async def __next_formula(self, exponent: int) -> None:
         formula = self.__log.current_formula
 
@@ -131,27 +165,6 @@ class Leader(AbstractAsyncContextManager):
             return
 
         self.__tasks = deque(get_tasks_from_formula(formula, exponent))
-
-    @async_loop
-    async def __send_heartbeat(self) -> None:
-        await self.__producer.send_and_wait(
-            Topic.HEARTBEAT, {"sender": str(self.__node_id)}
-        )
-
-        logger.debug(f"Sent {Topic.HEARTBEAT}")
-
-        await asyncio.sleep(2)
-
-    @async_loop
-    async def __receive_heartbeat_response(self) -> None:
-        """
-        Read messages via heartbeat_response_consumer
-        """
-
-        logger.info("Leader consumer loop started")
-
-        message = await self.__heartbeat_consumer.receive()
-        await self.__handle_message(message)
 
     async def __handle_message(self, message: Message) -> None:
         logger.debug(f"Received {message.topic}")
@@ -173,16 +186,3 @@ class Leader(AbstractAsyncContextManager):
 
         self.__log.append(entry)
         self.__log.commit()
-
-    async def __receive_input(self, timeout: Second) -> SatFormula:
-        """
-        Receives one SAT formula.
-
-        Raises:
-            TimeoutError: If timeout is exceeded.
-        """
-
-        message = await self.__input_consumer.receive(timeout)
-        input_ = message.data
-
-        return SatFormula(input_["data"])
