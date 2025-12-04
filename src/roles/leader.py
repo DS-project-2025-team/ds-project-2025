@@ -148,10 +148,12 @@ class Leader(AbstractAsyncContextManager):
 
         if satisfiable:
             await self.__send_output(satisfiable)
+            self.__remove_current_formula()
             return
 
         if self.__scheduler and self.__scheduler.done():
             await self.__send_output(False)
+            self.__remove_current_formula()
 
     @async_loop
     async def __handle_input(self, timeout: Second) -> None:
@@ -176,6 +178,7 @@ class Leader(AbstractAsyncContextManager):
 
         if not self.__scheduler:
             self.__scheduler = TaskSchedulerService(formula, exponent)
+            self.__set_new_completed_tasks(self.__scheduler.completed_tasks)
 
         if (task := self.__scheduler.next_task()) is None:
             return
@@ -192,6 +195,18 @@ class Leader(AbstractAsyncContextManager):
             return
 
         self.__scheduler.complete_task(task)
+
+        self.__log.append(entry)
+        self.__log.commit()
+
+    def __set_new_completed_tasks(self, completed_tasks: list[bool]) -> None:
+        entry = LogEntryFactory.set_completed_tasks(self.__log.term, completed_tasks)
+
+        self.__log.append(entry)
+        self.__log.commit()
+
+    def __remove_current_formula(self) -> None:
+        entry = LogEntryFactory.pop_formula(self.__log.term)
 
         self.__log.append(entry)
         self.__log.commit()
