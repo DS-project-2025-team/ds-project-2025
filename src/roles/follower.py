@@ -1,3 +1,4 @@
+import asyncio
 import random
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
@@ -12,6 +13,7 @@ from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
 from services.logger_service import logger
+from utils.async_loop import async_loop
 
 
 class Follower(AbstractAsyncContextManager):
@@ -45,32 +47,28 @@ class Follower(AbstractAsyncContextManager):
         await self.__heartbeat_consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.CANDIDATE]:
-        while True:
-            try:
-                message = await self.__heartbeat_consumer.receive(
-                    self.__election_timeout
-                )
-                await self.__heartbeat_consumer.commit()
+        try:
+            async with asyncio.TaskGroup() as group:
+                group.create_task(self.__handle_heartbeat())
 
-                logger.debug(f"Received {message.topic}")
-
-                # send response with received message offset
-                await self.__producer.send(
-                    Topic.HEARTBEAT_RESPONSE,
-                    {
-                        "responder_uuid": str(self.__node_id),
-                        "original_offset": message.offset,
-                    },
-                )
-
-            except TimeoutError:
-                logger.warning("Missing heartbeat, election timeout elapsed.")
-                break
-
-            self.__process_message(message)
+        except TimeoutError:
+            logger.warning("Missing heartbeat, election timeout elapsed.")
 
         logger.info("Changing role to CANDIDATE")
         return Role.CANDIDATE
 
-    def __process_message(self, message: dict) -> None:
-        pass
+    @async_loop
+    async def __handle_heartbeat(self) -> None:
+        message = await self.__heartbeat_consumer.receive(self.__election_timeout)
+        await self.__heartbeat_consumer.commit()
+
+        logger.debug(f"Received {message.topic}")
+
+        # send response with received message offset
+        await self.__producer.send(
+            Topic.HEARTBEAT_RESPONSE,
+            {
+                "responder_uuid": str(self.__node_id),
+                "original_offset": message.offset,
+            },
+        )
