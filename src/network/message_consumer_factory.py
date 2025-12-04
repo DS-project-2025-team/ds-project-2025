@@ -60,3 +60,12 @@ class MessageConsumerFactory:
         return MessageConsumer(
             Topic.REPORT, server=server, groupid="LEADER", offset_reset="earliest"
         )
+
+    @staticmethod
+    def assign_consumer(server: ServerAddress) -> MessageConsumer:
+        return MessageConsumer(
+            Topic.ASSIGN,
+            server=server,
+            groupid="FOLLOWER",
+            offset_reset="latest",
+        )
