@@ -35,6 +35,14 @@ def get_subinterval(interval_size: int, i: int) -> tuple[int, int]:
     return (begin, end)
 
 
+def get_tasks_from_formula(formula: SatFormula, power: int) -> list[int]:
+    """
+    Wrapper for get_tasks that takes a formula instead of max_variable.
+    """
+
+    return get_tasks(formula.max_variable(), power)
+
+
 def get_tasks(max_variable: int, power: int) -> list[int]:
     """
     Splits the assignment interval into subintervals of size 2**power.
