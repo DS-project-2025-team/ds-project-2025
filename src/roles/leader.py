@@ -19,7 +19,6 @@ from roles.role import Role
 from services.logger_service import logger
 from services.task_scheduler_service import TaskSchedulerService
 from utils.async_loop import async_loop
-from utils.hash_sat_formula import hash_sat_formula
 
 
 class Leader(AbstractAsyncContextManager):
