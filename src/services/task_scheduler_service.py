@@ -16,3 +16,15 @@ class TaskSchedulerService:
         self.__tasks: deque[int] = deque(tasks or [])
         self.__completed_tasks: list[int] = list(completed_tasks or [])
         self.__tasks_remaining: int = tasks_remaining
+
+    def next_task(self) -> int | None:
+        task = None
+
+        while self.__tasks:
+            task = self.__tasks.popleft()
+
+            if not self.__completed_tasks[task]:
+                self.__tasks.append(task)
+                break
+
+        return task
