@@ -1,4 +1,5 @@
 import pytest
+
 from entities.sat_formula import SatFormula
 from services.task_scheduler_service import TaskSchedulerService
 
@@ -53,10 +54,11 @@ def test_complete_task_is_idempotent(task, result):
 
     scheduler = TaskSchedulerService(formula, exponent=2, tasks=tasks)
 
-    initial = scheduler.complete_task(task, result)
-
     for _ in range(2 * n):
-        assert scheduler.complete_task(task, result) == initial
+        scheduler.complete_task(task)
+
+        assert scheduler._TaskSchedulerService__tasks_remaining == n - 1
+        assert scheduler._TaskSchedulerService__completed_tasks[task]
 
 
 def test_complete_task_gives_false_when_all_tasks_false():
@@ -66,17 +68,6 @@ def test_complete_task_gives_false_when_all_tasks_false():
 
     scheduler = TaskSchedulerService(formula, exponent=2, tasks=tasks)
 
-    assert not scheduler.complete_task(1, False)
-    assert not scheduler.complete_task(2, False)
-    assert not scheduler.complete_task(3, False)
-
-
-def test_complete_task_gives_true_when_any_task_true():
-    formula = SatFormula([(1, -2, 6), (-1, 3, 4)])
-    n = 3
-    tasks = range(n)
-
-    scheduler = TaskSchedulerService(formula, exponent=2, tasks=tasks)
-
-    assert not scheduler.complete_task(1, False)
-    assert scheduler.complete_task(2, True)
+    assert not scheduler.complete_task(0)
+    assert not scheduler.complete_task(1)
+    assert not scheduler.complete_task(2)
