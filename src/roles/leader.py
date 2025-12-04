@@ -50,7 +50,7 @@ class Leader(AbstractAsyncContextManager):
     async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
         await self.__input_consumer.__aenter__()
-        await self.__heartbeat_consumer.__aenter__()  # heartbeat response
+        await self.__heartbeat_consumer.__aenter__()
 
         return self
 
