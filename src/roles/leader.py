@@ -152,7 +152,7 @@ class Leader(AbstractAsyncContextManager):
             return
 
         if not self.__scheduler:
-            self.__scheduler = TaskSchedulerService(formula)
+            self.__scheduler = TaskSchedulerService(formula, exponent)
 
         await asyncio.sleep(1)
 
