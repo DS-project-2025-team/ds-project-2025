@@ -173,7 +173,7 @@ class Leader(AbstractAsyncContextManager):
         await asyncio.sleep(1)
 
         if (formula := self.__log.current_formula) is None:
-            logger.info("No current formula to assign tasks for")
+            logger.debug("No current formula to assign tasks for")
             return
 
         if not self.__scheduler:
