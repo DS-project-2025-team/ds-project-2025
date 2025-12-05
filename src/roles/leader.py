@@ -74,6 +74,8 @@ class Leader(AbstractAsyncContextManager):
                 _task3 = group.create_task(self.__handle_input(Second(1)))
                 _task4 = group.create_task(self.__assign_task())
                 _task5 = group.create_task(self.__handle_report())
+
+                logger.info("Leader is running")
         except Exception as error:
             raise NotImplementedError(
                 "Leader failure handling not implemented"
