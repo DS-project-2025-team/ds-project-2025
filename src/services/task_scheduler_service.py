@@ -45,7 +45,7 @@ class TaskSchedulerService(Hashable):
 
         self.__completed_tasks[task] = True
 
-    def done(self, result: bool) -> bool:
+    def is_done(self, result: bool) -> bool:
         """
         Returns whether computation is done.
         """

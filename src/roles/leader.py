@@ -148,7 +148,7 @@ class Leader(AbstractAsyncContextManager):
 
         satisfiable: bool = message.data["result"]
 
-        if not (self.__scheduler and self.__scheduler.done(satisfiable)):
+        if not (self.__scheduler and self.__scheduler.is_done(satisfiable)):
             return
 
         await self.__send_output(satisfiable)
