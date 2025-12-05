@@ -54,7 +54,7 @@
     - `--server`: optional, defaults to `localhost`
     - `--port`: optional, defaults to `9092`
 
-    Edit [`client.py`](/src/client.py) to change input.
+    Edit `start_client()` in [`tasks.py`](/tasks.py) to change input.
 
 ## Documentation
 

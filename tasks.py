@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 import sys
 
@@ -7,6 +8,9 @@ from invoke.tasks import task
 sys.path.append(str(Path(__file__).parent / "src"))
 
 from config import KAFKA_CLUSTER_ID, KAFKA_PATH, ROOT_DIR, SOURCE_DIR
+from client import run_client
+from entities.sat_formula import SatFormula
+from entities.server_address import ServerAddress
 
 
 @task
@@ -66,21 +70,25 @@ def start(
     ctx.run(command)
 
 
-@task
+@task(
+    help={
+        "server": 'Kafka server. Defaults to "localhost"',
+        "port": "Kafka server port. Defaults to 9092",
+    }
+)
 def start_client(
-    ctx: Context,
-    server: str | None = None,
-    port: int | None = None,
+    _,
+    server: str = "localhost",
+    port: int = 9092,
 ) -> None:
-    command = " ".join(
-        [
-            f"uv run python {SOURCE_DIR}/client.py",
-            f"--server {server}" if server else "",
-            f"--port {port}" if port else "",
-        ]
-    )
+    """
+    Starts client and sends input to the system.
+    """
 
-    ctx.run(command)
+    formula = SatFormula([(1, 2, 3), (-1, -2, 4), (-3, -4, -5)])
+    server_address = ServerAddress(server, port)
+
+    asyncio.run(run_client(formula, server_address))
 
 
 @task
