@@ -20,3 +20,10 @@ class LeaderState:
             return
 
         self.completed_tasks[task] = True
+
+    def __repr__(self) -> str:
+        return (
+            f"LeaderState(nodes={self.nodes}, "
+            f"completed_tasks={self.completed_tasks}, "
+            f"formulas={list(self.formulas)})"
+        )
