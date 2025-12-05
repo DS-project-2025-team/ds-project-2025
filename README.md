@@ -11,30 +11,58 @@
     curl -LsSf https://astral.sh/uv/install.sh | sh
     ```
 
-2. Clone repository
+1. Clone repository
 
    ```sh
    git clone git@github.com:DS-project-2025-team/ds-project-2025.git
    ```
 
+1. Install and initialize Kafka
+
+    ```sh
+    uv run invoke install-kafka
+    ```
+
+## Running the program
+
+1. Start Kafka server
+
+   ```sh
+    uv run invoke start-kafka
+   ```
+
+1. Start node.
+   Repeat at least twice, for example in different terminal tabs.
+
+    ```sh
+    uv run invoke start
+    ```
+
+    Parameters:
+    - `--role`: optional, defaults to `follower`
+    - `--server`: optional, defaults to `localhost`
+    - `--port`: optional, defaults to `9092`
+    - `--log-level`: optional, defaults to `INFO`
+
+1. Start client to send inputs to the system
+
+    ```sh
+    uv run invoke start-client
+    ```
+
+    Parameters:
+    - `--server`: optional, defaults to `localhost`
+    - `--port`: optional, defaults to `9092`
+
+    Edit [`client.py`](/src/client.py) to change input.
+
 ## Documentation
 
 - [Architecture](/docs/architecture.md)
 
-## Invoke tasks
+## Tasks
 
-Start program
-
-```sh
-uv run invoke start --role leader --server test.com --port 9092 --log-level [DEBUG|INFO|WARNING|ERROR|CRITICAL]
-```
-
-- `--role`: optional, defaults to `follower`
-- `--server`: optional, defaults to `localhost`
-- `--port`: optional, defaults to `9092`
-- `--log-level`: optional, defaults to `INFO`
-
-See `tasks.py` for other tasks:
+See [`tasks.py`](/tasks.py) for other tasks:
 
 ```sh
 uv run invoke task-name-kebab-case
