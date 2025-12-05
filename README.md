@@ -56,6 +56,13 @@
 
     Edit `start_client()` in [`tasks.py`](/tasks.py) to change input.
 
+> [TIP]
+> Use `--help` to get more information about invoke task parameters.
+>
+> ```sh
+> uv run invoke start --help
+> ```
+
 ## Documentation
 
 - [Architecture](/docs/architecture.md)
