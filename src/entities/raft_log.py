@@ -39,7 +39,7 @@ class RaftLog:
         self.entries.append(entry)
 
     def commit(self) -> None:
-        if self.commit_index + 1 >= len(self.entries):
+        if self.commit_index >= len(self.entries):
             return
 
         entry = self.entries[self.commit_index]
