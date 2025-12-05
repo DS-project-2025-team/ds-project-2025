@@ -45,11 +45,11 @@ class TaskSchedulerService(Hashable):
 
         self.__completed_tasks[task] = True
 
-    def done(self) -> bool:
+    def done(self, result: bool) -> bool:
         """
-        Returns whether all tasks are done.
+        Returns whether computation is done.
         """
-        return self.__tasks_remaining == 0
+        return result or self.__tasks_remaining == 0
 
     def __hash__(self) -> int:
         return self.__hash

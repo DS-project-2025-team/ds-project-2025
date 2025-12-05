@@ -148,7 +148,7 @@ class Leader(AbstractAsyncContextManager):
 
         satisfiable: bool = message.data["result"]
 
-        if not self.__check_done(satisfiable):
+        if not (self.__scheduler and self.__scheduler.done(satisfiable)):
             return
 
         await self.__send_output(satisfiable)
@@ -200,11 +200,6 @@ class Leader(AbstractAsyncContextManager):
 
         self.__log.append(entry)
         self.__log.commit()
-
-    def __check_done(self, satisfiable: bool) -> bool:
-        no_tasks = self.__scheduler is not None and self.__scheduler.done()
-
-        return satisfiable or no_tasks
 
     def __reset_scheduler(self) -> None:
         self.__scheduler = None
