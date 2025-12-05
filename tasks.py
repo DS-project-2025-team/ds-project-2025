@@ -11,6 +11,9 @@ from config import KAFKA_CLUSTER_ID, KAFKA_PATH, ROOT_DIR, SOURCE_DIR
 from client import run_client
 from entities.sat_formula import SatFormula
 from entities.server_address import ServerAddress
+from main import main
+from roles.role import Role
+from services.logger_service import logger
 
 
 @task
@@ -49,25 +52,27 @@ def coverage_html(ctx: Context) -> None:
         ctx.run("pytest --cov --cov-branch --cov-report html -n auto", pty=True)
 
 
-@task
+@task(
+    help={
+        "role": "Node role [follower | candidate | leader]. Defaults to follower",
+        "server": 'Kafka server. Defaults to "localhost"',
+        "port": "Kafka server port. Defaults to 9092",
+        "log_level": "Logging level [DEBUG | INFO | WARNING | ERROR | CRITICAL]. Defaults to INFO",
+    }
+)
 def start(
-    ctx: Context,
-    role: str | None = None,
-    server: str | None = None,
-    port: int | None = None,
-    log_level: int | None = None,
+    _: Context,
+    role: Role = Role.FOLLOWER,
+    server: str = "localhost",
+    port: int = 9092,
+    log_level: str = "INFO",
 ) -> None:
-    command = " ".join(
-        [
-            f"uv run python {SOURCE_DIR}/main.py",
-            f"--role {role}" if role else "",
-            f"--server {server}" if server else "",
-            f"--port {port}" if port else "",
-            f"--log-level {log_level}" if log_level else "",
-        ]
-    )
+    """
+    Starts a node.
+    """
+    server_address = ServerAddress(server, port)
 
-    ctx.run(command)
+    asyncio.run(main(role=role, server=server_address, log_level=log_level))
 
 
 @task(
