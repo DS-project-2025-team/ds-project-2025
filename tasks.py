@@ -1,13 +1,12 @@
 from pathlib import Path
+import sys
 from uuid import uuid4
-
 from invoke.context import Context
 from invoke.tasks import task
 
-ROOT_DIR = Path(__file__).parent
-SOURCE_DIR = ROOT_DIR / "src"
-KAFKA_DIR = ROOT_DIR / "bin" / "kafka"
-KAFKA_CLUSTER_ID = "e54a5213-2e0f-49d6-8339-978aae554a11"
+sys.path.append(str(Path(__file__).parent / "src"))
+
+from config import KAFKA_CLUSTER_ID, KAFKA_PATH, ROOT_DIR, SOURCE_DIR
 
 
 @task
@@ -89,16 +88,18 @@ def install_kafka(ctx: Context) -> None:
     ctx.run(f"uv run python {SOURCE_DIR}/install_kafka.py")
 
     ctx.run(
-        f"{KAFKA_DIR}/bin/kafka-storage.sh format --standalone -t {KAFKA_CLUSTER_ID} -c kafka-config/server.properties"
+        f"{KAFKA_PATH}/bin/kafka-storage.sh format --standalone -t {KAFKA_CLUSTER_ID} -c kafka-config/server.properties"
     )
 
 
 @task
 def start_kafka(ctx: Context) -> None:
     with ctx.cd(ROOT_DIR):
-        ctx.run(f"{KAFKA_DIR}/bin/kafka-server-start.sh kafka-config/server.properties")
+        ctx.run(
+            f"{KAFKA_PATH}/bin/kafka-server-start.sh kafka-config/server.properties"
+        )
 
 
 @task
 def stop_kafka(ctx: Context) -> None:
-    ctx.run(f"{KAFKA_DIR}/bin/kafka-server-stop.sh")
+    ctx.run(f"{KAFKA_PATH}/bin/kafka-server-stop.sh")
