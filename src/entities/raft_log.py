@@ -24,7 +24,7 @@ class RaftLog:
         self.leader_state: LeaderState = leader_state or LeaderState()
 
     @property
-    def completed_tasks(self) -> list[int]:
+    def completed_tasks(self) -> list[bool]:
         return self.leader_state.completed_tasks
 
     @property
