@@ -63,6 +63,7 @@ class Follower(AbstractAsyncContextManager):
                 group.create_task(self.__handle_heartbeat())
                 group.create_task(self.__handle_assign())
 
+                logger.info("Follower is running")
         except TimeoutError:
             logger.warning("Missing heartbeat, election timeout elapsed.")
 
