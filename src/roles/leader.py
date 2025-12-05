@@ -150,12 +150,12 @@ class Leader(AbstractAsyncContextManager):
 
         if satisfiable:
             await self.__send_output(satisfiable)
-            self.__remove_current_formula()
+            self.__reset_scheduler()
             return
 
         if self.__scheduler and self.__scheduler.done():
             await self.__send_output(False)
-            self.__remove_current_formula()
+            self.__reset_scheduler()
 
     @async_loop
     async def __handle_input(self, timeout: Second) -> None:
@@ -203,6 +203,10 @@ class Leader(AbstractAsyncContextManager):
 
         self.__log.append(entry)
         self.__log.commit()
+
+    def __reset_scheduler(self) -> None:
+        self.__scheduler = None
+        self.__remove_current_formula()
 
     def __set_new_completed_tasks(self, completed_tasks: list[bool]) -> None:
         entry = LogEntryFactory.set_completed_tasks(self.__log.term, completed_tasks)
