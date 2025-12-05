@@ -148,14 +148,11 @@ class Leader(AbstractAsyncContextManager):
 
         satisfiable: bool = message.data["result"]
 
-        if satisfiable:
-            await self.__send_output(satisfiable)
-            self.__reset_scheduler()
+        if not self.__check_done(satisfiable):
             return
 
-        if self.__scheduler and self.__scheduler.done():
-            await self.__send_output(False)
-            self.__reset_scheduler()
+        await self.__send_output(satisfiable)
+        self.__reset_scheduler()
 
     @async_loop
     async def __handle_input(self, timeout: Second) -> None:
@@ -203,6 +200,11 @@ class Leader(AbstractAsyncContextManager):
 
         self.__log.append(entry)
         self.__log.commit()
+
+    def __check_done(self, satisfiable: bool) -> bool:
+        no_tasks = self.__scheduler is not None and self.__scheduler.done()
+
+        return satisfiable or no_tasks
 
     def __reset_scheduler(self) -> None:
         self.__scheduler = None
