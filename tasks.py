@@ -1,6 +1,6 @@
 from pathlib import Path
 import sys
-from uuid import uuid4
+
 from invoke.context import Context
 from invoke.tasks import task
 
