@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 from entities.leader_state import LeaderState
 from entities.log_entry import LogEntry
 from entities.sat_formula import SatFormula
+from services.logger_service import logger
 
 
 class RaftLog:
@@ -43,8 +44,12 @@ class RaftLog:
 
         entry = self.entries[self.commit_index]
 
+        logger.info(f"Committing log entry, state before: {self.leader_state}")
+
         entry.operate(self.leader_state)
         self.commit_index += 1
+
+        logger.info(f"Committed log entry, state after: {self.leader_state}")
 
     def revert(self, index: int) -> None:
         if index < -1 or index >= len(self.entries):
