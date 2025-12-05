@@ -11,7 +11,7 @@ class RaftLog:
     def __init__(
         self,
         entries: Iterable[LogEntry] | None = None,
-        commit_index: int = -1,
+        commit_index: int = 0,
         term: int = 0,
         leader_id: UUID | None = None,
         leader_state: LeaderState | None = None,
