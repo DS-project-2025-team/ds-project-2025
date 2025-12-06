@@ -170,7 +170,7 @@ class Leader(AbstractAsyncContextManager):
 
     @async_loop
     async def __assign_task(self, exponent: int = SUBINTERVAL_EXPONENT) -> None:
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
 
         if (formula := self.__log.current_formula) is None:
             logger.debug("No current formula to assign tasks for")
