@@ -11,7 +11,7 @@ from utils.task import get_subinterval
 
 
 class WorkerService(AbstractContextManager):
-    def __init__(self, processes: int = 8) -> None:
+    def __init__(self, processes: int = os.cpu_count() or 4) -> None:
         self.__pool: Pool = Pool(processes)
 
     def __enter__(self) -> Self:
