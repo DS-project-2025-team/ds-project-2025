@@ -27,7 +27,6 @@ class MessageProducer(AbstractAsyncContextManager):
         logger.debug(
             f"Sent message {topic}: {payload}",
         )
-        logger.debug(f"Sent {topic}")
 
     async def send_and_wait(self, topic: Topic, payload: dict) -> None:
         metadata: RecordMetadata = await self.__producer.send_and_wait(topic, payload)
