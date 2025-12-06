@@ -35,7 +35,7 @@ class MessageProducer(AbstractAsyncContextManager):
         metadata: RecordMetadata = await self.__producer.send_and_wait(topic, payload)
 
         if logging.getLevelName(logger.get_level()) == "DEBUG":
-            logger.debug(f"Sent {topic} {payload!r} {metadata.offset}")
+            logger.debug(f"Sent topic: {topic}, partition: {metadata.partition}, offset: {metadata.offset}, data:  {payload!r} ")
         else:
             logger.info(f"Sent topic: {topic}, partition: {metadata.partition}, offset: {metadata.offset}")
 
