@@ -2,73 +2,51 @@
 
 ```mermaid
 ---
-title: Classes
+title: Components
 ---
-classDiagram
+graph
 
-namespace Raft {
-    class Node
+roles[
+    roles
+    Raft roles and consensus algorithm
+]
+network[
+    network
+    Handles messaging between nodes
+]
+services[
+    services
+    Business logic
+]
+entities[
+    entities
+    Types and objects, mostly data objects
+]
+utils[
+    utils
+    helper functions
+]
 
-    class Candidate {
-        +elect()
-    }
 
-    class Leader {
-        +run()
-    }
+roles --> network
+roles --> services
+roles --> utils
+roles --> entities
 
-    class Follower {
-        +run()
-    }
+services --> utils
+services --> entities
 
-    class Roles {
-        CANDIDATE
-        FOLLOWER
-        LEADER
-    }
-    class RaftLog {
-        -nodes
-        -leader_id
-        -commit_index
-        -queue
-        -formula
-        -tasks
-        -uncompleted_tasks
+network --> entities
+network --> services
+network --> utils
 
-        +commit()
-        +revert()
-    }
-    class LogEntry {
-        +operate()
-    }
-}
-
-class MessageService
-class LoggerService
-class Client
-
-note for LoggerService "Singleton, used everywhere"
-note for MessageService "Singleton, Kafka client"
-note for Client "CLI client"
-
-<<Enum>> Roles
-Node --> Roles
-Node --> Candidate
-Node --> Leader
-Node --> Follower
-Node --> RaftLog
-Node -- MessageService
-
-Leader -- MessageService
-Follower -- MessageService
-Candidate -- MessageService
-Leader -- RaftLog
-Follower -- RaftLog
-
-RaftLog -- LogEntry
-
-Client -- MessageService
+entities --> services
 ```
+
+The usage of other directories:
+
+- `benchmark`: Performance testing
+- `examples`: Prototyping
 
 ## Initialization
 
