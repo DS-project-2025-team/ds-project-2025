@@ -1,6 +1,6 @@
 import asyncio
 from collections.abc import Callable, Coroutine
-from contextlib import AbstractAsyncContextManager
+from contextlib import AbstractAsyncContextManager, AbstractContextManager
 from multiprocessing.pool import Pool
 from types import TracebackType
 from typing import Self
@@ -10,15 +10,15 @@ from utils.check_sat import check_sat_formula
 from utils.task import get_subinterval
 
 
-class WorkerService(AbstractAsyncContextManager):
+class WorkerService(AbstractContextManager):
     def __init__(self, processes: int = 8) -> None:
         self.__pool: Pool = Pool(processes)
 
-    async def __aenter__(self) -> Self:
+    def __enter__(self) -> Self:
         self.__pool.__enter__()
         return self
 
-    async def __aexit__(
+    def __exit__(
         self,
         exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
