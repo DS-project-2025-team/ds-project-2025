@@ -52,7 +52,7 @@ class MessageConsumerFactory:
     @staticmethod
     def client_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
         return MessageConsumer(
-            Topic.OUTPUT, server=server, groupid=str(node_id), offset_reset="earliest"
+            Topic.OUTPUT, server=server, groupid=str(node_id), offset_reset="latest"
         )
 
     @staticmethod
