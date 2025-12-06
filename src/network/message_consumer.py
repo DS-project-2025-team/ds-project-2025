@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 from contextlib import AbstractAsyncContextManager, suppress
 from types import TracebackType
 from typing import Literal, Self
@@ -56,9 +57,11 @@ class MessageConsumer(AbstractAsyncContextManager):
         with suppress(IllegalOperation):
             await self.__consumer.commit()
 
-        logger.debug(
-            f"Received message {message})",
-        )
+        if logging.getLevelName(logger.get_level()) == "DEBUG":
+            logger.debug(f"Received topic: {message.topic}, partition: {message.partition}, offset: {message.offset}, data: {message.data}")
+        else:
+            logger.info(f"Received topic: {message.topic}")
+
 
         return message
 

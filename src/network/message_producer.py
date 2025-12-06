@@ -1,4 +1,5 @@
 import json
+import logging
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
 from typing import Any, Self
@@ -12,7 +13,7 @@ from services.logger_service import logger
 
 
 def serializer(value: dict) -> bytes:
-    return json.dumps(value).encode()
+        return json.dumps(value).encode()
 
 
 class MessageProducer(AbstractAsyncContextManager):
@@ -24,13 +25,19 @@ class MessageProducer(AbstractAsyncContextManager):
 
     async def send(self, topic: Topic, payload: dict[str, Any]) -> None:
         await self.__producer.send(topic, payload)
-        logger.debug(
-            f"Sent message {topic}: {payload}",
-        )
+
+        if logging.getLevelName(logger.get_level()) == "DEBUG":
+            logger.debug(f"Sent {topic} {payload}")
+        else:
+            logger.info(f"Sent topic: {topic}")
 
     async def send_and_wait(self, topic: Topic, payload: dict) -> None:
         metadata: RecordMetadata = await self.__producer.send_and_wait(topic, payload)
-        logger.debug(f"Sent message {topic}: {metadata}")
+
+        if logging.getLevelName(logger.get_level()) == "DEBUG":
+            logger.debug(f"Sent {topic} {payload!r} {metadata.offset}")
+        else:
+            logger.info(f"Sent topic: {topic}, partition: {metadata.partition}, offset: {metadata.offset}")
 
     async def __aenter__(self) -> Self:
         await self.__producer.start()

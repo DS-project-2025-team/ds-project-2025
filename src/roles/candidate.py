@@ -40,8 +40,8 @@ class Candidate:
         self.__vote_consumer = MessageConsumerFactory.vote_consumer(
             server=server, node_id=node_id
         )
-        self.__heartbeat_consumer: MessageConsumer = (
-            MessageConsumerFactory.heartbeat_consumer(server=server, node_id=node_id)
+        self.__appendentry_consumer: MessageConsumer = (
+            MessageConsumerFactory.appendentry_consumer(server=server, node_id=node_id)
         )
 
     async def elect(self) -> Role:
@@ -103,7 +103,7 @@ class Candidate:
     @async_loop
     async def __check_leader_existence(self) -> bool:
         try:
-            await self.__heartbeat_consumer.receive(timeout=Second(1))
+            await self.__appendentry_consumer.receive(timeout=Second(1))
 
             logger.info("Detected existing leader via heartbeat")
 

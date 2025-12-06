@@ -28,8 +28,8 @@ class Follower(AbstractAsyncContextManager):
         worker: WorkerService | None = None,
     ) -> None:
         self.__producer: MessageProducer = MessageProducer(server=server)
-        self.__heartbeat_consumer: MessageConsumer = (
-            MessageConsumerFactory.heartbeat_consumer(server=server, node_id=node_id)
+        self.__appendentry_consumer: MessageConsumer = (
+            MessageConsumerFactory.appendentry_consumer(server=server, node_id=node_id)
         )
         self.__assign_consumer: MessageConsumer = (
             MessageConsumerFactory.assign_consumer(server=server)
@@ -43,7 +43,7 @@ class Follower(AbstractAsyncContextManager):
 
     async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
-        await self.__heartbeat_consumer.__aenter__()
+        await self.__appendentry_consumer.__aenter__()
         await self.__assign_consumer.__aenter__()
         self.__worker.__enter__()
 
@@ -56,14 +56,14 @@ class Follower(AbstractAsyncContextManager):
         traceback: TracebackType | None,
     ) -> None:
         await self.__producer.__aexit__(exc_type, exc_value, traceback)
-        await self.__heartbeat_consumer.__aexit__(exc_type, exc_value, traceback)
+        await self.__appendentry_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__assign_consumer.__aexit__(exc_type, exc_value, traceback)
         self.__worker.__exit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.CANDIDATE]:
         try:
             async with asyncio.TaskGroup() as group:
-                group.create_task(self.__handle_heartbeat())
+                group.create_task(self.__handle_appendentry())
                 group.create_task(self.__handle_assign())
 
                 logger.info("Follower is running")
@@ -74,15 +74,15 @@ class Follower(AbstractAsyncContextManager):
         return Role.CANDIDATE
 
     @async_loop
-    async def __handle_heartbeat(self) -> None:
-        message = await self.__heartbeat_consumer.receive(self.__election_timeout)
-        await self.__heartbeat_consumer.commit()
+    async def __handle_appendentry(self) -> None:
+        message = await self.__appendentry_consumer.receive(self.__election_timeout)
+        await self.__appendentry_consumer.commit()
 
         logger.debug(f"Received {message.topic}")
 
         # send response with received message offset
         await self.__producer.send(
-            Topic.HEARTBEAT_RESPONSE,
+            Topic.APPENDENTRY_RESPONSE,
             {
                 "responder_uuid": str(self.__node_id),
                 "original_offset": message.offset,

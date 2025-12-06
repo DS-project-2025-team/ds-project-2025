@@ -34,8 +34,8 @@ class Leader(AbstractAsyncContextManager):
             server,
             node_id,
         )
-        self.__heartbeat_consumer: MessageConsumer = (
-            MessageConsumerFactory.heartbeat_response_consumer(
+        self.__appendentry_consumer: MessageConsumer = (
+            MessageConsumerFactory.appendentry_response_consumer(
                 server=server, node_id=node_id
             )
         )
@@ -50,7 +50,7 @@ class Leader(AbstractAsyncContextManager):
     async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
         await self.__input_consumer.__aenter__()
-        await self.__heartbeat_consumer.__aenter__()
+        await self.__appendentry_consumer.__aenter__()
         await self.__report_consumer.__aenter__()
 
         return self
@@ -61,7 +61,7 @@ class Leader(AbstractAsyncContextManager):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        await self.__heartbeat_consumer.__aexit__(exc_type, exc_value, traceback)
+        await self.__appendentry_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__report_consumer.__aexit__(exc_type, exc_value, traceback)
@@ -69,8 +69,8 @@ class Leader(AbstractAsyncContextManager):
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
             async with asyncio.TaskGroup() as group:
-                _task1 = group.create_task(self.__send_heartbeat())
-                _task2 = group.create_task(self.__receive_heartbeat_response())
+                _task1 = group.create_task(self.__send_appendentry())
+                _task2 = group.create_task(self.__receive_appendentry_response())
                 _task3 = group.create_task(self.__handle_input(Second(1)))
                 _task4 = group.create_task(self.__assign_task())
                 _task5 = group.create_task(self.__handle_report())
@@ -110,22 +110,23 @@ class Leader(AbstractAsyncContextManager):
         logger.info(f"Sent result {result}")
 
     @async_loop
-    async def __send_heartbeat(self) -> None:
+    async def __send_appendentry(self) -> None:
+        commit_index = self.__log.get_commit_index()
+        #entries = self.__log.get_raftlog_entries(self.__log.get_commit_index()+1)
+        entries = [e.to_dict() for e in self.__log.get_raftlog_entries(commit_index+1)]
+
         await self.__producer.send_and_wait(
-            Topic.HEARTBEAT, {"sender": str(self.__node_id)}
+            Topic.APPENDENTRY, {"sender": str(self.__node_id), "entries": entries}
         )
-
-        logger.debug(f"Sent {Topic.HEARTBEAT}")
-
         await asyncio.sleep(2)
 
     @async_loop
-    async def __receive_heartbeat_response(self) -> None:
+    async def __receive_appendentry_response(self) -> None:
         """
-        Read messages via heartbeat_response_consumer
+        Read messages via appendentry_response_consumer
         """
 
-        message = await self.__heartbeat_consumer.receive()
+        message = await self.__appendentry_consumer.receive()
         await self.__handle_message(message)
 
     async def __send_task(self, formula: SatFormula, task: int, exponent: int) -> None:
@@ -161,7 +162,7 @@ class Leader(AbstractAsyncContextManager):
 
             logger.info(f"Received new SAT formula: {formula}")
 
-            entry = LogEntryFactory.add_formula(self.__log.term, formula)
+            entry = LogEntryFactory.add_formula(self.__log, formula)
 
             self.__log.append(entry)
             self.__log.commit()
@@ -188,10 +189,10 @@ class Leader(AbstractAsyncContextManager):
         await self.__send_task(formula, task, exponent)
 
     async def __handle_message(self, message: Message) -> None:
-        logger.debug(f"Received {message.topic}")
+        pass
 
     def __complete_task(self, task: int) -> None:
-        entry = LogEntryFactory.complete_task(self.__log.term, task)
+        entry = LogEntryFactory.complete_task(self.__log, task)
 
         if not self.__scheduler:
             return
@@ -199,6 +200,7 @@ class Leader(AbstractAsyncContextManager):
         self.__scheduler.complete_task(task)
 
         self.__log.append(entry)
+        # here we must wait until majority of non-faulty nodes have acknowledged before committing.
         self.__log.commit()
 
     def __reset_scheduler(self) -> None:
@@ -206,13 +208,15 @@ class Leader(AbstractAsyncContextManager):
         self.__remove_current_formula()
 
     def __set_new_completed_tasks(self, completed_tasks: list[bool]) -> None:
-        entry = LogEntryFactory.set_completed_tasks(self.__log.term, completed_tasks)
+        entry = LogEntryFactory.set_completed_tasks(self.__log, completed_tasks)
 
         self.__log.append(entry)
+        # here we must wait until majority of non-faulty nodes have acknowledged before committing.
         self.__log.commit()
 
     def __remove_current_formula(self) -> None:
-        entry = LogEntryFactory.pop_formula(self.__log.term)
+        entry = LogEntryFactory.pop_formula(self.__log)
 
         self.__log.append(entry)
+        # here we must wait until majority of non-faulty nodes have acknowledged before committing.
         self.__log.commit()

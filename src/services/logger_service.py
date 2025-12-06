@@ -1,6 +1,9 @@
 import logging
 import sys
+from collections.abc import Callable
+from typing import Any
 
+LogFunc = Callable[..., None]
 
 class LoggerService:
     def __init__(self) -> None:

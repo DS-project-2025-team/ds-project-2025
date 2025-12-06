@@ -1,3 +1,4 @@
+import threading
 from collections.abc import Iterable
 from uuid import UUID, uuid4
 
@@ -21,7 +22,7 @@ class RaftLog:
         self.commit_index: int = commit_index
         self.term: int = term
         self.leader_id: UUID = leader_id or uuid4()
-
+        self.lock = threading.Lock()
         self.leader_state: LeaderState = leader_state or LeaderState()
 
     @property
@@ -36,7 +37,10 @@ class RaftLog:
         return self.leader_state.formulas[0]
 
     def append(self, entry: LogEntry) -> None:
-        self.entries.append(entry)
+        with self.lock:
+            entry.set_index(self.entries.__len__())
+            self.entries.append(entry)
+            logger.debug(f"Applied entry {entry.to_dict()} to raftlog")
 
     def commit(self) -> None:
         if self.commit_index >= len(self.entries):
@@ -44,12 +48,12 @@ class RaftLog:
 
         entry = self.entries[self.commit_index]
 
-        logger.info(f"Committing log entry, state before: {self.leader_state}")
+        logger.info(f"Committing log entry index: {entry.get_index()}, state before: {self.leader_state}")
 
         entry.operate(self.leader_state)
         self.commit_index += 1
 
-        logger.info(f"Committed log entry, state after: {self.leader_state}")
+        logger.info(f"Committed log entry index: {entry.get_index()}, state after: {self.leader_state}")
 
     def revert(self, index: int) -> None:
         if index < -1 or index >= len(self.entries):
@@ -58,3 +62,12 @@ class RaftLog:
         # Trim entries to the requested index and update commit_index
         self.entries = self.entries[: index + 1]
         self.commit_index = index
+
+    def get_commit_index(self) -> int:
+        return self.commit_index
+
+    def get_raftlog_entries(self, fromindex: int=0) -> Iterable[LogEntry]:
+        return self.entries[fromindex:]
+
+    def get_entry_at_index(self, index: int) -> LogEntry:
+        return self.entries[index]
