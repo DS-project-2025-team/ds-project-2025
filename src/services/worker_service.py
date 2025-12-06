@@ -15,11 +15,11 @@ def compute(formula: SatFormula, task: int, exponent: int) -> bool:
 
 
 class WorkerService(AbstractContextManager):
-    def __init__(self, pool: ProcessPoolExecutor | None = None) -> None:
-        self.__pool: ProcessPoolExecutor = pool or ProcessPoolExecutor()
+    def __init__(self, executor: ProcessPoolExecutor | None = None) -> None:
+        self.__executor: ProcessPoolExecutor = executor or ProcessPoolExecutor()
 
     def __enter__(self) -> Self:
-        self.__pool.__enter__()
+        self.__executor.__enter__()
         return self
 
     def __exit__(
@@ -28,7 +28,7 @@ class WorkerService(AbstractContextManager):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        self.__pool.__exit__(exc_type, exc_value, traceback)
+        self.__executor.__exit__(exc_type, exc_value, traceback)
 
     async def run_task(
         self,
@@ -37,5 +37,5 @@ class WorkerService(AbstractContextManager):
         exponent: int,
     ) -> bool:
         return await asyncio.get_event_loop().run_in_executor(
-            self.__pool, compute, formula, task, exponent
+            self.__executor, compute, formula, task, exponent
         )
