@@ -1,6 +1,6 @@
 import asyncio
 from collections.abc import Callable, Coroutine
-from contextlib import AbstractAsyncContextManager, AbstractContextManager
+from contextlib import AbstractContextManager
 from multiprocessing.pool import Pool
 from types import TracebackType
 from typing import Self
