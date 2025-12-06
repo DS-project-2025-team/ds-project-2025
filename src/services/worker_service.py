@@ -15,6 +15,10 @@ def compute(formula: SatFormula, task: int, exponent: int) -> bool:
 
 
 class WorkerService(AbstractContextManager):
+    """
+    Class for running computation in multiple processes.
+    """
+
     def __init__(self, executor: ProcessPoolExecutor | None = None) -> None:
         self.__executor: ProcessPoolExecutor = executor or ProcessPoolExecutor()
 
@@ -36,6 +40,18 @@ class WorkerService(AbstractContextManager):
         task: int,
         exponent: int,
     ) -> bool:
+        """
+        Run a task.
+
+        Args:
+            formula (SatFormula): Formula to check.
+            task (int): Task index.
+            exponent (int): Subinterval exponent.
+
+        Returns:
+            bool: Satisfiability of given formula.
+        """
+
         return await asyncio.get_event_loop().run_in_executor(
             self.__executor, compute, formula, task, exponent
         )
