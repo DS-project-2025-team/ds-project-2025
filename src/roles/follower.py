@@ -16,9 +16,7 @@ from roles.role import Role
 from services.logger_service import logger
 from services.worker_service import WorkerService
 from utils.async_loop import async_loop
-from utils.check_sat import check_sat_formula
 from utils.hash_sat_formula import hash_sat_formula
-from utils.task import get_subinterval
 
 
 class Follower(AbstractAsyncContextManager):
@@ -103,13 +101,13 @@ class Follower(AbstractAsyncContextManager):
         task: int = data["task"]
         exponent: int = data["exponent"]
 
-        satisfiable = self.__compute(formula, task, exponent)
+        result = await self.__worker.run_task(
+            formula,
+            task,
+            exponent,
+        )
 
-        await self.__send_result(formula, task, satisfiable)
-
-    def __compute(self, formula: SatFormula, task: int, exponent: int) -> bool:
-        begin, end = get_subinterval(2**exponent, task)
-        return check_sat_formula(formula, begin, end)
+        await self.__send_result(formula, task, result)
 
     async def __send_result(self, formula: SatFormula, task: int, result: bool) -> None:
         payload = {

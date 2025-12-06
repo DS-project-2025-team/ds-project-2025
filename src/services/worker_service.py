@@ -1,7 +1,6 @@
 import asyncio
-from collections.abc import Callable, Coroutine
+from concurrent.futures import ProcessPoolExecutor
 from contextlib import AbstractContextManager
-from multiprocessing.pool import Pool
 from types import TracebackType
 from typing import Self
 
@@ -10,9 +9,14 @@ from utils.check_sat import check_sat_formula
 from utils.task import get_subinterval
 
 
+def compute(formula: SatFormula, task: int, exponent: int) -> bool:
+    begin, end = get_subinterval(2**exponent, task)
+    return check_sat_formula(formula, begin, end)
+
+
 class WorkerService(AbstractContextManager):
-    def __init__(self, processes: int = os.cpu_count() or 4) -> None:
-        self.__pool: Pool = Pool(processes)
+    def __init__(self, pool: ProcessPoolExecutor | None = None) -> None:
+        self.__pool: ProcessPoolExecutor = pool or ProcessPoolExecutor()
 
     def __enter__(self) -> Self:
         self.__pool.__enter__()
@@ -26,19 +30,12 @@ class WorkerService(AbstractContextManager):
     ) -> None:
         self.__pool.__exit__(exc_type, exc_value, traceback)
 
-    def run_task(
+    async def run_task(
         self,
         formula: SatFormula,
         task: int,
         exponent: int,
-        callback: Callable[[bool], Coroutine],
-    ) -> None:
-        self.__pool.apply_async(
-            self.__compute,
-            (formula, task, exponent),
-            callback=lambda result: asyncio.run(callback(result)),
+    ) -> bool:
+        return await asyncio.get_event_loop().run_in_executor(
+            self.__pool, compute, formula, task, exponent
         )
-
-    def __compute(self, formula: SatFormula, task: int, exponent: int) -> bool:
-        begin, end = get_subinterval(2**exponent, task)
-        return check_sat_formula(formula, begin, end)
