@@ -22,7 +22,7 @@ class MessageConsumer(AbstractAsyncContextManager):
         *topics: str,
         server: ServerAddress,
         groupid: str,
-        offset_reset: Literal["earliest", "latest"],
+        offset_reset: Literal["earliest", "latest"] = "latest",
     ) -> None:
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(
             *topics,
