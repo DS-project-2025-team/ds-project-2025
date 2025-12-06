@@ -14,6 +14,7 @@ from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
 from services.logger_service import logger
+from services.worker_service import WorkerService
 from utils.async_loop import async_loop
 from utils.check_sat import check_sat_formula
 from utils.hash_sat_formula import hash_sat_formula
@@ -26,6 +27,7 @@ class Follower(AbstractAsyncContextManager):
         server: ServerAddress,
         node_id: UUID,
         election_timeout: Second | None = None,
+        worker: WorkerService | None = None,
     ) -> None:
         self.__producer: MessageProducer = MessageProducer(server=server)
         self.__heartbeat_consumer: MessageConsumer = (
@@ -34,6 +36,7 @@ class Follower(AbstractAsyncContextManager):
         self.__assign_consumer: MessageConsumer = (
             MessageConsumerFactory.assign_consumer(server=server)
         )
+        self.__worker: WorkerService = worker or WorkerService()
 
         self.__election_timeout: Second = election_timeout or Second(
             10 + random.randint(0, 5)
@@ -44,6 +47,7 @@ class Follower(AbstractAsyncContextManager):
         await self.__producer.__aenter__()
         await self.__heartbeat_consumer.__aenter__()
         await self.__assign_consumer.__aenter__()
+        self.__worker.__enter__()
 
         return self
 
@@ -56,6 +60,7 @@ class Follower(AbstractAsyncContextManager):
         await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__heartbeat_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__assign_consumer.__aexit__(exc_type, exc_value, traceback)
+        self.__worker.__exit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.CANDIDATE]:
         try:
