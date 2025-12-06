@@ -7,6 +7,10 @@ from utils.task import get_tasks_from_formula
 
 
 class TaskSchedulerService(Hashable):
+    """
+    Class for managing tasks.
+    """
+
     def __init__(
         self,
         formula: SatFormula,
