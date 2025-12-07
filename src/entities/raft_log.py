@@ -49,6 +49,17 @@ class RaftLog:
 
         return self.entries[-1].index
 
+    @property
+    def last_log_term(self) -> int:
+        """
+        Return term of the last log entry if exists, otherwise 0.
+        """
+
+        if not self.entries:
+            return 0
+
+        return self.entries[-1].term
+
     def append(self, entry: LogEntry) -> None:
         with self.lock:
             entry.index = self.entries.__len__()
