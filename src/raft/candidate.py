@@ -69,7 +69,7 @@ class Candidate(AbstractAsyncContextManager):
         role = Role.FOLLOWER
 
         try:
-            await asyncio.create_task(self.__check_leader_existence())
+            await asyncio.create_task(self.__check_leader_existence(term))
 
             role = await asyncio.wait_for(
                 self.__elect(term, nodes), timeout=self.__vote_timeout
@@ -132,13 +132,10 @@ class Candidate(AbstractAsyncContextManager):
         return 1
 
     @async_loop
-    async def __check_leader_existence(self) -> bool:
-        try:
-            await self.__appendentry_consumer.receive(timeout=Second(1))
+    async def __check_leader_existence(self, term: int) -> None:
+        message = await self.__appendentry_consumer.receive()
 
-            logger.info("Detected existing leader via heartbeat")
+        leader_term = message.data["term"]
 
+        if leader_term >= term:
             raise LeaderExistsError()
-
-        except TimeoutError:
-            return False
