@@ -1,4 +1,7 @@
 import asyncio
+from contextlib import AbstractAsyncContextManager
+from types import TracebackType
+from typing import Self
 from uuid import UUID
 
 from entities.raft_log import RaftLog
@@ -19,7 +22,7 @@ class SufficientVotes(Exception):  # noqa: N818
     pass
 
 
-class Candidate:
+class Candidate(AbstractAsyncContextManager):
     def __init__(
         self,
         server: ServerAddress,
@@ -45,6 +48,24 @@ class Candidate:
         self.__appendentry_consumer: MessageConsumer = (
             MessageConsumerFactory.appendentry_consumer(server=server, node_id=node_id)
         )
+
+    async def __aenter__(self) -> Self:
+        await self.__ping_service.__aenter__()
+        await self.__producer.__aenter__()
+        await self.__vote_consumer.__aenter__()
+        await self.__appendentry_consumer.__aenter__()
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        await self.__ping_service.__aexit__(exc_type, exc_value, traceback)
+        await self.__producer.__aexit__(exc_type, exc_value, traceback)
+        await self.__vote_consumer.__aexit__(exc_type, exc_value, traceback)
+        await self.__appendentry_consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def elect(self) -> Role:
         logger.info(f"Starting election for term {self.__term}")
