@@ -62,11 +62,14 @@ class Candidate(AbstractAsyncContextManager):
         await self.__vote_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__appendentry_consumer.__aexit__(exc_type, exc_value, traceback)
 
-    async def elect(self) -> Role:
+    async def run(self) -> Role:
         term = self.__log.term + 1
-        logger.info(f"Starting election for term {term}")
-
         nodes = await self.__count_nodes()
+
+        return await self.__elect(term, nodes)
+
+    async def __elect(self, term: int, nodes: int) -> Role:
+        logger.info(f"Starting election for term {term}")
 
         begin_time = asyncio.get_event_loop().time()
         role = Role.FOLLOWER
