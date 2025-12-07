@@ -5,6 +5,10 @@ from roles.role import Role
 
 
 class ConsumerGroup(str):
+    """
+    Class representing Kafka consumer group.
+    """
+
     @classmethod
     def leader(cls) -> Self:
         return cls(Role.LEADER)
