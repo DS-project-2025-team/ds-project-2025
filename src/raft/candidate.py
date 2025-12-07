@@ -78,7 +78,10 @@ class Candidate(AbstractAsyncContextManager):
         except LeaderExistsError:
             logger.info("Detected existing leader, aborting election.")
 
-        except (TimeoutError, OutDatedTermError):
+        except OutDatedTermError:
+            logger.info(f"Term {term} is out of date")
+
+        except TimeoutError:
             logger.info(f"Election for term {term} timed out.")
             role = Role.CANDIDATE
 
