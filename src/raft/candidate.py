@@ -75,11 +75,8 @@ class Candidate(AbstractAsyncContextManager):
                 self.__elect(term, nodes), timeout=self.__vote_timeout
             )
 
-        except LeaderExistsError:
-            logger.info("Detected existing leader, aborting election.")
-
-        except OutDatedTermError:
-            logger.info(f"Term {term} is out of date")
+        except (LeaderExistsError, OutDatedTermError) as error:
+            logger.info(str(error))
 
         except TimeoutError:
             logger.info(f"Election for term {term} timed out.")
@@ -127,7 +124,7 @@ class Candidate(AbstractAsyncContextManager):
 
         if vote_term > term:
             self.__log.term = vote_term
-            raise OutDatedTermError()
+            raise OutDatedTermError(term, vote_term)
 
         if not vote_granted:
             return 0
