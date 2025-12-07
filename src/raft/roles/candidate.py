@@ -18,10 +18,6 @@ from services.ping_service import PingService
 from utils.async_loop import async_loop
 
 
-class SufficientVotes(Exception):  # noqa: N818
-    pass
-
-
 class Candidate(AbstractAsyncContextManager):
     def __init__(
         self,
