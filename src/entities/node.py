@@ -14,12 +14,10 @@ class Node:
         self,
         server: ServerAddress,
         node_id: UUID | None = None,
-        peers: list[str] | None = None,
         role: Role = Role.FOLLOWER,
         log: RaftLog | None = None,
     ) -> None:
         self.node_id: UUID = node_id or uuid4()
-        self.peers: list[str] = peers or []
         self.__server: ServerAddress = server
         self.__role: Role = role
         self.__log: RaftLog = log or RaftLog()
