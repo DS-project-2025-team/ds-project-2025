@@ -58,6 +58,10 @@ class Candidate(AbstractAsyncContextManager):
         await self.__vote_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__appendentry_consumer.__aexit__(exc_type, exc_value, traceback)
 
+    @property
+    def term(self) -> int:
+        return self.__log.term
+
     async def run(self) -> Role:
         self.__log.term += 1
         nodes = await self.__count_nodes()
@@ -75,13 +79,13 @@ class Candidate(AbstractAsyncContextManager):
             logger.info(str(error))
 
         except TimeoutError:
-            logger.info(f"Election for term {self.__log.term} timed out.")
+            logger.info(f"Election for term {self.term} timed out.")
             role = Role.CANDIDATE
 
         return role
 
     async def __elect(self, nodes: int) -> Role:
-        logger.info(f"Starting election for term {self.__log.term}")
+        logger.info(f"Starting election for term {self.term}")
 
         await self.__send_vote_request()
         await self.__wait_for_votes(nodes)
@@ -93,7 +97,7 @@ class Candidate(AbstractAsyncContextManager):
         last_log_term = self.__log.last_log_term
 
         payload = {
-            "term": self.__log.term,
+            "term": self.term,
             "candidate_id": self.__id,
             "last_log_index": last_log_index,
             "last_log_term": last_log_term,
@@ -118,9 +122,9 @@ class Candidate(AbstractAsyncContextManager):
         vote_term = message.data["term"]
         vote_granted = message.data["vote_granted"]
 
-        if vote_term > self.__log.term:
+        if vote_term > self.term:
             self.__log.term = vote_term
-            raise OutDatedTermError(self.__log.term, vote_term)
+            raise OutDatedTermError(self.term, vote_term)
 
         if not vote_granted:
             return 0
@@ -133,5 +137,5 @@ class Candidate(AbstractAsyncContextManager):
 
         leader_term = message.data["term"]
 
-        if leader_term >= self.__log.term:
+        if leader_term >= self.term:
             raise LeaderExistsError()
