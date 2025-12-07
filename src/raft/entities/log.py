@@ -21,7 +21,6 @@ class Log:
 
         self.commit_index: int = commit_index
         self.__term: int = term
-        self.leader_id: UUID = leader_id or uuid4()
         self.lock = threading.Lock()
         self.event = threading.Event()
         self.last_acked_index = -1
