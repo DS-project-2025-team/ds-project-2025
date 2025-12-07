@@ -33,7 +33,7 @@ class Candidate(AbstractAsyncContextManager):
         self.__id = node_id
         self.__vote_timeout = vote_timeout
 
-        self.__term = log.term + 1
+        self.__log: RaftLog = log
 
         self.__ping_service: PingService = PingService(server=server, node_id=node_id)
         self.__producer = MessageProducer(server=server)
@@ -63,7 +63,8 @@ class Candidate(AbstractAsyncContextManager):
         await self.__appendentry_consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def elect(self) -> Role:
-        logger.info(f"Starting election for term {self.__term}")
+        term = self.__log.term + 1
+        logger.info(f"Starting election for term {term}")
 
         begin_time = asyncio.get_event_loop().time()
         role = Role.FOLLOWER
@@ -76,7 +77,7 @@ class Candidate(AbstractAsyncContextManager):
             async with asyncio.TaskGroup() as group:
                 _task1 = group.create_task(self.__check_leader_existence())
                 _task2 = group.create_task(self.__check_timeout(begin_time))
-                _task3 = group.create_task(self.__check_votes())
+                _task3 = group.create_task(self.__check_votes(term))
 
         except LeaderExistsError:
             logger.info("Detected existing leader, aborting election.")
@@ -86,7 +87,7 @@ class Candidate(AbstractAsyncContextManager):
             role = Role.CANDIDATE
 
         except SufficientVotes:
-            logger.info(f"Won the election for term {self.__term}")
+            logger.info(f"Won the election for term {term}")
             role = Role.LEADER
 
         return role
@@ -121,8 +122,8 @@ class Candidate(AbstractAsyncContextManager):
         except TimeoutError:
             return False
 
-    async def __check_votes(self) -> None:
-        self.__votes += await self.__receive_vote(self.__term)
+    async def __check_votes(self, term: int) -> None:
+        self.__votes += await self.__receive_vote(term)
 
         if self.__votes < self.__required_votes:
             return
