@@ -123,8 +123,10 @@ class Candidate(AbstractAsyncContextManager):
         vote_granted = message.data["vote_granted"]
 
         if vote_term > self.term:
+            old_term = self.term
             self.__log.term = vote_term
-            raise OutDatedTermError(self.term, vote_term)
+
+            raise OutDatedTermError(old_term, vote_term)
 
         if not vote_granted:
             return 0
