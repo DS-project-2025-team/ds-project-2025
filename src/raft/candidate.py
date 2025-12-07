@@ -88,12 +88,7 @@ class Candidate(AbstractAsyncContextManager):
         logger.info(f"Starting election for term {term}")
 
         await self.__send_vote_request(term)
-
-        votes_required = nodes // 2 + 1
-        votes = 0
-
-        while votes < votes_required:
-            votes += await self.__receive_vote(term)
+        await self.__wait_for_votes(term, nodes)
 
         return Role.LEADER
 
@@ -110,6 +105,13 @@ class Candidate(AbstractAsyncContextManager):
 
         await self.__producer.send(Topic.VOTE_REQUEST, payload)
         logger.info("Sent vote requests")
+
+    async def __wait_for_votes(self, term: int, nodes: int) -> None:
+        votes = 0
+        votes_required = nodes // 2 + 1
+
+        while votes < votes_required:
+            votes += await self.__receive_vote(term)
 
     async def __count_nodes(self) -> int:
         return await self.__ping_service.count_consumers()
