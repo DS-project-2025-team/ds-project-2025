@@ -1,6 +1,6 @@
 from raft.entities.leader_state import LeaderState
 from raft.entities.log_entry import LogEntry
-from raft.raft_log import RaftLog
+from raft.entities.raft_log import RaftLog
 from entities.sat_formula import SatFormula
 
 

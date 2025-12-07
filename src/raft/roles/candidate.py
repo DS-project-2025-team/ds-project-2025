@@ -4,7 +4,7 @@ from types import TracebackType
 from typing import Self
 from uuid import UUID
 
-from raft.raft_log import RaftLog
+from raft.entities.raft_log import RaftLog
 from entities.second import Second
 from entities.server_address import ServerAddress
 from error import LeaderExistsError, OutDatedTermError

@@ -4,7 +4,7 @@ from types import TracebackType
 from typing import Self
 from uuid import UUID, uuid4
 
-from raft.raft_log import RaftLog
+from raft.entities.raft_log import RaftLog
 from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
