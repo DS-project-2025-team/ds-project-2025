@@ -38,6 +38,17 @@ class RaftLog:
 
         return self.leader_state.formulas[0]
 
+    @property
+    def last_log_index(self) -> int:
+        """
+        Return index of the last log entry if exists, otherwise 0.
+        """
+
+        if not self.entries:
+            return 0
+
+        return self.entries[-1].get_index()
+
     def append(self, entry: LogEntry) -> None:
         with self.lock:
             entry.set_index(self.entries.__len__())
