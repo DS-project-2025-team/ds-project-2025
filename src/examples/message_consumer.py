@@ -27,9 +27,7 @@ async def main() -> None:
     logger.set_level(level)
     server = ServerAddress("svm-11.cs.helsinki.fi", 9092)
 
-    async with MessageConsumer(
-        "hello", server=server, group="hello_group"
-    ) as consumer:
+    async with MessageConsumer("hello", server=server, group="hello_group") as consumer:
         await consume_loop(consumer)
 
 
