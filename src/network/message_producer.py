@@ -13,7 +13,7 @@ from services.logger_service import logger
 
 
 def serializer(value: dict) -> bytes:
-        return json.dumps(value).encode()
+    return json.dumps(value).encode()
 
 
 class MessageProducer(AbstractAsyncContextManager):
@@ -35,9 +35,13 @@ class MessageProducer(AbstractAsyncContextManager):
         metadata: RecordMetadata = await self.__producer.send_and_wait(topic, payload)
 
         if logging.getLevelName(logger.get_level()) == "DEBUG":
-            logger.debug(f"Sent topic: {topic}, partition: {metadata.partition}, offset: {metadata.offset}, data:  {payload!r} ")
+            logger.debug(
+                f"Sent topic: {topic}, partition: {metadata.partition}, offset: {metadata.offset}, data:  {payload!r} "
+            )
         else:
-            logger.info(f"Sent topic: {topic}, partition: {metadata.partition}, offset: {metadata.offset}")
+            logger.info(
+                f"Sent topic: {topic}, partition: {metadata.partition}, offset: {metadata.offset}"
+            )
 
     async def __aenter__(self) -> Self:
         await self.__producer.start()

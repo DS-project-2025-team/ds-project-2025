@@ -6,7 +6,9 @@ from entities.leader_state import LeaderState
 
 
 class LogEntry:
-    def __init__(self, raftlog: "RaftLog", operation: Callable[[LeaderState], None]) -> None:
+    def __init__(
+        self, raftlog: "RaftLog", operation: Callable[[LeaderState], None]
+    ) -> None:
         term = raftlog.term
         self.__raftlog = raftlog
         self.__term = term
@@ -21,10 +23,10 @@ class LogEntry:
 
     def get_index(self) -> int:
         return self.__index
-    
+
     def to_dict(self) -> dict[str, object]:
         raftlog = self.__raftlog
-        prev_index = self.__index-1
+        prev_index = self.__index - 1
         prev_log_entry = raftlog.get_entry_at_index(prev_index)
         commit_index = raftlog.get_commit_index()
         return {
@@ -32,6 +34,5 @@ class LogEntry:
             "index": self.__index,
             "prev_log_index": prev_index,
             "prev_log_term": prev_log_entry.__term,
-            "commit_index": commit_index
+            "commit_index": commit_index,
         }
-

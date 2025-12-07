@@ -29,4 +29,3 @@ class LogEntryFactory:
             state.completed_tasks = completed_tasks
 
         return LogEntry(raftlog, update_state)
-

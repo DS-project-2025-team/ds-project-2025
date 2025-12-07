@@ -5,6 +5,7 @@ from typing import Any
 
 LogFunc = Callable[..., None]
 
+
 class LoggerService:
     def __init__(self) -> None:
         self._logger = logging.getLogger("ds-project-2025")

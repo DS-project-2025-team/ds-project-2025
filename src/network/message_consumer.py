@@ -58,10 +58,11 @@ class MessageConsumer(AbstractAsyncContextManager):
             await self.__consumer.commit()
 
         if logging.getLevelName(logger.get_level()) == "DEBUG":
-            logger.debug(f"Received topic: {message.topic}, partition: {message.partition}, offset: {message.offset}, data: {message.data}")
+            logger.debug(
+                f"Received topic: {message.topic}, partition: {message.partition}, offset: {message.offset}, data: {message.data}"
+            )
         else:
             logger.info(f"Received topic: {message.topic}")
-
 
         return message
 

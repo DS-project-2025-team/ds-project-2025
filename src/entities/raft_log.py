@@ -48,12 +48,16 @@ class RaftLog:
 
         entry = self.entries[self.commit_index]
 
-        logger.info(f"Committing log entry index: {entry.get_index()}, state before: {self.leader_state}")
+        logger.info(
+            f"Committing log entry index: {entry.get_index()}, state before: {self.leader_state}"
+        )
 
         entry.operate(self.leader_state)
         self.commit_index += 1
 
-        logger.info(f"Committed log entry index: {entry.get_index()}, state after: {self.leader_state}")
+        logger.info(
+            f"Committed log entry index: {entry.get_index()}, state after: {self.leader_state}"
+        )
 
     def revert(self, index: int) -> None:
         if index < -1 or index >= len(self.entries):
@@ -66,7 +70,7 @@ class RaftLog:
     def get_commit_index(self) -> int:
         return self.commit_index
 
-    def get_raftlog_entries(self, fromindex: int=0) -> Iterable[LogEntry]:
+    def get_raftlog_entries(self, fromindex: int = 0) -> Iterable[LogEntry]:
         return self.entries[fromindex:]
 
     def get_entry_at_index(self, index: int) -> LogEntry:

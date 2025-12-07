@@ -112,8 +112,10 @@ class Leader(AbstractAsyncContextManager):
     @async_loop
     async def __send_appendentry(self) -> None:
         commit_index = self.__log.get_commit_index()
-        #entries = self.__log.get_raftlog_entries(self.__log.get_commit_index()+1)
-        entries = [e.to_dict() for e in self.__log.get_raftlog_entries(commit_index+1)]
+        # entries = self.__log.get_raftlog_entries(self.__log.get_commit_index()+1)
+        entries = [
+            e.to_dict() for e in self.__log.get_raftlog_entries(commit_index + 1)
+        ]
 
         await self.__producer.send_and_wait(
             Topic.APPENDENTRY, {"sender": str(self.__node_id), "entries": entries}
