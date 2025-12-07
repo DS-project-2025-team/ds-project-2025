@@ -84,3 +84,9 @@ class MessageConsumerFactory:
         return MessageConsumerFactory.multicast_consumer(
             Topic.PING, server=server, node_id=node_id
         )
+
+    @staticmethod
+    def ping_response_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
+        return MessageConsumerFactory.multicast_consumer(
+            Topic.PING_RESPONSE, server=server, node_id=node_id
+        )
