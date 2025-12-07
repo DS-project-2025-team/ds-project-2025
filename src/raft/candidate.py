@@ -87,18 +87,15 @@ class Candidate(AbstractAsyncContextManager):
     async def __elect(self, term: int, nodes: int) -> Role:
         logger.info(f"Starting election for term {term}")
 
-        role = Role.FOLLOWER
-
         await self.__send_vote_request(term)
 
-        try:
-            await self.__check_votes(term)
+        votes_required = nodes // 2 + 1
+        votes = 0
 
-        except SufficientVotes:
-            logger.info(f"Won the election for term {term}")
-            role = Role.LEADER
+        while votes < votes_required:
+            votes += await self.__receive_vote(term)
 
-        return role
+        return Role.LEADER
 
     async def __send_vote_request(self, term: int) -> None:
         last_log_index = self.__log.last_log_index
@@ -136,11 +133,3 @@ class Candidate(AbstractAsyncContextManager):
 
         except TimeoutError:
             return False
-
-    async def __check_votes(self, term: int) -> None:
-        self.__votes += await self.__receive_vote(term)
-
-        if self.__votes < self.__required_votes:
-            return
-
-        raise SufficientVotes()
