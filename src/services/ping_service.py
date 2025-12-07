@@ -1,6 +1,6 @@
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
-from typing import Any, Self
+from typing import Self
 from uuid import UUID
 
 from entities.second import Second
