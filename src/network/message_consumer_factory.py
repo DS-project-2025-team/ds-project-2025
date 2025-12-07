@@ -18,11 +18,10 @@ class MessageConsumerFactory:
     def appendentry_response_consumer(
         server: ServerAddress, node_id: UUID
     ) -> MessageConsumer:
-        return MessageConsumer(
+        return MessageConsumerFactory.multicast_consumer(
             Topic.APPENDENTRY_RESPONSE,
             server=server,
-            groupid=str(node_id),
-            offset_reset="latest",
+            node_id=node_id,
         )
 
     @staticmethod
@@ -51,8 +50,8 @@ class MessageConsumerFactory:
 
     @staticmethod
     def client_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
-        return MessageConsumer(
-            Topic.OUTPUT, server=server, groupid=str(node_id), offset_reset="latest"
+        return MessageConsumerFactory.multicast_consumer(
+            Topic.OUTPUT, server=server, node_id=node_id
         )
 
     @staticmethod
