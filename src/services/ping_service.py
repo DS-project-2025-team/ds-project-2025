@@ -3,6 +3,7 @@ from types import TracebackType
 from typing import Any, Self
 from uuid import UUID
 
+from entities.second import Second
 from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
@@ -19,8 +20,10 @@ class PingService(AbstractAsyncContextManager):
         server: ServerAddress,
         node_id: UUID,
         count: int = 0,
+        timeout: Second = Second(5),
     ) -> None:
         self.__count: int = count
+        self.__timeout: Second = timeout
         self.__producer: MessageProducer = MessageProducer(server)
         self.__consumer: MessageConsumer = (
             MessageConsumerFactory.ping_response_consumer(server, node_id)
