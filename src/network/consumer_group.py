@@ -1,0 +1,2 @@
+class ConsumerGroup(str):
+    pass
