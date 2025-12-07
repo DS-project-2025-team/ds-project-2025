@@ -6,7 +6,7 @@ from typing import Literal, Self
 from uuid import UUID
 
 from config import SUBINTERVAL_EXPONENT
-from entities.log_entry_factory import LogEntryFactory
+from raft.log_entry_factory import LogEntryFactory
 from entities.raft_log import RaftLog
 from entities.sat_formula import SatFormula
 from entities.second import Second
