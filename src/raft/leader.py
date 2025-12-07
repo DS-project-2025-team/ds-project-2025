@@ -178,11 +178,11 @@ class Leader(AbstractAsyncContextManager):
             self.__log.append(entry)
             # here we must wait until majority of non-faulty nodes
             # have acknowledged before committing.
-            while self.__log.last_acked_index != entry.get_index():
+            while self.__log.last_acked_index != entry.index:
                 logger.debug(
                     "__handle_input: Wait event until appendentry "
                     "index: %s is sent, last sent: %s",
-                    entry.get_index(),
+                    entry.index,
                     self.__log.last_acked_index,
                 )
                 await asyncio.sleep(1)
@@ -229,11 +229,11 @@ class Leader(AbstractAsyncContextManager):
         self.__log.append(entry)
         # here we must wait until majority of non-faulty nodes
         # have acknowledged before committing.
-        while self.__log.last_acked_index != entry.get_index():
+        while self.__log.last_acked_index != entry.index:
             logger.debug(
                 "__complete_task: Wait event until appendentry "
                 "index: %s is sent, last sent: %s",
-                entry.get_index(),
+                entry.index,
                 self.__log.last_acked_index,
             )
             time.sleep(1)
@@ -257,11 +257,11 @@ class Leader(AbstractAsyncContextManager):
         self.__log.append(entry)
         # here we must wait until majority of non-faulty nodes
         # have acknowledged before committing.
-        while self.__log.last_acked_index != entry.get_index():
+        while self.__log.last_acked_index != entry.index:
             logger.debug(
                 "__set_new_completed_tasks: Wait event until "
                 "appendentry index: %s is sent, last sent: %s",
-                entry.get_index(),
+                entry.index,
                 self.__log.last_acked_index,
             )
             time.sleep(1)
@@ -278,11 +278,11 @@ class Leader(AbstractAsyncContextManager):
         self.__log.append(entry)
         # here we must wait until majority of non-faulty nodes
         # have acknowledged before committing.
-        while self.__log.last_acked_index < entry.get_index():
+        while self.__log.last_acked_index < entry.index:
             logger.debug(
                 "__remove_current_formula: Wait event until "
                 "appendentry index: %s is sent, last sent: %s",
-                entry.get_index(),
+                entry.index,
                 self.__log.last_acked_index,
             )
             time.sleep(1)

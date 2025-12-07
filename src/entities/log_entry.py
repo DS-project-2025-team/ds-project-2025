@@ -18,11 +18,13 @@ class LogEntry:
     def operate(self, state: LeaderState) -> None:
         self.__operation(state)
 
-    def set_index(self, index: int) -> None:
-        self.__index = index
-
-    def get_index(self) -> int:
+    @property
+    def index(self) -> int:
         return self.__index
+
+    @index.setter
+    def index(self, index: int) -> None:
+        self.__index = index
 
     def to_dict(self) -> dict[str, object]:
         raftlog = self.__raftlog

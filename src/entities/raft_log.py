@@ -47,11 +47,11 @@ class RaftLog:
         if not self.entries:
             return 0
 
-        return self.entries[-1].get_index()
+        return self.entries[-1].index
 
     def append(self, entry: LogEntry) -> None:
         with self.lock:
-            entry.set_index(self.entries.__len__())
+            entry.index = self.entries.__len__()
             self.entries.append(entry)
             logger.debug(f"Applied entry {entry.to_dict()} to raftlog")
 
@@ -63,7 +63,7 @@ class RaftLog:
 
         logger.info(
             "Committing log entry index: %s, state before: %s",
-            entry.get_index(),
+            entry.index,
             self.leader_state,
         )
 
@@ -72,7 +72,7 @@ class RaftLog:
 
         logger.info(
             "Committed log entry index: %s, state after: %s",
-            entry.get_index(),
+            entry.index,
             self.leader_state,
         )
 
