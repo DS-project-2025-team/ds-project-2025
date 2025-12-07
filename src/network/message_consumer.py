@@ -9,6 +9,7 @@ from aiokafka import AIOKafkaConsumer, IllegalOperation
 
 from entities.second import Second
 from entities.server_address import ServerAddress
+from network.consumer_group import ConsumerGroup
 from network.message import Message
 from services.logger_service import logger
 
@@ -22,7 +23,7 @@ class MessageConsumer(AbstractAsyncContextManager):
         self,
         *topics: str,
         server: ServerAddress,
-        group: str,
+        group: ConsumerGroup,
         offset_reset: Literal["earliest", "latest"] = "latest",
     ) -> None:
         self.__consumer: AIOKafkaConsumer = AIOKafkaConsumer(

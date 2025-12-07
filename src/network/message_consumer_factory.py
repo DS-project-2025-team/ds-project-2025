@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from entities.server_address import ServerAddress
+from network.consumer_group import ConsumerGroup
 from network.message_consumer import MessageConsumer
 from network.topic import Topic
 
@@ -11,7 +12,10 @@ class MessageConsumerFactory:
         *topics: Topic, server: ServerAddress, node_id: UUID
     ) -> MessageConsumer:
         return MessageConsumer(
-            *topics, server=server, group=str(node_id), offset_reset="latest"
+            *topics,
+            server=server,
+            group=ConsumerGroup.node(node_id),
+            offset_reset="latest",
         )
 
     @staticmethod
@@ -45,7 +49,10 @@ class MessageConsumerFactory:
     @staticmethod
     def input_consumer(server: ServerAddress) -> MessageConsumer:
         return MessageConsumer(
-            Topic.INPUT, server=server, group="LEADER", offset_reset="latest"
+            Topic.INPUT,
+            server=server,
+            group=ConsumerGroup.leader(),
+            offset_reset="latest",
         )
 
     @staticmethod
@@ -57,7 +64,10 @@ class MessageConsumerFactory:
     @staticmethod
     def report_consumer(server: ServerAddress) -> MessageConsumer:
         return MessageConsumer(
-            Topic.REPORT, server=server, group="LEADER", offset_reset="latest"
+            Topic.REPORT,
+            server=server,
+            group=ConsumerGroup.leader(),
+            offset_reset="latest",
         )
 
     @staticmethod
@@ -65,7 +75,7 @@ class MessageConsumerFactory:
         return MessageConsumer(
             Topic.ASSIGN,
             server=server,
-            group="FOLLOWER",
+            group=ConsumerGroup.follower(),
             offset_reset="latest",
         )
 
