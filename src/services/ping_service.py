@@ -9,6 +9,7 @@ from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
+from network.topic import Topic
 from utils.async_loop import async_loop
 
 
@@ -45,6 +46,22 @@ class PingService(AbstractAsyncContextManager):
     ) -> bool | None:
         await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__consumer.__aexit__(exc_type, exc_value, traceback)
+
+    async def count_consumers(self) -> int:
+        """
+        Counts alive consumers.
+
+        Returns:
+            int: Number of alive consumers
+        """
+        payload = {
+            "sender": self.__id,
+        }
+
+        await self.__producer.send(Topic.PING, payload)
+        await asyncio.wait_for(self.receive_response(), timeout=self.__timeout)
+
+        return self.__count
 
     @async_loop
     async def receive_response(self) -> None:
