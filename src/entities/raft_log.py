@@ -23,6 +23,8 @@ class RaftLog:
         self.term: int = term
         self.leader_id: UUID = leader_id or uuid4()
         self.lock = threading.Lock()
+        self.event = threading.Event()
+        self.last_acked_index = -1
         self.leader_state: LeaderState = leader_state or LeaderState()
 
     @property
@@ -48,14 +50,20 @@ class RaftLog:
 
         entry = self.entries[self.commit_index]
 
-        logger.info(f"Committing log entry index: {entry.get_index()}")
-        logger.debug(f"State before: {self.leader_state}")
+        logger.info(
+            "Committing log entry index: %s, state before: %s",
+            entry.get_index(),
+            self.leader_state
+        )
 
         entry.operate(self.leader_state)
         self.commit_index += 1
 
-        logger.info(f"Committed log entry index: {entry.get_index()}")
-        logger.debug(f"State after: {self.leader_state}")
+        logger.info(
+            "Committed log entry index: %s, state after: %s",
+            entry.get_index(),
+            self.leader_state
+        )
 
     def revert(self, index: int) -> None:
         if index < -1 or index >= len(self.entries):

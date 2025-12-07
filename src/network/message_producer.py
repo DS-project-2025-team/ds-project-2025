@@ -36,11 +36,18 @@ class MessageProducer(AbstractAsyncContextManager):
 
         if logging.getLevelName(logger.get_level()) == "DEBUG":
             logger.debug(
-                f"Sent topic: {topic}, partition: {metadata.partition}, offset: {metadata.offset}, data:  {payload!r} "
+                "Sent topic: %s, partition: %s, offset: %s, data: %r",
+                topic,
+                metadata.partition,
+                metadata.offset,
+                payload
             )
         else:
             logger.info(
-                f"Sent topic: {topic}, partition: {metadata.partition}, offset: {metadata.offset}"
+                "Sent topic: %s, partition: %s, offset: %s",
+                topic,
+                metadata.partition,
+                metadata.offset
             )
 
     async def __aenter__(self) -> Self:

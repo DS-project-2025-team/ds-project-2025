@@ -7,7 +7,9 @@ from entities.leader_state import LeaderState
 
 class LogEntry:
     def __init__(
-        self, raftlog: "RaftLog", operation: Callable[[LeaderState], None]
+            self,
+            raftlog: "RaftLog",
+            operation: Callable[[LeaderState], None]
     ) -> None:
         term = raftlog.term
         self.__raftlog = raftlog

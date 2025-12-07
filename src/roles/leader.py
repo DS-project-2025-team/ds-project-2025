@@ -1,4 +1,5 @@
 import asyncio
+import time
 from contextlib import AbstractAsyncContextManager, suppress
 from types import TracebackType
 from typing import Literal, Self
@@ -111,14 +112,21 @@ class Leader(AbstractAsyncContextManager):
     @async_loop
     async def __send_appendentry(self) -> None:
         commit_index = self.__log.get_commit_index()
-        # entries = self.__log.get_raftlog_entries(self.__log.get_commit_index()+1)
-        entries = [
-            e.to_dict() for e in self.__log.get_raftlog_entries(commit_index + 1)
-        ]
+        index_len = self.__log.entries.__len__()
+        entries = [e.to_dict() for e in self.__log.get_raftlog_entries(commit_index+1)]
 
         await self.__producer.send_and_wait(
             Topic.APPENDENTRY, {"sender": str(self.__node_id), "entries": entries}
         )
+        logger.debug(
+            "Send event, last sent index: %s -> %s",
+            self.__log.last_acked_index,
+            index_len-1
+        )
+        self.__log.last_acked_index = index_len-1
+        # Send event to the waiting log applier
+        self.__log.event.set()
+
         await asyncio.sleep(2)
 
     @async_loop
@@ -146,7 +154,7 @@ class Leader(AbstractAsyncContextManager):
             logger.debug(f"Received outdated REPORT with hash {data['hash']}")
             return
 
-        self.__complete_task(data["task"])
+        await self.__complete_task(data["task"])
 
         satisfiable: bool = message.data["result"]
 
@@ -154,7 +162,7 @@ class Leader(AbstractAsyncContextManager):
             return
 
         await self.__send_output(satisfiable)
-        self.__reset_scheduler()
+        await self.__reset_scheduler()
 
     @async_loop
     async def __handle_input(self, timeout: Second) -> None:
@@ -166,6 +174,19 @@ class Leader(AbstractAsyncContextManager):
             entry = LogEntryFactory.add_formula(self.__log, formula)
 
             self.__log.append(entry)
+            # here we must wait until majority of non-faulty nodes
+            # have acknowledged before committing.
+            while self.__log.last_acked_index != entry.get_index():
+                logger.debug(
+                    "__handle_input: Wait event until appendentry "
+                     "index: %s is sent, last sent: %s",
+                    entry.get_index(),
+                    self.__log.last_acked_index
+                )
+                await asyncio.sleep(1)
+
+            self.__log.event.wait()
+            logger.debug("Received event")
             self.__log.commit()
 
             logger.info(f"Committed new formula {formula} to log")
@@ -182,7 +203,7 @@ class Leader(AbstractAsyncContextManager):
             self.__scheduler = TaskSchedulerService(formula, exponent)
             logger.info(f"Set {self.__scheduler} for new formula {formula}")
 
-            self.__set_new_completed_tasks(self.__scheduler.completed_tasks)
+            await self.__set_new_completed_tasks(self.__scheduler.completed_tasks)
 
         if (task := self.__scheduler.next_task()) is None:
             return
@@ -192,7 +213,11 @@ class Leader(AbstractAsyncContextManager):
     async def __handle_message(self, message: Message) -> None:
         pass
 
-    def __complete_task(self, task: int) -> None:
+
+    async def __complete_task(self, task:int) -> None:
+        await asyncio.to_thread(self.__complete_task_blocking, task)
+
+    def __complete_task_blocking(self, task: int) -> None:
         entry = LogEntryFactory.complete_task(self.__log, task)
 
         if not self.__scheduler:
@@ -201,23 +226,67 @@ class Leader(AbstractAsyncContextManager):
         self.__scheduler.complete_task(task)
 
         self.__log.append(entry)
-        # here we must wait until majority of non-faulty nodes have acknowledged before committing.
+        # here we must wait until majority of non-faulty nodes
+        # have acknowledged before committing.
+        while self.__log.last_acked_index != entry.get_index():
+            logger.debug(
+                "__complete_task: Wait event until appendentry "
+                "index: %s is sent, last sent: %s",
+                entry.get_index(),
+                self.__log.last_acked_index
+            )
+            time.sleep(1)
+
+        self.__log.event.wait()
+        logger.debug("Received event")
         self.__log.commit()
 
-    def __reset_scheduler(self) -> None:
+    async def __reset_scheduler(self) -> None:
         self.__scheduler = None
-        self.__remove_current_formula()
+        await self.__remove_current_formula()
 
-    def __set_new_completed_tasks(self, completed_tasks: list[bool]) -> None:
+
+    async def __set_new_completed_tasks(self, completed_tasks: list[bool]) -> None:
+        await asyncio.to_thread(
+            self.__set_new_completed_tasks_blocking,
+            completed_tasks
+        )
+
+    def __set_new_completed_tasks_blocking(self, completed_tasks: list[bool]) -> None:
         entry = LogEntryFactory.set_completed_tasks(self.__log, completed_tasks)
 
         self.__log.append(entry)
-        # here we must wait until majority of non-faulty nodes have acknowledged before committing.
+        # here we must wait until majority of non-faulty nodes
+        # have acknowledged before committing.
+        while self.__log.last_acked_index != entry.get_index():
+            logger.debug(
+                "__set_new_completed_tasks: Wait event until "
+                "appendentry index: %s is sent, last sent: %s",
+                entry.get_index(),
+                self.__log.last_acked_index
+            )
+            time.sleep(1)
+        self.__log.event.wait()
+        logger.debug("Received event")
         self.__log.commit()
 
-    def __remove_current_formula(self) -> None:
+
+    async def __remove_current_formula(self) -> None:
+        await asyncio.to_thread(self.__remove_current_formula_blocking)
+
+    def __remove_current_formula_blocking(self) -> None:
         entry = LogEntryFactory.pop_formula(self.__log)
 
         self.__log.append(entry)
-        # here we must wait until majority of non-faulty nodes have acknowledged before committing.
+        # here we must wait until majority of non-faulty nodes
+        # have acknowledged before committing.
+        while self.__log.last_acked_index < entry.get_index():
+            logger.debug(
+                "__remove_current_formula: Wait event until "
+                 "appendentry index: %s is sent, last sent: %s",
+                 entry.get_index(),
+                 self.__log.last_acked_index)
+            time.sleep(1)
+        self.__log.event.wait()
+        logger.debug("Received event")
         self.__log.commit()

@@ -90,7 +90,22 @@ def start_client(
     Starts client and sends input to the system.
     """
 
-    formula = SatFormula([(1, 2, 3), (-1, -2, 4), (-3, -4, -5)])
+    formula = SatFormula(
+            [
+                (1, 2, 3),
+                (1, 2, -3),
+                (1, -2, 3),
+                (1, -2, -3),
+                (-1, 2, 3),
+                (-1, 2, -3),
+                (-1, -2, 3),
+                (-1, -2, -3),
+                (-5, 6, 10),
+                (1, 19, -20),
+                (-20, 18, -19),
+            ]
+        )
+
     server_address = ServerAddress(server, port)
 
     asyncio.run(run_client(formula, server_address))

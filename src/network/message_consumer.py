@@ -60,8 +60,13 @@ class MessageConsumer(AbstractAsyncContextManager):
 
         if logging.getLevelName(logger.get_level()) == "DEBUG":
             logger.debug(
-                f"Received topic: {message.topic}, partition: {message.partition}, offset: {message.offset}, data: {message.data}"
+                "Received topic: %s, partition: %s, offset: %s, data: %s",
+                message.topic,
+                message.partition,
+                message.offset,
+                message.data
             )
+
         else:
             logger.info(f"Received topic: {message.topic}")
 

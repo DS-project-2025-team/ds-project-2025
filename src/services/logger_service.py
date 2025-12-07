@@ -1,5 +1,6 @@
 import logging
 import sys
+import threading
 from collections.abc import Callable
 
 LogFunc = Callable[..., None]
@@ -30,7 +31,8 @@ class LoggerService:
         return self._logger.getEffectiveLevel()
 
     def debug(self, msg: str, *args: object) -> None:
-        self._logger.debug(msg, *args)
+        tid = threading.get_native_id()
+        self._logger.debug("%s: " + msg, tid, *args)
 
     def info(self, msg: str, *args: object) -> None:
         self._logger.info(msg, *args)
