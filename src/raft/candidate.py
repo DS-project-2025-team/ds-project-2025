@@ -69,9 +69,14 @@ class Candidate(AbstractAsyncContextManager):
         role = Role.FOLLOWER
 
         try:
+            await asyncio.create_task(self.__check_leader_existence())
+
             role = await asyncio.wait_for(
                 self.__elect(term, nodes), timeout=self.__vote_timeout
             )
+
+        except LeaderExistsError:
+            logger.info("Detected existing leader, aborting election.")
 
         except TimeoutError:
             logger.info(f"Election for term {term} timed out.")
@@ -89,12 +94,7 @@ class Candidate(AbstractAsyncContextManager):
         logger.info(f"{self.__id} sent vote requests to peers")
 
         try:
-            async with asyncio.TaskGroup() as group:
-                _task1 = group.create_task(self.__check_leader_existence())
-                _task2 = group.create_task(self.__check_votes(term))
-
-        except LeaderExistsError:
-            logger.info("Detected existing leader, aborting election.")
+            await self.__check_votes(term)
 
         except SufficientVotes:
             logger.info(f"Won the election for term {term}")
