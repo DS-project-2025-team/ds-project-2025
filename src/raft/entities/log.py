@@ -20,12 +20,27 @@ class Log:
         self.entries: list[LogEntry] = list(entries or [])
 
         self.commit_index: int = commit_index
-        self.term: int = term
+        self.__term: int = term
         self.leader_id: UUID = leader_id or uuid4()
         self.lock = threading.Lock()
         self.event = threading.Event()
         self.last_acked_index = -1
         self.leader_state: LeaderState = leader_state or LeaderState()
+
+    @property
+    def term(self) -> int:
+        return self.__term
+
+    @term.setter
+    def term(self, new_term: int) -> None:
+        with self.lock:
+            if new_term < self.__term:
+                logger.warning(
+                    f"Attempted to set term {self.term} to smaller term {new_term}"
+                )
+                return
+
+            self.__term = new_term
 
     @property
     def completed_tasks(self) -> list[bool]:
