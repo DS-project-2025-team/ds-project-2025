@@ -66,6 +66,8 @@ class Candidate(AbstractAsyncContextManager):
         term = self.__log.term + 1
         logger.info(f"Starting election for term {term}")
 
+        nodes = await self.__count_nodes()
+
         begin_time = asyncio.get_event_loop().time()
         role = Role.FOLLOWER
 
