@@ -1,7 +1,7 @@
 from typing import Self
 from uuid import UUID
 
-from roles.role import Role
+from raft.role import Role
 
 
 class ConsumerGroup(str):

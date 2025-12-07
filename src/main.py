@@ -1,8 +1,8 @@
 import logging
 
 from entities.server_address import ServerAddress
-from roles.node import Node
-from roles.role import Role
+from raft.node import Node
+from raft.role import Role
 from services.logger_service import logger
 
 

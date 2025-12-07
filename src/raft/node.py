@@ -10,9 +10,9 @@ from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
-from roles.follower import Follower
-from roles.leader import Leader
-from roles.role import Role
+from raft.follower import Follower
+from raft.leader import Leader
+from raft.role import Role
 from services.logger_service import logger
 from utils.async_loop import async_loop
 
