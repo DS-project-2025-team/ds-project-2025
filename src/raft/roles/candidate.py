@@ -26,14 +26,14 @@ class Candidate(AbstractAsyncContextManager):
         node_id: UUID,
         vote_timeout: Second = Second(20),
     ) -> None:
-        self.__id = node_id
-        self.__vote_timeout = vote_timeout
+        self.__id: UUID = node_id
+        self.__vote_timeout: Second = vote_timeout
 
         self.__log: Log = log
 
         self.__ping_service: PingService = PingService(server=server, node_id=node_id)
         self.__producer = MessageProducer(server=server)
-        self.__vote_consumer = MessageConsumerFactory.vote_consumer(
+        self.__vote_consumer: MessageConsumer = MessageConsumerFactory.vote_consumer(
             server=server, node_id=node_id
         )
         self.__appendentry_consumer: MessageConsumer = (
