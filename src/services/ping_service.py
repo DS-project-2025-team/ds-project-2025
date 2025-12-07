@@ -1,4 +1,6 @@
 from contextlib import AbstractAsyncContextManager
+from types import TracebackType
+from typing import Any, Self
 from uuid import UUID
 
 from entities.server_address import ServerAddress
@@ -23,3 +25,17 @@ class PingService(AbstractAsyncContextManager):
         self.__consumer: MessageConsumer = (
             MessageConsumerFactory.ping_response_consumer(server, node_id)
         )
+
+    async def __aenter__(self) -> Self:
+        self.__producer = await self.__producer.__aenter__()
+        self.__consumer = await self.__consumer.__aenter__()
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> bool | None:
+        await self.__producer.__aexit__(exc_type, exc_value, traceback)
+        await self.__consumer.__aexit__(exc_type, exc_value, traceback)
