@@ -4,7 +4,7 @@ from types import TracebackType
 from typing import Self
 from uuid import UUID
 
-from raft.entities.raft_log import RaftLog
+from raft.entities.log import Log
 from entities.second import Second
 from entities.server_address import ServerAddress
 from error import LeaderExistsError, OutDatedTermError
@@ -26,14 +26,14 @@ class Candidate(AbstractAsyncContextManager):
     def __init__(
         self,
         server: ServerAddress,
-        log: RaftLog,
+        log: Log,
         node_id: UUID,
         vote_timeout: Second = Second(20),
     ) -> None:
         self.__id = node_id
         self.__vote_timeout = vote_timeout
 
-        self.__log: RaftLog = log
+        self.__log: Log = log
 
         self.__ping_service: PingService = PingService(server=server, node_id=node_id)
         self.__producer = MessageProducer(server=server)

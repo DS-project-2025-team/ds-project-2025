@@ -8,7 +8,7 @@ from entities.sat_formula import SatFormula
 from services.logger_service import logger
 
 
-class RaftLog:
+class Log:
     def __init__(
         self,
         entries: Iterable[LogEntry] | None = None,

@@ -1,14 +1,14 @@
 from collections import deque
 
 from raft.entities.leader_state import LeaderState
-from raft.entities.raft_log import RaftLog
+from raft.entities.log import Log
 from entities.sat_formula import SatFormula
 
 
 def test_get_completed_tasks():
     leader_state = LeaderState(completed_tasks=[True, False, True, True])
 
-    log = RaftLog(leader_state=leader_state)
+    log = Log(leader_state=leader_state)
     log.leader_state.completed_tasks = [True, False, True]
 
     assert log.completed_tasks == [True, False, True]
@@ -28,6 +28,6 @@ def test_get_current_formula():
     )
 
     leader_state = LeaderState(formulas=formulas)
-    log = RaftLog(leader_state=leader_state)
+    log = Log(leader_state=leader_state)
 
     assert log.current_formula == formula1

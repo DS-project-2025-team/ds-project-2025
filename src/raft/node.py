@@ -4,7 +4,7 @@ from types import TracebackType
 from typing import Self
 from uuid import UUID, uuid4
 
-from raft.entities.raft_log import RaftLog
+from raft.entities.log import Log
 from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
@@ -23,12 +23,12 @@ class Node(AbstractAsyncContextManager):
         server: ServerAddress,
         node_id: UUID | None = None,
         role: Role = Role.FOLLOWER,
-        log: RaftLog | None = None,
+        log: Log | None = None,
     ) -> None:
         self.node_id: UUID = node_id or uuid4()
         self.__server: ServerAddress = server
         self.__role: Role = role
-        self.__log: RaftLog = log or RaftLog()
+        self.__log: Log = log or Log()
 
         self.__producer: MessageProducer = MessageProducer(server=server)
         self.__ping_consumer: MessageConsumer = MessageConsumerFactory.ping_consumer(

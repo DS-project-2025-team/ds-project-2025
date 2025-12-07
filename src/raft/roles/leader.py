@@ -7,7 +7,7 @@ from uuid import UUID
 
 from config import SUBINTERVAL_EXPONENT
 from raft.entities.log_entry_factory import LogEntryFactory
-from raft.entities.raft_log import RaftLog
+from raft.entities.log import Log
 from entities.sat_formula import SatFormula
 from entities.second import Second
 from entities.server_address import ServerAddress
@@ -25,7 +25,7 @@ from utils.async_loop import async_loop
 class Leader(AbstractAsyncContextManager):
     def __init__(
         self,
-        log: RaftLog,
+        log: Log,
         server: ServerAddress,
         node_id: UUID,
         task_scheduler: TaskSchedulerService | None = None,
@@ -44,7 +44,7 @@ class Leader(AbstractAsyncContextManager):
         )
 
         self.__scheduler: TaskSchedulerService | None = task_scheduler
-        self.__log: RaftLog = log
+        self.__log: Log = log
         self.__node_id: UUID = node_id
 
     async def __aenter__(self) -> Self:
