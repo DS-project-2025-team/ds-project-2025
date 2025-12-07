@@ -64,7 +64,7 @@ class MessageConsumer(AbstractAsyncContextManager):
                 message.topic,
                 message.partition,
                 message.offset,
-                message.data
+                message.data,
             )
 
         else:

@@ -40,14 +40,14 @@ class MessageProducer(AbstractAsyncContextManager):
                 topic,
                 metadata.partition,
                 metadata.offset,
-                payload
+                payload,
             )
         else:
             logger.info(
                 "Sent topic: %s, partition: %s, offset: %s",
                 topic,
                 metadata.partition,
-                metadata.offset
+                metadata.offset,
             )
 
     async def __aenter__(self) -> Self:

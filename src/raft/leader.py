@@ -113,7 +113,9 @@ class Leader(AbstractAsyncContextManager):
     async def __send_appendentry(self) -> None:
         commit_index = self.__log.get_commit_index()
         index_len = self.__log.entries.__len__()
-        entries = [e.to_dict() for e in self.__log.get_raftlog_entries(commit_index+1)]
+        entries = [
+            e.to_dict() for e in self.__log.get_raftlog_entries(commit_index + 1)
+        ]
 
         await self.__producer.send_and_wait(
             Topic.APPENDENTRY, {"sender": str(self.__node_id), "entries": entries}
@@ -121,9 +123,9 @@ class Leader(AbstractAsyncContextManager):
         logger.debug(
             "Send event, last sent index: %s -> %s",
             self.__log.last_acked_index,
-            index_len-1
+            index_len - 1,
         )
-        self.__log.last_acked_index = index_len-1
+        self.__log.last_acked_index = index_len - 1
         # Send event to the waiting log applier
         self.__log.event.set()
 
@@ -179,9 +181,9 @@ class Leader(AbstractAsyncContextManager):
             while self.__log.last_acked_index != entry.get_index():
                 logger.debug(
                     "__handle_input: Wait event until appendentry "
-                     "index: %s is sent, last sent: %s",
+                    "index: %s is sent, last sent: %s",
                     entry.get_index(),
-                    self.__log.last_acked_index
+                    self.__log.last_acked_index,
                 )
                 await asyncio.sleep(1)
 
@@ -213,8 +215,7 @@ class Leader(AbstractAsyncContextManager):
     async def __handle_message(self, message: Message) -> None:
         pass
 
-
-    async def __complete_task(self, task:int) -> None:
+    async def __complete_task(self, task: int) -> None:
         await asyncio.to_thread(self.__complete_task_blocking, task)
 
     def __complete_task_blocking(self, task: int) -> None:
@@ -233,7 +234,7 @@ class Leader(AbstractAsyncContextManager):
                 "__complete_task: Wait event until appendentry "
                 "index: %s is sent, last sent: %s",
                 entry.get_index(),
-                self.__log.last_acked_index
+                self.__log.last_acked_index,
             )
             time.sleep(1)
 
@@ -245,11 +246,9 @@ class Leader(AbstractAsyncContextManager):
         self.__scheduler = None
         await self.__remove_current_formula()
 
-
     async def __set_new_completed_tasks(self, completed_tasks: list[bool]) -> None:
         await asyncio.to_thread(
-            self.__set_new_completed_tasks_blocking,
-            completed_tasks
+            self.__set_new_completed_tasks_blocking, completed_tasks
         )
 
     def __set_new_completed_tasks_blocking(self, completed_tasks: list[bool]) -> None:
@@ -263,13 +262,12 @@ class Leader(AbstractAsyncContextManager):
                 "__set_new_completed_tasks: Wait event until "
                 "appendentry index: %s is sent, last sent: %s",
                 entry.get_index(),
-                self.__log.last_acked_index
+                self.__log.last_acked_index,
             )
             time.sleep(1)
         self.__log.event.wait()
         logger.debug("Received event")
         self.__log.commit()
-
 
     async def __remove_current_formula(self) -> None:
         await asyncio.to_thread(self.__remove_current_formula_blocking)
@@ -283,9 +281,10 @@ class Leader(AbstractAsyncContextManager):
         while self.__log.last_acked_index < entry.get_index():
             logger.debug(
                 "__remove_current_formula: Wait event until "
-                 "appendentry index: %s is sent, last sent: %s",
-                 entry.get_index(),
-                 self.__log.last_acked_index)
+                "appendentry index: %s is sent, last sent: %s",
+                entry.get_index(),
+                self.__log.last_acked_index,
+            )
             time.sleep(1)
         self.__log.event.wait()
         logger.debug("Received event")

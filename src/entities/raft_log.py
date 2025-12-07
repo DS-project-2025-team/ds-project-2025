@@ -64,7 +64,7 @@ class RaftLog:
         logger.info(
             "Committing log entry index: %s, state before: %s",
             entry.get_index(),
-            self.leader_state
+            self.leader_state,
         )
 
         entry.operate(self.leader_state)
@@ -73,7 +73,7 @@ class RaftLog:
         logger.info(
             "Committed log entry index: %s, state after: %s",
             entry.get_index(),
-            self.leader_state
+            self.leader_state,
         )
 
     def revert(self, index: int) -> None:
