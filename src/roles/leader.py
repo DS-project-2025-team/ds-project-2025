@@ -32,7 +32,6 @@ class Leader(AbstractAsyncContextManager):
         self.__producer: MessageProducer = MessageProducer(server=server)
         self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
             server,
-            node_id,
         )
         self.__appendentry_consumer: MessageConsumer = (
             MessageConsumerFactory.appendentry_response_consumer(
