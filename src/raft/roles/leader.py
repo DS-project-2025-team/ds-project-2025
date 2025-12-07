@@ -6,8 +6,6 @@ from typing import Literal, Self
 from uuid import UUID
 
 from config import SUBINTERVAL_EXPONENT
-from raft.entities.log_entry_factory import LogEntryFactory
-from raft.entities.log import Log
 from entities.sat_formula import SatFormula
 from entities.second import Second
 from entities.server_address import ServerAddress
@@ -16,6 +14,8 @@ from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
+from raft.entities.log import Log
+from raft.entities.log_entry_factory import LogEntryFactory
 from raft.role import Role
 from services.logger_service import logger
 from services.task_scheduler_service import TaskSchedulerService

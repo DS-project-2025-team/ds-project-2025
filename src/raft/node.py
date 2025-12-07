@@ -4,15 +4,15 @@ from types import TracebackType
 from typing import Self
 from uuid import UUID, uuid4
 
-from raft.entities.log import Log
 from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
+from raft.entities.log import Log
+from raft.role import Role
 from raft.roles.follower import Follower
 from raft.roles.leader import Leader
-from raft.role import Role
 from services.logger_service import logger
 from utils.async_loop import async_loop
 

@@ -4,7 +4,6 @@ from types import TracebackType
 from typing import Self
 from uuid import UUID
 
-from raft.entities.log import Log
 from entities.second import Second
 from entities.server_address import ServerAddress
 from error import LeaderExistsError, OutDatedTermError
@@ -12,6 +11,7 @@ from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
+from raft.entities.log import Log
 from raft.role import Role
 from services.logger_service import logger
 from services.ping_service import PingService

@@ -1,8 +1,8 @@
 from collections import deque
 
+from entities.sat_formula import SatFormula
 from raft.entities.leader_state import LeaderState
 from raft.entities.log import Log
-from entities.sat_formula import SatFormula
 
 
 def test_get_completed_tasks():
