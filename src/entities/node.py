@@ -9,9 +9,11 @@ from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
+from network.topic import Topic
 from roles.follower import Follower
 from roles.leader import Leader
 from roles.role import Role
+from services.logger_service import logger
 from utils.async_loop import async_loop
 
 
@@ -51,6 +53,7 @@ class Node(AbstractAsyncContextManager):
     async def run(self) -> None:
         async with TaskGroup() as group:
             _task1 = group.create_task(self.__run_raft())
+            _task2 = group.create_task(self.__handle_ping())
 
     @async_loop
     async def __run_raft(self) -> None:
@@ -71,3 +74,16 @@ class Node(AbstractAsyncContextManager):
                     log=self.__log, server=self.__server, node_id=self.node_id
                 ) as leader:
                     self.__role = await leader.run()
+
+    @async_loop
+    async def __handle_ping(self) -> None:
+        message = await self.__ping_consumer.receive()
+        sender = message.data["sender"]
+
+        logger.debug(f"Received ping from {sender}")
+
+        payload = {
+            "receiver": sender,
+        }
+
+        await self.__producer.send(Topic.PING_RESPONSE, payload)
