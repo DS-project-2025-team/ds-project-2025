@@ -6,9 +6,9 @@ title: Components
 ---
 graph
 
-roles[
-    roles
-    Raft roles and consensus algorithm
+raft[
+    raft
+    Raft consensus algorithm
 ]
 network[
     network
@@ -28,10 +28,10 @@ utils[
 ]
 
 
-roles --> network
-roles --> services
-roles --> utils
-roles --> entities
+raft --> network
+raft --> services
+raft --> utils
+raft --> entities
 
 services --> utils
 services --> entities
@@ -39,8 +39,6 @@ services --> entities
 network --> entities
 network --> services
 network --> utils
-
-entities --> services
 ```
 
 The usage of other directories:
