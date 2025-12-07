@@ -7,7 +7,7 @@ from uuid import UUID
 from entities.raft_log import RaftLog
 from entities.second import Second
 from entities.server_address import ServerAddress
-from error import LeaderExistsError
+from error import LeaderExistsError, OutDatedTermError
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
@@ -78,7 +78,7 @@ class Candidate(AbstractAsyncContextManager):
         except LeaderExistsError:
             logger.info("Detected existing leader, aborting election.")
 
-        except TimeoutError:
+        except (TimeoutError, OutDatedTermError):
             logger.info(f"Election for term {term} timed out.")
             role = Role.CANDIDATE
 
@@ -116,10 +116,17 @@ class Candidate(AbstractAsyncContextManager):
     async def __count_nodes(self) -> int:
         return await self.__ping_service.count_consumers()
 
-    async def __receive_vote(self, current_term: int, timeout: float = 0.5) -> int:
-        try:
-            vote = await self.__vote_consumer.receive(Second(timeout))
-        except TimeoutError:
+    async def __receive_vote(self, term: int) -> int:
+        message = await self.__vote_consumer.receive()
+
+        vote_term = message.data["term"]
+        vote_granted = message.data["vote_granted"]
+
+        if vote_term > term:
+            self.__log.term = vote_term
+            raise OutDatedTermError()
+
+        if not vote_granted:
             return 0
 
         return 1
