@@ -1,6 +1,6 @@
 from collections import deque
 
-from entities.leader_state import LeaderState
+from raft.leader_state import LeaderState
 from entities.raft_log import RaftLog
 from entities.sat_formula import SatFormula
 

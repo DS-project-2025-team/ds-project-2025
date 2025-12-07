@@ -2,7 +2,7 @@ import threading
 from collections.abc import Iterable
 from uuid import UUID, uuid4
 
-from entities.leader_state import LeaderState
+from raft.leader_state import LeaderState
 from entities.log_entry import LogEntry
 from entities.sat_formula import SatFormula
 from services.logger_service import logger

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from entities.leader_state import LeaderState
+from raft.leader_state import LeaderState
 
 
 class LogEntry:
