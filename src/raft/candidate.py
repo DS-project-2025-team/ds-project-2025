@@ -66,12 +66,22 @@ class Candidate(AbstractAsyncContextManager):
         term = self.__log.term + 1
         nodes = await self.__count_nodes()
 
-        return await self.__elect(term, nodes)
+        role = Role.FOLLOWER
+
+        try:
+            role = await asyncio.wait_for(
+                self.__elect(term, nodes), timeout=self.__vote_timeout
+            )
+
+        except TimeoutError:
+            logger.info(f"Election for term {term} timed out.")
+            role = Role.CANDIDATE
+
+        return role
 
     async def __elect(self, term: int, nodes: int) -> Role:
         logger.info(f"Starting election for term {term}")
 
-        begin_time = asyncio.get_event_loop().time()
         role = Role.FOLLOWER
 
         await self.__producer.send(Topic.VOTE_REQUEST, {})
@@ -81,15 +91,10 @@ class Candidate(AbstractAsyncContextManager):
         try:
             async with asyncio.TaskGroup() as group:
                 _task1 = group.create_task(self.__check_leader_existence())
-                _task2 = group.create_task(self.__check_timeout(begin_time))
-                _task3 = group.create_task(self.__check_votes(term))
+                _task2 = group.create_task(self.__check_votes(term))
 
         except LeaderExistsError:
             logger.info("Detected existing leader, aborting election.")
-
-        except TimeoutError:
-            logger.info("Election timed out.")
-            role = Role.CANDIDATE
 
         except SufficientVotes:
             logger.info(f"Won the election for term {term}")
@@ -107,13 +112,6 @@ class Candidate(AbstractAsyncContextManager):
             return 0
 
         return 1
-
-    @async_loop
-    async def __check_timeout(self, begin_time: float) -> None:
-        if asyncio.get_event_loop().time() - begin_time > self.__vote_timeout:
-            raise TimeoutError()
-
-        await asyncio.sleep(1)
 
     @async_loop
     async def __check_leader_existence(self) -> bool:
