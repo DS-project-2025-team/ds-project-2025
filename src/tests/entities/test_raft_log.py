@@ -6,12 +6,12 @@ from entities.sat_formula import SatFormula
 
 
 def test_get_completed_tasks():
-    leader_state = LeaderState(completed_tasks=[1, 2, 6, 10])
+    leader_state = LeaderState(completed_tasks=[True, False, True, True])
 
     log = RaftLog(leader_state=leader_state)
-    log.leader_state.completed_tasks = [1, 2, 3]
+    log.leader_state.completed_tasks = [True, False, True]
 
-    assert log.completed_tasks == [1, 2, 3]
+    assert log.completed_tasks == [True, False, True]
 
 
 def test_get_current_formula():
