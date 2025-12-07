@@ -28,7 +28,7 @@ async def main() -> None:
     server = ServerAddress("svm-11.cs.helsinki.fi", 9092)
 
     async with MessageConsumer(
-        "hello", server=server, groupid="hello_group"
+        "hello", server=server, group="hello_group"
     ) as consumer:
         await consume_loop(consumer)
 

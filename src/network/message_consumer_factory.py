@@ -11,7 +11,7 @@ class MessageConsumerFactory:
         *topics: Topic, server: ServerAddress, node_id: UUID
     ) -> MessageConsumer:
         return MessageConsumer(
-            *topics, server=server, groupid=str(node_id), offset_reset="latest"
+            *topics, server=server, group=str(node_id), offset_reset="latest"
         )
 
     @staticmethod
@@ -45,7 +45,7 @@ class MessageConsumerFactory:
     @staticmethod
     def input_consumer(server: ServerAddress) -> MessageConsumer:
         return MessageConsumer(
-            Topic.INPUT, server=server, groupid="LEADER", offset_reset="latest"
+            Topic.INPUT, server=server, group="LEADER", offset_reset="latest"
         )
 
     @staticmethod
@@ -57,7 +57,7 @@ class MessageConsumerFactory:
     @staticmethod
     def report_consumer(server: ServerAddress) -> MessageConsumer:
         return MessageConsumer(
-            Topic.REPORT, server=server, groupid="LEADER", offset_reset="latest"
+            Topic.REPORT, server=server, group="LEADER", offset_reset="latest"
         )
 
     @staticmethod
@@ -65,7 +65,7 @@ class MessageConsumerFactory:
         return MessageConsumer(
             Topic.ASSIGN,
             server=server,
-            groupid="FOLLOWER",
+            group="FOLLOWER",
             offset_reset="latest",
         )
 

@@ -9,7 +9,7 @@ async def main() -> None:
     server = ServerAddress("localhost", 9092)
 
     async with (
-        MessageConsumer("hello", server=server, groupid="hello_group") as consumer,
+        MessageConsumer("hello", server=server, group="hello_group") as consumer,
         MessageProducer(server=server) as producer,
     ):
         for i in range(1, 10):
