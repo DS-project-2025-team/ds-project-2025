@@ -10,7 +10,7 @@ from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
-from raft.follower import Follower
+from raft.roles.follower import Follower
 from raft.roles.leader import Leader
 from raft.role import Role
 from services.logger_service import logger
