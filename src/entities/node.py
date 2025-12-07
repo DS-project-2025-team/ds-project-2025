@@ -1,15 +1,21 @@
 from asyncio import TaskGroup
+from contextlib import AbstractAsyncContextManager
+from types import TracebackType
+from typing import Self
 from uuid import UUID, uuid4
 
 from entities.raft_log import RaftLog
 from entities.server_address import ServerAddress
+from network.message_consumer import MessageConsumer
+from network.message_consumer_factory import MessageConsumerFactory
+from network.message_producer import MessageProducer
 from roles.follower import Follower
 from roles.leader import Leader
 from roles.role import Role
 from utils.async_loop import async_loop
 
 
-class Node:
+class Node(AbstractAsyncContextManager):
     def __init__(
         self,
         server: ServerAddress,
@@ -21,6 +27,25 @@ class Node:
         self.__server: ServerAddress = server
         self.__role: Role = role
         self.__log: RaftLog = log or RaftLog()
+
+        self.__producer: MessageProducer = MessageProducer(server=server)
+        self.__ping_consumer: MessageConsumer = MessageConsumerFactory.ping_consumer(
+            server=server, node_id=self.node_id
+        )
+
+    async def __aenter__(self) -> Self:
+        await self.__producer.__aenter__()
+        await self.__ping_consumer.__aenter__()
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        await self.__producer.__aexit__(exc_type, exc_value, traceback)
+        await self.__ping_consumer.__aexit__(exc_type, exc_value, traceback)
 
     @async_loop
     async def run(self) -> None:

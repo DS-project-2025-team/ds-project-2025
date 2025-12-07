@@ -14,6 +14,5 @@ async def main(
     level = getattr(logging, log_level.upper())
     logger.set_level(level)
 
-    node = Node(server=server, role=role)
-
-    await node.run()
+    async with Node(server=server, role=role) as node:
+        await node.run()
