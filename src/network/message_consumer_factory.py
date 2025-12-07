@@ -44,9 +44,9 @@ class MessageConsumerFactory:
         )
 
     @staticmethod
-    def input_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
+    def input_consumer(server: ServerAddress) -> MessageConsumer:
         return MessageConsumer(
-            Topic.INPUT, server=server, groupid=str(node_id), offset_reset="latest"
+            Topic.INPUT, server=server, groupid="LEADER", offset_reset="latest"
         )
 
     @staticmethod
