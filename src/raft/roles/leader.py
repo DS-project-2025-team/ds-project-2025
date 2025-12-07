@@ -16,7 +16,7 @@ from network.message_producer import MessageProducer
 from network.topic import Topic
 from raft.entities.log import Log
 from raft.entities.log_entry_factory import LogEntryFactory
-from raft.role import Role
+from raft.roles.role import Role
 from services.logger_service import logger
 from services.task_scheduler_service import TaskSchedulerService
 from utils.async_loop import async_loop

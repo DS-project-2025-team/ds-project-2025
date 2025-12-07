@@ -12,7 +12,7 @@ from client import run_client
 from entities.sat_formula import SatFormula
 from entities.server_address import ServerAddress
 from main import main
-from raft.role import Role
+from raft.roles.role import Role
 from services.logger_service import logger
 
 
