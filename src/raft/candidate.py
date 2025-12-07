@@ -89,7 +89,7 @@ class Candidate(AbstractAsyncContextManager):
 
         role = Role.FOLLOWER
 
-        await self.__producer.send(Topic.VOTE_REQUEST, {})
+        await self.__send_vote_request(term)
 
         logger.info(f"{self.__id} sent vote requests to peers")
 
@@ -101,6 +101,19 @@ class Candidate(AbstractAsyncContextManager):
             role = Role.LEADER
 
         return role
+
+    async def __send_vote_request(self, term: int) -> None:
+        last_log_index = self.__log.last_log_index
+        last_log_term = self.__log.last_log_term
+
+        payload = {
+            "term": term,
+            "candidate_id": self.__id,
+            "last_log_index": last_log_index,
+            "last_log_term": last_log_term,
+        }
+
+        await self.__producer.send(Topic.VOTE_REQUEST, payload)
 
     async def __count_nodes(self) -> int:
         return await self.__ping_service.count_consumers()
