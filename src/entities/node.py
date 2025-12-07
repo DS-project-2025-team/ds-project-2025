@@ -1,3 +1,4 @@
+from asyncio import TaskGroup
 from uuid import UUID, uuid4
 
 from entities.raft_log import RaftLog
@@ -25,6 +26,11 @@ class Node:
 
     @async_loop
     async def run(self) -> None:
+        async with TaskGroup() as group:
+            _task1 = group.create_task(self.__run_raft())
+
+    @async_loop
+    async def __run_raft(self) -> None:
         match self.__role:
             case Role.FOLLOWER:
                 async with Follower(
