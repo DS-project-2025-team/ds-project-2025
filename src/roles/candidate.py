@@ -26,18 +26,13 @@ class Candidate(AbstractAsyncContextManager):
     def __init__(
         self,
         server: ServerAddress,
-        peers: list[str],
         log: RaftLog,
         node_id: UUID,
         vote_timeout: Second = Second(20),
     ) -> None:
-        self.__peers = peers
-        self.__log = log
         self.__id = node_id
         self.__vote_timeout = vote_timeout
 
-        self.__votes: int = 0
-        self.__required_votes: int = (len(peers) + 1) // 2 + 1
         self.__term = log.term + 1
 
         self.__ping_service: PingService = PingService(server=server, node_id=node_id)
@@ -73,14 +68,7 @@ class Candidate(AbstractAsyncContextManager):
         begin_time = asyncio.get_event_loop().time()
         role = Role.FOLLOWER
 
-        request = {
-            "term": self.__term,
-            "candidate_id": self.__id,
-            "last_log_index": len(self.__log.entries) - 1,
-            "last_log_term": self.__log.entries[-1].term if self.__log.entries else 0,
-        }
-
-        await self.__producer.send(Topic.VOTE_REQUEST, request)
+        await self.__producer.send(Topic.VOTE_REQUEST, {})
 
         logger.info(f"{self.__id} sent vote requests to peers")
 
@@ -112,11 +100,6 @@ class Candidate(AbstractAsyncContextManager):
         except TimeoutError:
             return 0
 
-        logger.debug("Received a vote: %r", vote)
-        if vote["term"] != current_term and vote["recipient_id"] != self.__id:
-            return 0
-
-        logger.info("Received a vote")
         return 1
 
     @async_loop
