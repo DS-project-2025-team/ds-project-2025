@@ -91,8 +91,6 @@ class Candidate(AbstractAsyncContextManager):
 
         await self.__send_vote_request(term)
 
-        logger.info(f"{self.__id} sent vote requests to peers")
-
         try:
             await self.__check_votes(term)
 
@@ -114,6 +112,7 @@ class Candidate(AbstractAsyncContextManager):
         }
 
         await self.__producer.send(Topic.VOTE_REQUEST, payload)
+        logger.info("Sent vote requests")
 
     async def __count_nodes(self) -> int:
         return await self.__ping_service.count_consumers()
