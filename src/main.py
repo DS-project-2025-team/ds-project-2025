@@ -1,6 +1,6 @@
 import logging
 
-from entities.node import Node
+from network.node import Node
 from entities.server_address import ServerAddress
 from roles.role import Role
 from services.logger_service import logger
