@@ -10,3 +10,5 @@ class Topic(StrEnum):
     OUTPUT = auto()
     INPUT = auto()
     REPORT = auto()
+    PING = auto()
+    PING_RESPONSE = auto()

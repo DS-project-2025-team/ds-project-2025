@@ -69,3 +69,9 @@ class MessageConsumerFactory:
             groupid="FOLLOWER",
             offset_reset="latest",
         )
+
+    @staticmethod
+    def ping_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
+        return MessageConsumerFactory.multicast_consumer(
+            Topic.PING, server=server, node_id=node_id
+        )
