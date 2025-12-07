@@ -1,7 +1,6 @@
 import logging
 import sys
 from collections.abc import Callable
-from typing import Any
 
 LogFunc = Callable[..., None]
 
