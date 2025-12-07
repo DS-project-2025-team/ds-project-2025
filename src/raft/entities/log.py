@@ -1,6 +1,5 @@
 import threading
 from collections.abc import Iterable
-from uuid import UUID, uuid4
 
 from entities.sat_formula import SatFormula
 from raft.entities.leader_state import LeaderState
@@ -14,7 +13,6 @@ class Log:
         entries: Iterable[LogEntry] | None = None,
         commit_index: int = 0,
         term: int = 0,
-        leader_id: UUID | None = None,
         leader_state: LeaderState | None = None,
     ) -> None:
         self.entries: list[LogEntry] = list(entries or [])
