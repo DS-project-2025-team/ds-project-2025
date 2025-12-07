@@ -19,6 +19,10 @@ class LogEntry:
         self.__operation(state)
 
     @property
+    def term(self) -> int:
+        return self.__term
+
+    @property
     def index(self) -> int:
         return self.__index
 
