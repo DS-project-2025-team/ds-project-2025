@@ -11,6 +11,7 @@ from network.message_producer import MessageProducer
 from network.topic import Topic
 from roles.role import Role
 from services.logger_service import logger
+from services.ping_service import PingService
 from utils.async_loop import async_loop
 
 
@@ -36,6 +37,7 @@ class Candidate:
         self.__required_votes: int = (len(peers) + 1) // 2 + 1
         self.__term = log.term + 1
 
+        self.__ping_service: PingService = PingService(server=server, node_id=node_id)
         self.__producer = MessageProducer(server=server)
         self.__vote_consumer = MessageConsumerFactory.vote_consumer(
             server=server, node_id=node_id
@@ -79,6 +81,9 @@ class Candidate:
             role = Role.LEADER
 
         return role
+
+    async def __count_nodes(self) -> int:
+        return await self.__ping_service.count_consumers()
 
     async def __receive_vote(self, current_term: int, timeout: float = 0.5) -> int:
         try:
