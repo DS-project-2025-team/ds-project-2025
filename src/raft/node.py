@@ -60,7 +60,9 @@ class Node(AbstractAsyncContextManager):
         match self.__role:
             case Role.FOLLOWER:
                 async with Follower(
-                    server=self.__server, node_id=self.node_id
+                    server=self.__server,
+                    node_id=self.node_id,
+                    producer=self.__producer,
                 ) as follower:
                     self.__role = await follower.run()
 

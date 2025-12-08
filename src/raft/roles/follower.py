@@ -24,10 +24,11 @@ class Follower(AbstractAsyncContextManager):
         self,
         server: ServerAddress,
         node_id: UUID,
+        producer: MessageProducer,
         election_timeout: Second | None = None,
         worker: WorkerService | None = None,
     ) -> None:
-        self.__producer: MessageProducer = MessageProducer(server=server)
+        self.__producer: MessageProducer = producer
         self.__appendentry_consumer: MessageConsumer = (
             MessageConsumerFactory.appendentry_consumer(server=server, node_id=node_id)
         )
@@ -42,7 +43,6 @@ class Follower(AbstractAsyncContextManager):
         self.__node_id = node_id
 
     async def __aenter__(self) -> Self:
-        await self.__producer.__aenter__()
         await self.__appendentry_consumer.__aenter__()
         await self.__assign_consumer.__aenter__()
         self.__worker.__enter__()
@@ -55,7 +55,6 @@ class Follower(AbstractAsyncContextManager):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__appendentry_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__assign_consumer.__aexit__(exc_type, exc_value, traceback)
         self.__worker.__exit__(exc_type, exc_value, traceback)
