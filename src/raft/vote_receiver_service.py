@@ -54,6 +54,7 @@ class VoteReceiverService(AbstractAsyncContextManager):
         )
 
         if vote_granted:
+            self.__log.voted_for = candidate_id
             logger.info(f"Voted for {candidate_id} in term {term}")
         else:
             logger.info(f"Did not vote for {candidate_id} in term {term}")
