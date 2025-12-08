@@ -68,7 +68,9 @@ class PingService(AbstractAsyncContextManager):
     async def receive_response(self) -> None:
         message = await self.__consumer.receive()
 
-        if message.data["receiver"] != self.__id:
+        receiver = UUID(message.data["receiver"])
+
+        if receiver != self.__id:
             return
 
         async with asyncio.Lock():
