@@ -3,6 +3,8 @@ import sys
 import threading
 from collections.abc import Callable
 
+import colorlog
+
 LogFunc = Callable[..., None]
 
 
@@ -10,9 +12,9 @@ class LoggerService:
     def __init__(self) -> None:
         self._logger = logging.getLogger("ds-project-2025")
         if not self._logger.handlers:
-            handler = logging.StreamHandler(sys.stdout)
-            formatter = logging.Formatter(
-                "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+            handler = colorlog.StreamHandler()
+            formatter = colorlog.ColoredFormatter(
+                "%(log_color)s[%(levelname)s] %(asctime)s %(name)s: %(message)s"
             )
             handler.setFormatter(formatter)
 
