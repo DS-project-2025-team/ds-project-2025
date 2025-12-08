@@ -46,6 +46,8 @@ class Node(AbstractAsyncContextManager):
     async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
         await self.__ping_consumer.__aenter__()
+        await self.__vote_receiver.__aenter__()
+
         return self
 
     async def __aexit__(
@@ -56,6 +58,7 @@ class Node(AbstractAsyncContextManager):
     ) -> None:
         await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__ping_consumer.__aexit__(exc_type, exc_value, traceback)
+        await self.__vote_receiver.__aexit__(exc_type, exc_value, traceback)
 
     @async_loop
     async def run(self) -> None:
