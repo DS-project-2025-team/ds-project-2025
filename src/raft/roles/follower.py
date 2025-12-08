@@ -37,7 +37,9 @@ class Follower(AbstractAsyncContextManager):
         )
         self.__worker: WorkerService = worker or WorkerService()
 
-        self.__election_timeout: Second = election_timeout or Second(1)
+        self.__election_timeout: Second = election_timeout or Second(
+            10 + random.randint(0, 5)
+        )
         self.__node_id = node_id
 
     async def __aenter__(self) -> Self:
