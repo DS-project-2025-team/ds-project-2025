@@ -67,13 +67,18 @@ class VoteReceiverService(AbstractAsyncContextManager):
         """
 
         if last_log_term < self.__log.last_log_term:
+            logger.warning("Candidate's log term is outdated")
             return False
 
         if (
             last_log_term == self.__log.last_log_term
             and last_log_index < self.__log.last_log_index
         ):
+            logger.warning("Candidate's log index is outdated")
+
             return False
+
+        logger.info("Candidate's log is up-to-date")
 
         return last_log_term > self.__log.last_log_term
 
