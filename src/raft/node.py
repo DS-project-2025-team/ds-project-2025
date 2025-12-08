@@ -10,6 +10,7 @@ from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
 from raft.entities.log import Log
+from raft.roles.candidate import Candidate
 from raft.roles.follower import Follower
 from raft.roles.leader import Leader
 from raft.roles.role import Role
@@ -75,9 +76,13 @@ class Node(AbstractAsyncContextManager):
                     self.__role = await follower.run()
 
             case Role.CANDIDATE:
-                # candidate = Candidate(self.__message_service, self.peers, self.__log)
-                # self.__role = await candidate.elect()
-                self.__role = Role.LEADER
+                async with Candidate(
+                    server=self.__server,
+                    log=self.__log,
+                    node_id=self.node_id,
+                    producer=self.__producer,
+                ) as candidate:
+                    self.__role = await candidate.run()
 
             case Role.LEADER:
                 async with Leader(
