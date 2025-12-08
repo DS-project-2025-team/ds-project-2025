@@ -15,10 +15,11 @@ class Log:
         term: int = 0,
         leader_state: LeaderState | None = None,
     ) -> None:
+        self.__term: int = term
+
         self.entries: list[LogEntry] = list(entries or [])
 
         self.commit_index: int = commit_index
-        self.__term: int = term
         self.lock = threading.Lock()
         self.event = threading.Event()
         self.last_acked_index = -1
