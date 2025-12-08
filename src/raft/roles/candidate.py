@@ -24,6 +24,7 @@ class Candidate(AbstractAsyncContextManager):
         server: ServerAddress,
         log: Log,
         node_id: UUID,
+        producer: MessageProducer,
         vote_timeout: Second = Second(20),
     ) -> None:
         self.__id: UUID = node_id
@@ -32,7 +33,7 @@ class Candidate(AbstractAsyncContextManager):
         self.__log: Log = log
 
         self.__ping_service: PingService = PingService(server=server, node_id=node_id)
-        self.__producer = MessageProducer(server=server)
+        self.__producer: MessageProducer = producer
         self.__vote_consumer: MessageConsumer = MessageConsumerFactory.vote_consumer(
             server=server, node_id=node_id
         )
@@ -42,7 +43,6 @@ class Candidate(AbstractAsyncContextManager):
 
     async def __aenter__(self) -> Self:
         await self.__ping_service.__aenter__()
-        await self.__producer.__aenter__()
         await self.__vote_consumer.__aenter__()
         await self.__appendentry_consumer.__aenter__()
         return self
@@ -54,7 +54,6 @@ class Candidate(AbstractAsyncContextManager):
         traceback: TracebackType | None,
     ) -> None:
         await self.__ping_service.__aexit__(exc_type, exc_value, traceback)
-        await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__vote_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__appendentry_consumer.__aexit__(exc_type, exc_value, traceback)
 
