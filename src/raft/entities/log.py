@@ -53,11 +53,11 @@ class Log:
     @property
     def last_log_index(self) -> int:
         """
-        Return index of the last log entry if exists, otherwise 0.
+        Return index of the last log entry if exists, otherwise -1.
         """
 
         if not self.entries:
-            return 0
+            return -1
 
         return self.entries[-1].index
 
