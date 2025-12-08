@@ -28,9 +28,10 @@ class Leader(AbstractAsyncContextManager):
         log: Log,
         server: ServerAddress,
         node_id: UUID,
+        producer: MessageProducer,
         task_scheduler: TaskSchedulerService | None = None,
     ) -> None:
-        self.__producer: MessageProducer = MessageProducer(server=server)
+        self.__producer: MessageProducer = producer
         self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
             server,
         )
@@ -48,7 +49,6 @@ class Leader(AbstractAsyncContextManager):
         self.__node_id: UUID = node_id
 
     async def __aenter__(self) -> Self:
-        await self.__producer.__aenter__()
         await self.__input_consumer.__aenter__()
         await self.__appendentry_consumer.__aenter__()
         await self.__report_consumer.__aenter__()
@@ -62,7 +62,6 @@ class Leader(AbstractAsyncContextManager):
         traceback: TracebackType | None,
     ) -> None:
         await self.__appendentry_consumer.__aexit__(exc_type, exc_value, traceback)
-        await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__report_consumer.__aexit__(exc_type, exc_value, traceback)
 
