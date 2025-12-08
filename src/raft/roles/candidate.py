@@ -32,7 +32,9 @@ class Candidate(AbstractAsyncContextManager):
 
         self.__log: Log = log
 
-        self.__ping_service: PingService = PingService(server=server, node_id=node_id)
+        self.__ping_service: PingService = PingService(
+            server=server, node_id=node_id, producer=producer
+        )
         self.__producer: MessageProducer = producer
         self.__vote_consumer: MessageConsumer = MessageConsumerFactory.vote_consumer(
             server=server, node_id=node_id

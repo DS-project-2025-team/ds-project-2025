@@ -22,19 +22,19 @@ class PingService(AbstractAsyncContextManager):
         self,
         server: ServerAddress,
         node_id: UUID,
+        producer: MessageProducer,
         count: int = 0,
         timeout: Second = Second(5),
     ) -> None:
         self.__count: int = count
         self.__id: UUID = node_id
         self.__timeout: Second = timeout
-        self.__producer: MessageProducer = MessageProducer(server)
+        self.__producer: MessageProducer = producer
         self.__consumer: MessageConsumer = (
             MessageConsumerFactory.ping_response_consumer(server, node_id)
         )
 
     async def __aenter__(self) -> Self:
-        self.__producer = await self.__producer.__aenter__()
         self.__consumer = await self.__consumer.__aenter__()
         return self
 
@@ -44,7 +44,6 @@ class PingService(AbstractAsyncContextManager):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> bool | None:
-        await self.__producer.__aexit__(exc_type, exc_value, traceback)
         await self.__consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def count_consumers(self) -> int:
