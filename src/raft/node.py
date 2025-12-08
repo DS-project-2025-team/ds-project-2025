@@ -13,6 +13,7 @@ from raft.entities.log import Log
 from raft.roles.follower import Follower
 from raft.roles.leader import Leader
 from raft.roles.role import Role
+from raft.vote_receiver_service import VoteReceiverService
 from services.logger_service import logger
 from utils.async_loop import async_loop
 
@@ -34,6 +35,12 @@ class Node(AbstractAsyncContextManager):
         self.__ping_consumer: MessageConsumer = MessageConsumerFactory.ping_consumer(
             server=server, node_id=self.node_id
         )
+        self.__vote_receiver: VoteReceiverService = VoteReceiverService(
+            server=server,
+            node_id=self.node_id,
+            producer=self.__producer,
+            log=self.__log,
+        )
 
     async def __aenter__(self) -> Self:
         await self.__producer.__aenter__()
@@ -54,6 +61,7 @@ class Node(AbstractAsyncContextManager):
         async with TaskGroup() as group:
             _task1 = group.create_task(self.__run_raft())
             _task2 = group.create_task(self.__handle_ping())
+            _task3 = group.create_task(self.__vote_receiver.handle_vote())
 
     @async_loop
     async def __run_raft(self) -> None:
