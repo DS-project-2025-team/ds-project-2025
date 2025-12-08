@@ -36,7 +36,7 @@ class VoteReceiverService(AbstractAsyncContextManager):
         await self.__vote_consumer.__aexit__(exc_type, exc_value, traceback)
 
     @async_loop
-    async def __handle_vote(self) -> None:
+    async def handle_vote(self) -> None:
         message = await self.__vote_consumer.receive()
         term = message.data["term"]
         candidate_id = message.data["candidate_id"]
