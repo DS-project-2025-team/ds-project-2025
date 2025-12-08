@@ -78,10 +78,10 @@ class Candidate(AbstractAsyncContextManager):
                 self.__elect(nodes), timeout=self.__vote_timeout
             )
 
-        except (LeaderExistsError, OutDatedTermError) as error:
+        except* (LeaderExistsError, OutDatedTermError) as error:
             logger.info(str(error))
 
-        except TimeoutError:
+        except* TimeoutError:
             logger.info(f"Election for term {self.term} timed out.")
             role = Role.CANDIDATE
 
