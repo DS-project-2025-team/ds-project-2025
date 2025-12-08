@@ -43,9 +43,13 @@ class VoteReceiverService(AbstractAsyncContextManager):
         last_log_index = message.data["last_log_index"]
         last_log_term = message.data["last_log_term"]
 
-        if term < self.__log.term:
-            await self.__reject_vote()
-            return
+        vote_granted = (
+            term >= self.__log.term
+            and self.__log.voted_for in (None, candidate_id)
+            and self.__check_log_up_to_date(last_log_index, last_log_term)
+        )
+
+        await self.__send_vote(vote_granted)
 
     def __check_log_up_to_date(self, last_log_index: int, last_log_term: int) -> bool:
         """
@@ -63,9 +67,10 @@ class VoteReceiverService(AbstractAsyncContextManager):
 
         return last_log_term > self.__log.last_log_term
 
-    async def __reject_vote(self) -> None:
+    async def __send_vote(self, vote_granted: bool) -> None:
         payload = {
             "term": self.__log.term,
-            "vote_granted": False,
+            "vote_granted": vote_granted,
         }
+
         await self.__producer.send(Topic.VOTE, payload)
