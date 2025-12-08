@@ -54,7 +54,7 @@ class PingService(AbstractAsyncContextManager):
             int: Number of alive consumers
         """
         payload = {
-            "sender": self.__id,
+            "sender": str(self.__id),
         }
 
         await self.__producer.send(Topic.PING, payload)

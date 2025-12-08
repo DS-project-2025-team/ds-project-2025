@@ -101,7 +101,7 @@ class Candidate(AbstractAsyncContextManager):
 
         payload = {
             "term": self.term,
-            "candidate_id": self.__id,
+            "candidate_id": str(self.__id),
             "last_log_index": last_log_index,
             "last_log_term": last_log_term,
         }
