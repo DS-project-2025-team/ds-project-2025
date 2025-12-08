@@ -47,6 +47,22 @@ class VoteReceiverService(AbstractAsyncContextManager):
             await self.__reject_vote()
             return
 
+    def __check_log_up_to_date(self, last_log_index: int, last_log_term: int) -> bool:
+        """
+        Returns whether the candidate's log is at least as up-to-date as node.
+        """
+
+        if last_log_term < self.__log.last_log_term:
+            return False
+
+        if (
+            last_log_term == self.__log.last_log_term
+            and last_log_index < self.__log.last_log_index
+        ):
+            return False
+
+        return last_log_term > self.__log.last_log_term
+
     async def __reject_vote(self) -> None:
         payload = {
             "term": self.__log.term,
