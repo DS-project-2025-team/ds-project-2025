@@ -1,5 +1,6 @@
 import threading
 from collections.abc import Iterable
+from uuid import UUID
 
 from entities.sat_formula import SatFormula
 from raft.entities.leader_state import LeaderState
@@ -13,9 +14,11 @@ class Log:
         entries: Iterable[LogEntry] | None = None,
         commit_index: int = 0,
         term: int = 0,
+        voted_for: UUID | None = None,
         leader_state: LeaderState | None = None,
     ) -> None:
         self.__term: int = term
+        self.__voted_for: UUID | None = voted_for
 
         self.entries: list[LogEntry] = list(entries or [])
 
@@ -39,6 +42,15 @@ class Log:
                 return
 
             self.__term = new_term
+
+    @property
+    def voted_for(self) -> UUID | None:
+        return self.__voted_for
+
+    @voted_for.setter
+    def voted_for(self, node_id: UUID) -> None:
+        with self.lock:
+            self.__voted_for = node_id
 
     @property
     def completed_tasks(self) -> list[bool]:
