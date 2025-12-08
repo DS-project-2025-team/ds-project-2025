@@ -79,10 +79,10 @@ class Candidate(AbstractAsyncContextManager):
                 )
 
         except* (LeaderExistsError, OutDatedTermError) as error:
-            logger.info(str(error))
+            logger.warning(str(error))
 
         except* TimeoutError:
-            logger.info(f"Election for term {self.term} timed out.")
+            logger.warning(f"Election for term {self.term} timed out.")
             role = Role.CANDIDATE
 
         return role
