@@ -1,5 +1,5 @@
 import asyncio
-from contextlib import AbstractAsyncContextManager
+from contextlib import AbstractAsyncContextManager, suppress
 from types import TracebackType
 from typing import Self
 from uuid import UUID
@@ -58,7 +58,9 @@ class PingService(AbstractAsyncContextManager):
         }
 
         await self.__producer.send(Topic.PING, payload)
-        await asyncio.wait_for(self.receive_response(), timeout=self.__timeout)
+
+        with suppress(TimeoutError):
+            await asyncio.wait_for(self.receive_response(), timeout=self.__timeout)
 
         return self.__count
 
