@@ -65,6 +65,8 @@ class Candidate(AbstractAsyncContextManager):
 
     async def run(self) -> Role:
         self.__log.term += 1
+        logger.info(f"Canditate running for term {self.term}")
+
         nodes = await self.__count_nodes()
 
         role = Role.FOLLOWER
@@ -115,7 +117,10 @@ class Candidate(AbstractAsyncContextManager):
             votes += await self.__receive_vote()
 
     async def __count_nodes(self) -> int:
-        return await self.__ping_service.count_consumers()
+        count = await self.__ping_service.count_consumers()
+        logger.info(f"Alive nodes: {count}")
+
+        return count
 
     async def __receive_vote(self) -> int:
         message = await self.__vote_consumer.receive()

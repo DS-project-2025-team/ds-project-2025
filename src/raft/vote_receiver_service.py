@@ -9,6 +9,7 @@ from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
 from raft.entities.log import Log
+from services.logger_service import logger
 from utils.async_loop import async_loop
 
 
@@ -38,16 +39,24 @@ class VoteReceiverService(AbstractAsyncContextManager):
     @async_loop
     async def handle_vote(self) -> None:
         message = await self.__vote_consumer.receive()
+
         term = message.data["term"]
         candidate_id = message.data["candidate_id"]
         last_log_index = message.data["last_log_index"]
         last_log_term = message.data["last_log_term"]
+
+        logger.info(f"Received vote request from {candidate_id} for term {term}")
 
         vote_granted = (
             term >= self.__log.term
             and self.__log.voted_for in (None, candidate_id)
             and self.__check_log_up_to_date(last_log_index, last_log_term)
         )
+
+        if vote_granted:
+            logger.info(f"Voted for {candidate_id} in term {term}")
+        else:
+            logger.info(f"Did not vote for {candidate_id} in term {term}")
 
         await self.__send_vote(vote_granted)
 
