@@ -42,6 +42,7 @@ class Log:
                 return
 
             self.__term = new_term
+            self.__voted_for = None
 
     @property
     def voted_for(self) -> UUID | None:
