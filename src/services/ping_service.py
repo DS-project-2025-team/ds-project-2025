@@ -64,7 +64,7 @@ class PingService(AbstractAsyncContextManager):
 
     @async_loop
     async def receive_response(self) -> None:
-        message = await self.__consumer.receive(timeout=self.__timeout)
+        message = await self.__consumer.receive()
 
         if message.data["receiver"] != self.__id:
             return
