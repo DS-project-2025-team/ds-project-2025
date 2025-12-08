@@ -72,11 +72,11 @@ class Candidate(AbstractAsyncContextManager):
         role = Role.FOLLOWER
 
         try:
-            await asyncio.create_task(self.__check_leader_existence())
-
-            role = await asyncio.wait_for(
-                self.__elect(nodes), timeout=self.__vote_timeout
-            )
+            async with asyncio.TaskGroup() as group:
+                group.create_task(self.__check_leader_existence())
+                group.create_task(
+                    asyncio.wait_for(self.__elect(nodes), timeout=self.__vote_timeout)
+                )
 
         except* (LeaderExistsError, OutDatedTermError) as error:
             logger.info(str(error))
