@@ -107,7 +107,7 @@ class Candidate(AbstractAsyncContextManager):
         logger.info("Sent vote requests")
 
     async def __wait_for_votes(self, nodes: int) -> None:
-        votes = 0
+        votes = 1
         votes_required = nodes // 2 + 1
 
         while votes < votes_required:
