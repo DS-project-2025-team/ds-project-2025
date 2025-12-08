@@ -1,3 +1,5 @@
+from contextlib import AbstractAsyncContextManager
+from types import TracebackType
 from uuid import UUID
 
 from entities.server_address import ServerAddress
@@ -7,7 +9,7 @@ from network.message_producer import MessageProducer
 from utils.async_loop import async_loop
 
 
-class VoteReceiverService:
+class VoteReceiverService(AbstractAsyncContextManager):
     def __init__(
         self, server: ServerAddress, node_id: UUID, producer: MessageProducer
     ) -> None:
@@ -15,6 +17,18 @@ class VoteReceiverService:
         self.__vote_consumer: MessageConsumer = MessageConsumerFactory.vote_consumer(
             server, node_id
         )
+
+    async def __aenter__(self) -> "VoteReceiverService":
+        await self.__vote_consumer.__aenter__()
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        await self.__vote_consumer.__aexit__(exc_type, exc_value, traceback)
 
     @async_loop
     async def __handle_vote(self) -> None:
