@@ -20,8 +20,8 @@ class VoteReceiverService(AbstractAsyncContextManager):
         self.__log: Log = log
 
         self.__producer: MessageProducer = producer
-        self.__vote_consumer: MessageConsumer = MessageConsumerFactory.vote_consumer(
-            server, node_id
+        self.__vote_consumer: MessageConsumer = (
+            MessageConsumerFactory.vote_request_consumer(server, node_id)
         )
 
     async def __aenter__(self) -> Self:
