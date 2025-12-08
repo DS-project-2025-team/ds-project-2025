@@ -1,5 +1,6 @@
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
+from typing import Self
 from uuid import UUID
 
 from entities.server_address import ServerAddress
@@ -21,7 +22,7 @@ class VoteReceiverService(AbstractAsyncContextManager):
             server, node_id
         )
 
-    async def __aenter__(self) -> "VoteReceiverService":
+    async def __aenter__(self) -> Self:
         await self.__vote_consumer.__aenter__()
         return self
 
