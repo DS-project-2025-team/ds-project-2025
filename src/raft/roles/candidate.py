@@ -149,7 +149,9 @@ class Candidate(AbstractAsyncContextManager):
         if candidate_id != self.__id or not vote_granted:
             return 0
 
-        logger.info(f"Received vote from {voter} for term {self.term}")
+        logger.info(
+            f"Received vote from {voter} for term {self.term} for {candidate_id}"
+        )
 
         return 1
 
