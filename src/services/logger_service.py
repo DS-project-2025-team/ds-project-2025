@@ -14,7 +14,8 @@ class LoggerService:
         if not self._logger.handlers:
             handler = colorlog.StreamHandler()
             formatter = colorlog.ColoredFormatter(
-                "%(log_color)s[%(levelname)s] %(asctime)s %(name)s: %(message)s"
+                "%(log_color)s[%(levelname)s] %(asctime)s: %(message)s",
+                "%H:%M:%S",
             )
             handler.setFormatter(formatter)
 
