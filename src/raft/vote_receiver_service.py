@@ -18,6 +18,7 @@ class VoteReceiverService(AbstractAsyncContextManager):
         self, server: ServerAddress, node_id: UUID, producer: MessageProducer, log: Log
     ) -> None:
         self.__log: Log = log
+        self.__id: UUID = node_id
 
         self.__producer: MessageProducer = producer
         self.__vote_consumer: MessageConsumer = (
@@ -95,6 +96,7 @@ class VoteReceiverService(AbstractAsyncContextManager):
     async def __send_vote(self, vote_granted: bool) -> None:
         payload = {
             "term": self.__log.term,
+            "voter": str(self.__id),
             "vote_granted": vote_granted,
         }
 

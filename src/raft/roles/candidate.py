@@ -137,6 +137,7 @@ class Candidate(AbstractAsyncContextManager):
 
         vote_term = message.data["term"]
         vote_granted = message.data["vote_granted"]
+        voter = str(message.data["voter"])
 
         if vote_term > self.term:
             old_term = self.term
@@ -146,6 +147,8 @@ class Candidate(AbstractAsyncContextManager):
 
         if not vote_granted:
             return 0
+
+        logger.info(f"Received vote from {voter} for term {self.term}")
 
         return 1
 
