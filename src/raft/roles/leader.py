@@ -119,7 +119,12 @@ class Leader(AbstractAsyncContextManager):
                      entries.__len__() , commit_index+1)
 
         await self.__producer.send_and_wait(
-            Topic.APPENDENTRY, {"sender": str(self.__node_id), "entries": entries}
+            Topic.APPENDENTRY,
+            {
+                "term": self.__log.term,
+                "sender": str(self.__node_id),
+                "entries": entries,
+            },
         )
         logger.debug(
             "Send event, last sent index: %s -> %s",
