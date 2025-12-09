@@ -58,17 +58,13 @@ class MessageConsumer(AbstractAsyncContextManager):
         with suppress(IllegalOperation):
             await self.__consumer.commit()
 
-        if logging.getLevelName(logger.get_level()) == "DEBUG":
-            logger.debug(
-                "Received topic: %s, partition: %s, offset: %s, data: %s",
-                message.topic,
-                message.partition,
-                message.offset,
-                message.data,
-            )
-
-        else:
-            logger.info(f"Received topic: {message.topic}")
+        logger.debug(
+            "Received topic: %s, partition: %s, offset: %s, data: %s",
+            message.topic,
+            message.partition,
+            message.offset,
+            message.data,
+        )
 
         return message
 
