@@ -18,6 +18,10 @@ from services.ping_service import PingService
 from utils.async_loop import async_loop
 
 
+class WonElection(Exception):  # noqa: N818
+    pass
+
+
 class Candidate(AbstractAsyncContextManager):
     def __init__(
         self,
@@ -77,6 +81,9 @@ class Candidate(AbstractAsyncContextManager):
                 group.create_task(
                     asyncio.wait_for(self.__elect(nodes), timeout=self.__vote_timeout)
                 )
+        except* WonElection:
+            logger.info(f"Won election for term {self.term}")
+            role = Role.LEADER
 
         except* (LeaderExistsError, OutDatedTermError) as error:
             logger.warning(str(error))
@@ -87,13 +94,13 @@ class Candidate(AbstractAsyncContextManager):
 
         return role
 
-    async def __elect(self, nodes: int) -> Role:
+    async def __elect(self, nodes: int) -> None:
         logger.info(f"Starting election for term {self.term}")
 
         await self.__send_vote_request()
         await self.__wait_for_votes(nodes)
 
-        return Role.LEADER
+        raise WonElection()
 
     async def __send_vote_request(self) -> None:
         last_log_index = self.__log.last_log_index
