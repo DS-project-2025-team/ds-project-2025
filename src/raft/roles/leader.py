@@ -115,8 +115,11 @@ class Leader(AbstractAsyncContextManager):
         entries = [
             e.to_dict() for e in self.__log.get_raftlog_entries(commit_index + 1)
         ]
-        logger.debug("send %s entries starting from index %s",
-                     entries.__len__() , commit_index+1)
+        logger.debug(
+            "send %s entries starting from index %s",
+            entries.__len__(),
+            commit_index + 1,
+        )
 
         await self.__producer.send_and_wait(
             Topic.APPENDENTRY,
