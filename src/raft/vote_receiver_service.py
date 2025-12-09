@@ -90,7 +90,7 @@ class VoteReceiverService(AbstractAsyncContextManager):
 
         logger.info("Candidate's log is up-to-date")
 
-        return last_log_term > self.__log.last_log_term
+        return True
 
     async def __send_vote(self, vote_granted: bool) -> None:
         payload = {
