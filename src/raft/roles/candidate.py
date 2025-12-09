@@ -81,9 +81,6 @@ class Candidate(AbstractAsyncContextManager):
                 group.create_task(
                     asyncio.wait_for(self.__elect(nodes), timeout=self.__vote_timeout)
                 )
-        except* WonElection:
-            logger.info(f"Won election for term {self.term}")
-            role = Role.LEADER
 
         except* (LeaderExistsError, OutDatedTermError) as error:
             logger.warning(str(error))
@@ -91,6 +88,10 @@ class Candidate(AbstractAsyncContextManager):
         except* TimeoutError:
             logger.warning(f"Election for term {self.term} timed out.")
             role = Role.CANDIDATE
+
+        except* WonElection:
+            logger.info(f"Won election for term {self.term}")
+            role = Role.LEADER
 
         return role
 
