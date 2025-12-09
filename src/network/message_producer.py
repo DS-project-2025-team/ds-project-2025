@@ -26,10 +26,7 @@ class MessageProducer(AbstractAsyncContextManager):
     async def send(self, topic: Topic, payload: dict[str, Any]) -> None:
         await self.__producer.send(topic, payload)
 
-        if logging.getLevelName(logger.get_level()) == "DEBUG":
-            logger.debug(f"Sent {topic} {payload}")
-        else:
-            logger.info(f"Sent topic: {topic}")
+        logger.debug(f"Sent {topic} {payload}")
 
     async def send_and_wait(self, topic: Topic, payload: dict) -> None:
         metadata: RecordMetadata = await self.__producer.send_and_wait(topic, payload)
