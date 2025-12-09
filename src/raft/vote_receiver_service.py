@@ -41,7 +41,7 @@ class VoteReceiverService(AbstractAsyncContextManager):
     async def handle_vote(self) -> None:
         message = await self.__vote_consumer.receive()
 
-        term = message.data["term"]
+        term: bool = message.data["term"]
         candidate_id = UUID(message.data["candidate_id"])
         last_log_index = message.data["last_log_index"]
         last_log_term = message.data["last_log_term"]
@@ -98,6 +98,7 @@ class VoteReceiverService(AbstractAsyncContextManager):
             "term": self.__log.term,
             "voter": str(self.__id),
             "vote_granted": vote_granted,
+            "candidate_id": str(self.__log.voted_for),
         }
 
         await self.__producer.send(Topic.VOTE, payload)

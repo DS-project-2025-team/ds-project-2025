@@ -138,6 +138,7 @@ class Candidate(AbstractAsyncContextManager):
         vote_term = message.data["term"]
         vote_granted = message.data["vote_granted"]
         voter = str(message.data["voter"])
+        candidate_id = UUID(message.data["candidate_id"])
 
         if vote_term > self.term:
             old_term = self.term
@@ -145,7 +146,7 @@ class Candidate(AbstractAsyncContextManager):
 
             raise OutDatedTermError(old_term, vote_term)
 
-        if not vote_granted:
+        if candidate_id != self.__id or not vote_granted:
             return 0
 
         logger.info(f"Received vote from {voter} for term {self.term}")
