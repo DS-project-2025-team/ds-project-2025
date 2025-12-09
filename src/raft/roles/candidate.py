@@ -123,6 +123,8 @@ class Candidate(AbstractAsyncContextManager):
         while votes < votes_required:
             votes += await self.__receive_vote()
 
+            logger.info(f"Received votes: {votes}")
+
     async def __count_nodes(self) -> int:
         count = await self.__ping_service.count_consumers()
         logger.info(f"Alive nodes: {count}")
