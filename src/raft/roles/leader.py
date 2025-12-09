@@ -115,6 +115,8 @@ class Leader(AbstractAsyncContextManager):
         entries = [
             e.to_dict() for e in self.__log.get_raftlog_entries(commit_index + 1)
         ]
+        logger.debug("send %s entries starting from index %s",
+                     entries.__len__() , commit_index+1)
 
         await self.__producer.send_and_wait(
             Topic.APPENDENTRY, {"sender": str(self.__node_id), "entries": entries}
@@ -179,7 +181,7 @@ class Leader(AbstractAsyncContextManager):
             # have acknowledged before committing.
             while self.__log.last_acked_index != entry.index:
                 logger.debug(
-                    "__handle_input: Wait event until appendentry "
+                    "__handle_input: Wait until appendentry "
                     "index: %s is sent, last sent: %s",
                     entry.index,
                     self.__log.last_acked_index,
@@ -230,7 +232,7 @@ class Leader(AbstractAsyncContextManager):
         # have acknowledged before committing.
         while self.__log.last_acked_index != entry.index:
             logger.debug(
-                "__complete_task: Wait event until appendentry "
+                "__complete_task: Wait until appendentry "
                 "index: %s is sent, last sent: %s",
                 entry.index,
                 self.__log.last_acked_index,
@@ -258,7 +260,7 @@ class Leader(AbstractAsyncContextManager):
         # have acknowledged before committing.
         while self.__log.last_acked_index != entry.index:
             logger.debug(
-                "__set_new_completed_tasks: Wait event until "
+                "__set_new_completed_tasks: Wait until "
                 "appendentry index: %s is sent, last sent: %s",
                 entry.index,
                 self.__log.last_acked_index,
@@ -279,7 +281,7 @@ class Leader(AbstractAsyncContextManager):
         # have acknowledged before committing.
         while self.__log.last_acked_index < entry.index:
             logger.debug(
-                "__remove_current_formula: Wait event until "
+                "__remove_current_formula: Wait until "
                 "appendentry index: %s is sent, last sent: %s",
                 entry.index,
                 self.__log.last_acked_index,

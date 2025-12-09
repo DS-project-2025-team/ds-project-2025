@@ -12,7 +12,7 @@ class Log:
     def __init__(
         self,
         entries: Iterable[LogEntry] | None = None,
-        commit_index: int = 0,
+        commit_index: int = -1,
         term: int = 0,
         voted_for: UUID | None = None,
         leader_state: LeaderState | None = None,
