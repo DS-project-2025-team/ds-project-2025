@@ -20,6 +20,7 @@ from raft.roles.role import Role
 from services.logger_service import logger
 from services.task_scheduler_service import TaskSchedulerService
 from utils.async_loop import async_loop
+from utils.hash_sat_formula import hash_sat_formula
 
 
 class Leader(AbstractAsyncContextManager):
@@ -153,7 +154,7 @@ class Leader(AbstractAsyncContextManager):
         payload = {"formula": formula.to_list(), "task": task, "exponent": exponent}
 
         await self.__producer.send(Topic.ASSIGN, payload)
-        logger.info(f"Assigned task {task} of formula {formula}")
+        logger.info(f"Assigned task {task} of formula {hash_sat_formula(formula)}")
 
     @async_loop
     async def __handle_report(self) -> None:
