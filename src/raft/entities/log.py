@@ -1,3 +1,4 @@
+import asyncio
 import threading
 from collections.abc import Iterable
 from uuid import UUID
@@ -23,7 +24,7 @@ class Log:
         self.entries: list[LogEntry] = list(entries or [])
 
         self.commit_index: int = commit_index
-        self.lock = threading.Lock()
+        self.lock = asyncio.Lock()
         self.event = threading.Event()
         self.last_acked_index = -1
         self.leader_state: LeaderState = leader_state or LeaderState()
