@@ -48,27 +48,28 @@ class VoteReceiverService(AbstractAsyncContextManager):
 
         logger.info(f"Received vote request from {candidate_id} for term {term}")
 
-        term_up_to_date = term >= self.__log.term
-        not_voted = self.__log.voted_for in (None, candidate_id)
-        log_up_to_date = self.__check_log_up_to_date(last_log_index, last_log_term)
+        async with self.__log.lock:
+            term_up_to_date = term >= self.__log.term
+            not_voted = self.__log.voted_for in (None, candidate_id)
+            log_up_to_date = self.__check_log_up_to_date(last_log_index, last_log_term)
 
-        vote_granted = term_up_to_date and not_voted and log_up_to_date
+            vote_granted = term_up_to_date and not_voted and log_up_to_date
 
-        if vote_granted:
-            self.__log.voted_for = candidate_id
-            logger.info(f"Voted for {candidate_id} in term {term}")
-        else:
-            logger.info(f"Did not vote for {candidate_id} in term {term}")
-            logger.info(
-                ", ".join(
-                    [
-                        "Vote denied because:",
-                        f"term up to date: {term_up_to_date}",
-                        f"not voted yet: {not_voted}",
-                        f"log up to date: {log_up_to_date}",
-                    ]
+            if vote_granted:
+                self.__log.voted_for = candidate_id
+                logger.info(f"Voted for {candidate_id} in term {term}")
+            else:
+                logger.info(f"Did not vote for {candidate_id} in term {term}")
+                logger.info(
+                    ", ".join(
+                        [
+                            "Vote denied because:",
+                            f"term up to date: {term_up_to_date}",
+                            f"not voted yet: {not_voted}",
+                            f"log up to date: {log_up_to_date}",
+                        ]
+                    )
                 )
-            )
 
         await self.__send_vote(vote_granted)
 

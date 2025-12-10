@@ -50,8 +50,7 @@ class Log:
 
     @voted_for.setter
     def voted_for(self, node_id: UUID) -> None:
-        with self.lock:
-            self.__voted_for = node_id
+        self.__voted_for = node_id
 
     @property
     def completed_tasks(self) -> list[bool]:
