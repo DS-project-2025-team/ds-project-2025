@@ -68,7 +68,9 @@ class Candidate(AbstractAsyncContextManager):
         return self.__log.term
 
     async def run(self) -> Role:
-        self.__log.term += 1
+        async with self.__log.lock:
+            self.__log.term += 1
+
         logger.info(f"Canditate running for term {self.term}")
 
         nodes = await self.__count_nodes()
@@ -140,11 +142,12 @@ class Candidate(AbstractAsyncContextManager):
         voter = str(message.data["voter"])
         candidate_id = UUID(message.data["candidate_id"])
 
-        if vote_term > self.term:
-            old_term = self.term
-            self.__log.term = vote_term
+        async with self.__log.lock:
+            if vote_term > self.term:
+                old_term = self.term
+                self.__log.term = vote_term
 
-            raise OutDatedTermError(old_term, vote_term)
+                raise OutDatedTermError(old_term, vote_term)
 
         if candidate_id != self.__id or not vote_granted:
             return 0

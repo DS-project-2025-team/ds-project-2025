@@ -35,15 +35,14 @@ class Log:
 
     @term.setter
     def term(self, new_term: int) -> None:
-        with self.lock:
-            if new_term < self.__term:
-                logger.warning(
-                    f"Attempted to set term {self.term} to smaller term {new_term}"
-                )
-                return
+        if new_term < self.__term:
+            logger.warning(
+                f"Attempted to set term {self.term} to smaller term {new_term}"
+            )
+            return
 
-            self.__term = new_term
-            self.__voted_for = None
+        self.__term = new_term
+        self.__voted_for = None
 
     @property
     def voted_for(self) -> UUID | None:
