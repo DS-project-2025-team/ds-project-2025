@@ -86,10 +86,9 @@ class Log:
         return self.entries[-1].term
 
     def append(self, entry: LogEntry) -> None:
-        with self.lock:
-            entry.index = self.entries.__len__()
-            self.entries.append(entry)
-            logger.debug(f"Applied entry {entry.to_dict()} to raftlog")
+        entry.index = self.entries.__len__()
+        self.entries.append(entry)
+        logger.debug(f"Applied entry {entry.to_dict()} to raftlog")
 
     def commit(self) -> None:
         if self.commit_index >= len(self.entries):

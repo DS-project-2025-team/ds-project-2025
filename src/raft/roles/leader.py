@@ -185,7 +185,8 @@ class Leader(AbstractAsyncContextManager):
 
             entry = LogEntryFactory.add_formula(self.__log, formula)
 
-            self.__log.append(entry)
+            async with self.__log.lock:
+                self.__log.append(entry)
             # here we must wait until majority of non-faulty nodes
             # have acknowledged before committing.
             while self.__log.last_acked_index != entry.index:
@@ -226,7 +227,8 @@ class Leader(AbstractAsyncContextManager):
         pass
 
     async def __complete_task(self, task: int) -> None:
-        await asyncio.to_thread(self.__complete_task_blocking, task)
+        async with self.__log.lock:
+            await asyncio.to_thread(self.__complete_task_blocking, task)
 
     def __complete_task_blocking(self, task: int) -> None:
         entry = LogEntryFactory.complete_task(self.__log, task)
@@ -257,9 +259,10 @@ class Leader(AbstractAsyncContextManager):
         await self.__remove_current_formula()
 
     async def __set_new_completed_tasks(self, completed_tasks: list[bool]) -> None:
-        await asyncio.to_thread(
-            self.__set_new_completed_tasks_blocking, completed_tasks
-        )
+        async with self.__log.lock:
+            await asyncio.to_thread(
+                self.__set_new_completed_tasks_blocking, completed_tasks
+            )
 
     def __set_new_completed_tasks_blocking(self, completed_tasks: list[bool]) -> None:
         entry = LogEntryFactory.set_completed_tasks(self.__log, completed_tasks)
@@ -280,7 +283,8 @@ class Leader(AbstractAsyncContextManager):
         self.__log.commit()
 
     async def __remove_current_formula(self) -> None:
-        await asyncio.to_thread(self.__remove_current_formula_blocking)
+        async with self.__log.lock:
+            await asyncio.to_thread(self.__remove_current_formula_blocking)
 
     def __remove_current_formula_blocking(self) -> None:
         entry = LogEntryFactory.pop_formula(self.__log)
