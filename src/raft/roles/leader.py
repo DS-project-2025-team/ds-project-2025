@@ -174,7 +174,7 @@ class Leader(AbstractAsyncContextManager):
             return
 
         await self.__send_output(satisfiable)
-        await self.__reset_scheduler()
+        await self.__reset_task_queue()
 
     @async_loop
     async def __handle_input(self, timeout: Second) -> None:
@@ -264,7 +264,7 @@ class Leader(AbstractAsyncContextManager):
         logger.debug("Received event")
         self.__log.commit()
 
-    async def __reset_scheduler(self) -> None:
+    async def __reset_task_queue(self) -> None:
         self.__task_queue = None
         await self.__remove_current_formula()
 
