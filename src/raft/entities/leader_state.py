@@ -7,10 +7,10 @@ from entities.sat_formula import SatFormula
 class LeaderState:
     def __init__(
         self,
-        completed_tasks: list[bool] | None = None,
+        completed_tasks: Iterable[bool] | None = None,
         formulas: Iterable[SatFormula] | None = None,
     ) -> None:
-        self.completed_tasks: list[bool] = completed_tasks or []
+        self.completed_tasks: list[bool] = list(completed_tasks or [])
         self.formulas: deque[SatFormula] = deque(formulas or [])
 
     def mark_done(self, task: int) -> None:
