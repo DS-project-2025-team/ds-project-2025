@@ -1,5 +1,6 @@
 import asyncio
 import time
+from collections.abc import Iterable
 from contextlib import AbstractAsyncContextManager, suppress
 from types import TracebackType
 from typing import Literal, Self
@@ -16,6 +17,7 @@ from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
 from raft.entities.log import Log
+from raft.entities.log_entry import LogEntry
 from raft.entities.log_entry_factory import LogEntryFactory
 from raft.roles.role import Role
 from services.logger_service import logger
@@ -69,7 +71,7 @@ class Leader(AbstractAsyncContextManager):
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
             async with asyncio.TaskGroup() as group:
-                _task1 = group.create_task(self.__send_append_entries())
+                _task1 = group.create_task(self.__send_append_entries([]))
                 _task2 = group.create_task(self.__receive_append_entries_response())
                 _task3 = group.create_task(self.__handle_input(Second(1)))
                 _task4 = group.create_task(self.__assign_task())
@@ -110,24 +112,15 @@ class Leader(AbstractAsyncContextManager):
         logger.info(f"Sent result {result}")
 
     @async_loop
-    async def __send_append_entries(self) -> None:
-        commit_index = self.__log.get_commit_index()
+    async def __send_append_entries(self, entries: Iterable[LogEntry]) -> None:
         index_len = self.__log.entries.__len__()
-        entries = [
-            e.to_dict() for e in self.__log.get_raftlog_entries(commit_index + 1)
-        ]
-        logger.debug(
-            "send %s entries starting from index %s",
-            entries.__len__(),
-            commit_index + 1,
-        )
 
         await self.__producer.send_and_wait(
             Topic.APPEND_ENTRIES,
             {
                 "term": self.__log.term,
                 "sender": str(self.__node_id),
-                "entries": entries,
+                "entries": [entry.to_dict() for entry in entries],
             },
         )
         logger.debug(
