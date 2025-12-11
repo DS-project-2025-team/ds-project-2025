@@ -19,7 +19,7 @@ class LogEntryFactory:
     def add_formula(
         formula: SatFormula, state: LeaderState, term: int, index: int
     ) -> LogEntry:
-        formulas = concat(state.formulas, [formula])
+        formulas = concat(list(state.formulas), [formula])
         completed_tasks = state.completed_tasks.copy()
 
         return LogEntry(LeaderState(completed_tasks, formulas), term, index)
