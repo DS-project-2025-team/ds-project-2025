@@ -36,8 +36,8 @@ class Leader(AbstractAsyncContextManager):
         self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
             server,
         )
-        self.__appendentry_consumer: MessageConsumer = (
-            MessageConsumerFactory.appendentry_response_consumer(
+        self.__append_entry_consumer: MessageConsumer = (
+            MessageConsumerFactory.append_entry_response_consumer(
                 server=server, node_id=node_id
             )
         )
@@ -51,7 +51,7 @@ class Leader(AbstractAsyncContextManager):
 
     async def __aenter__(self) -> Self:
         await self.__input_consumer.__aenter__()
-        await self.__appendentry_consumer.__aenter__()
+        await self.__append_entry_consumer.__aenter__()
         await self.__report_consumer.__aenter__()
 
         return self
@@ -62,15 +62,15 @@ class Leader(AbstractAsyncContextManager):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        await self.__appendentry_consumer.__aexit__(exc_type, exc_value, traceback)
+        await self.__append_entry_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__report_consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
             async with asyncio.TaskGroup() as group:
-                _task1 = group.create_task(self.__send_appendentry())
-                _task2 = group.create_task(self.__receive_appendentry_response())
+                _task1 = group.create_task(self.__send_append_entry())
+                _task2 = group.create_task(self.__receive_append_entry_response())
                 _task3 = group.create_task(self.__handle_input(Second(1)))
                 _task4 = group.create_task(self.__assign_task())
                 _task5 = group.create_task(self.__handle_report())
@@ -110,7 +110,7 @@ class Leader(AbstractAsyncContextManager):
         logger.info(f"Sent result {result}")
 
     @async_loop
-    async def __send_appendentry(self) -> None:
+    async def __send_append_entry(self) -> None:
         commit_index = self.__log.get_commit_index()
         index_len = self.__log.entries.__len__()
         entries = [
@@ -123,7 +123,7 @@ class Leader(AbstractAsyncContextManager):
         )
 
         await self.__producer.send_and_wait(
-            Topic.APPENDENTRY,
+            Topic.APPEND_ENTRY,
             {
                 "term": self.__log.term,
                 "sender": str(self.__node_id),
@@ -142,12 +142,12 @@ class Leader(AbstractAsyncContextManager):
         await asyncio.sleep(2)
 
     @async_loop
-    async def __receive_appendentry_response(self) -> None:
+    async def __receive_append_entry_response(self) -> None:
         """
-        Read messages via appendentry_response_consumer
+        Read messages via append_entry_response_consumer
         """
 
-        message = await self.__appendentry_consumer.receive()
+        message = await self.__append_entry_consumer.receive()
         await self.__handle_message(message)
 
     async def __send_task(self, formula: SatFormula, task: int, exponent: int) -> None:
@@ -196,7 +196,7 @@ class Leader(AbstractAsyncContextManager):
             # have acknowledged before committing.
             while self.__log.last_acked_index != entry.index:
                 logger.debug(
-                    "__handle_input: Wait until appendentry "
+                    "__handle_input: Wait until append_entry "
                     "index: %s is sent, last sent: %s",
                     entry.index,
                     self.__log.last_acked_index,
@@ -253,7 +253,7 @@ class Leader(AbstractAsyncContextManager):
         # have acknowledged before committing.
         while self.__log.last_acked_index != entry.index:
             logger.debug(
-                "__complete_task: Wait until appendentry "
+                "__complete_task: Wait until append_entry "
                 "index: %s is sent, last sent: %s",
                 entry.index,
                 self.__log.last_acked_index,
@@ -288,7 +288,7 @@ class Leader(AbstractAsyncContextManager):
         while self.__log.last_acked_index != entry.index:
             logger.debug(
                 "__set_new_completed_tasks: Wait until "
-                "appendentry index: %s is sent, last sent: %s",
+                "append_entry index: %s is sent, last sent: %s",
                 entry.index,
                 self.__log.last_acked_index,
             )
@@ -312,7 +312,7 @@ class Leader(AbstractAsyncContextManager):
         while self.__log.last_acked_index < entry.index:
             logger.debug(
                 "__remove_current_formula: Wait until "
-                "appendentry index: %s is sent, last sent: %s",
+                "append_entry index: %s is sent, last sent: %s",
                 entry.index,
                 self.__log.last_acked_index,
             )

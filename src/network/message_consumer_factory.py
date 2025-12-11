@@ -19,19 +19,19 @@ class MessageConsumerFactory:
         )
 
     @staticmethod
-    def appendentry_response_consumer(
+    def append_entry_response_consumer(
         server: ServerAddress, node_id: UUID
     ) -> MessageConsumer:
         return MessageConsumerFactory.multicast_consumer(
-            Topic.APPENDENTRY_RESPONSE,
+            Topic.APPEND_ENTRY_RESPONSE,
             server=server,
             node_id=node_id,
         )
 
     @staticmethod
-    def appendentry_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
+    def append_entry_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
         return MessageConsumerFactory.multicast_consumer(
-            Topic.APPENDENTRY, server=server, node_id=node_id
+            Topic.APPEND_ENTRY, server=server, node_id=node_id
         )
 
     @staticmethod
