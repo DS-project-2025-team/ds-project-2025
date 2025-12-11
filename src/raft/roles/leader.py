@@ -18,7 +18,7 @@ from raft.entities.log import Log
 from raft.entities.log_entry_factory import LogEntryFactory
 from raft.roles.role import Role
 from services.logger_service import logger
-from services.task_queue import TaskQueue
+from entities.task_queue import TaskQueue
 from utils.async_loop import async_loop
 from utils.hash_sat_formula import hash_sat_formula
 

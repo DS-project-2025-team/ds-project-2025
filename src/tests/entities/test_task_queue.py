@@ -1,7 +1,7 @@
 import pytest
 
 from entities.sat_formula import SatFormula
-from services.task_queue import TaskQueue
+from entities.task_queue import TaskQueue
 
 
 def test_completed_tasks_initialized_correctly():
