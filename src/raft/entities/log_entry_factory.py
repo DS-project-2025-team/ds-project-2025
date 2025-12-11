@@ -6,8 +6,13 @@ from raft.entities.log_entry import LogEntry
 
 class LogEntryFactory:
     @staticmethod
-    def complete_task(raftlog: Log, task: int) -> LogEntry:
-        return LogEntry(raftlog, lambda state: state.mark_done(task))
+    def complete_task(task: int, state: LeaderState, term: int, index: int) -> LogEntry:
+        formulas = state.formulas.copy()
+        completed_tasks = (
+            (i == task) or x for i, x in enumerate(state.completed_tasks)
+        )
+
+        return LogEntry(LeaderState(completed_tasks, formulas), term, index)
 
     @staticmethod
     def add_formula(raftlog: Log, formula: SatFormula) -> LogEntry:

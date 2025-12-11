@@ -231,7 +231,12 @@ class Leader(AbstractAsyncContextManager):
             await asyncio.to_thread(self.__complete_task_blocking, task)
 
     def __complete_task_blocking(self, task: int) -> None:
-        entry = LogEntryFactory.complete_task(self.__log, task)
+        entry = LogEntryFactory.complete_task(
+            task,
+            self.__log.leader_state,
+            self.__log.term,
+            self.__log.last_log_index + 1,
+        )
 
         if not self.__task_queue:
             return
