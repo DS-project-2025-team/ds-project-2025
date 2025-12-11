@@ -57,3 +57,8 @@ class TaskQueue(Hashable):
 
     def __hash__(self) -> int:
         return self.__hash
+
+    def __repr__(self) -> str:
+        return (
+            f"TaskQueue(hash={self.__hash}, tasks_remaining={self.__tasks_remaining})"
+        )
