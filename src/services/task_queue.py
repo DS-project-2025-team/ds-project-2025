@@ -6,7 +6,7 @@ from utils.hash_sat_formula import hash_sat_formula
 from utils.task import get_tasks_from_formula
 
 
-class TaskSchedulerService(Hashable):
+class TaskQueue(Hashable):
     """
     Class for managing tasks.
     """

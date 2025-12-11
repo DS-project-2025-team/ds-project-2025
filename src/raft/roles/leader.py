@@ -18,7 +18,7 @@ from raft.entities.log import Log
 from raft.entities.log_entry_factory import LogEntryFactory
 from raft.roles.role import Role
 from services.logger_service import logger
-from services.task_scheduler_service import TaskSchedulerService
+from services.task_queue import TaskQueue
 from utils.async_loop import async_loop
 from utils.hash_sat_formula import hash_sat_formula
 
@@ -30,7 +30,7 @@ class Leader(AbstractAsyncContextManager):
         server: ServerAddress,
         node_id: UUID,
         producer: MessageProducer,
-        task_scheduler: TaskSchedulerService | None = None,
+        task_queue: TaskQueue | None = None,
     ) -> None:
         self.__producer: MessageProducer = producer
         self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
@@ -45,7 +45,7 @@ class Leader(AbstractAsyncContextManager):
             MessageConsumerFactory.report_consumer(server=server)
         )
 
-        self.__scheduler: TaskSchedulerService | None = task_scheduler
+        self.__task_queue: TaskQueue | None = task_queue
         self.__log: Log = log
         self.__node_id: UUID = node_id
 
@@ -101,7 +101,7 @@ class Leader(AbstractAsyncContextManager):
         logger.info(f"Computed result: {result}")
 
         payload = {
-            "hash": hash(self.__scheduler),
+            "hash": hash(self.__task_queue),
             "result": result,
         }
 
@@ -162,7 +162,7 @@ class Leader(AbstractAsyncContextManager):
 
         data = message.data
 
-        if data["hash"] != hash(self.__scheduler):
+        if data["hash"] != hash(self.__task_queue):
             logger.debug(f"Received outdated REPORT with hash {data['hash']}")
             return
 
@@ -170,7 +170,7 @@ class Leader(AbstractAsyncContextManager):
 
         satisfiable: bool = message.data["result"]
 
-        if not (self.__scheduler and self.__scheduler.is_done(satisfiable)):
+        if not (self.__task_queue and self.__task_queue.is_done(satisfiable)):
             return
 
         await self.__send_output(satisfiable)
@@ -212,13 +212,13 @@ class Leader(AbstractAsyncContextManager):
             logger.debug("No current formula to assign tasks for")
             return
 
-        if not self.__scheduler:
-            self.__scheduler = TaskSchedulerService(formula, exponent)
-            logger.info(f"Set {self.__scheduler} for new formula {formula}")
+        if not self.__task_queue:
+            self.__task_queue = TaskQueue(formula, exponent)
+            logger.info(f"Set {self.__task_queue} for new formula {formula}")
 
-            await self.__set_new_completed_tasks(self.__scheduler.completed_tasks)
+            await self.__set_new_completed_tasks(self.__task_queue.completed_tasks)
 
-        if (task := self.__scheduler.next_task()) is None:
+        if (task := self.__task_queue.next_task()) is None:
             return
 
         await self.__send_task(formula, task, exponent)
@@ -233,10 +233,10 @@ class Leader(AbstractAsyncContextManager):
     def __complete_task_blocking(self, task: int) -> None:
         entry = LogEntryFactory.complete_task(self.__log, task)
 
-        if not self.__scheduler:
+        if not self.__task_queue:
             return
 
-        self.__scheduler.complete_task(task)
+        self.__task_queue.complete_task(task)
 
         self.__log.append(entry)
         # here we must wait until majority of non-faulty nodes
@@ -255,7 +255,7 @@ class Leader(AbstractAsyncContextManager):
         self.__log.commit()
 
     async def __reset_scheduler(self) -> None:
-        self.__scheduler = None
+        self.__task_queue = None
         await self.__remove_current_formula()
 
     async def __set_new_completed_tasks(self, completed_tasks: list[bool]) -> None:
