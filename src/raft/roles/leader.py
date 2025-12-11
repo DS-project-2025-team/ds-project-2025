@@ -261,24 +261,10 @@ class Leader(AbstractAsyncContextManager):
 
     async def __remove_current_formula(self) -> None:
         async with self.__log.lock:
-            await asyncio.to_thread(self.__remove_current_formula_blocking)
-
-    def __remove_current_formula_blocking(self) -> None:
-        entry = LogEntryFactory.pop_formula(
-            self.__log.leader_state, self.__log.term, self.__log.last_log_index + 1
-        )
-
-        self.__log.append(entry)
-        # here we must wait until majority of non-faulty nodes
-        # have acknowledged before committing.
-        while self.__log.last_acked_index < entry.index:
-            logger.debug(
-                "__remove_current_formula: Wait until "
-                "append_entries index: %s is sent, last sent: %s",
-                entry.index,
-                self.__log.last_acked_index,
+            entry = LogEntryFactory.pop_formula(
+                self.__log.leader_state, self.__log.term, self.__log.last_log_index + 1
             )
-            time.sleep(1)
-        self.__log.event.wait()
-        logger.debug("Received event")
-        self.__log.commit()
+
+            self.__log.append(entry)
+
+            self.__log.commit()
