@@ -1,9 +1,11 @@
 from collections import deque
 from collections.abc import Iterable
+from dataclasses import dataclass
 
 from entities.sat_formula import SatFormula
 
 
+@dataclass
 class LeaderState:
     def __init__(
         self,
