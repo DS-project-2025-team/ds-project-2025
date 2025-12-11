@@ -1,5 +1,4 @@
 import logging
-import sys
 import threading
 from collections.abc import Callable
 

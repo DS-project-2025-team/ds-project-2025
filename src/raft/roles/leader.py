@@ -9,6 +9,7 @@ from config import SUBINTERVAL_EXPONENT
 from entities.sat_formula import SatFormula
 from entities.second import Second
 from entities.server_address import ServerAddress
+from entities.task_queue import TaskQueue
 from network.message import Message
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
@@ -18,7 +19,6 @@ from raft.entities.log import Log
 from raft.entities.log_entry_factory import LogEntryFactory
 from raft.roles.role import Role
 from services.logger_service import logger
-from entities.task_queue import TaskQueue
 from utils.async_loop import async_loop
 from utils.hash_sat_formula import hash_sat_formula
 

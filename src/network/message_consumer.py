@@ -1,6 +1,5 @@
 import asyncio
 import json
-import logging
 from contextlib import AbstractAsyncContextManager, suppress
 from types import TracebackType
 from typing import Literal, Self
