@@ -26,14 +26,13 @@ class LogEntryFactory:
         return LogEntry(LeaderState(completed_tasks, formulas), term, index)
 
     @staticmethod
-    def pop_formula(raftlog: Log) -> LogEntry:
-        def update_state(state: LeaderState) -> None:
-            if state.formulas:
-                state.formulas.popleft()
+    def pop_formula(state: LeaderState, term: int, index: int) -> LogEntry:
+        formulas = []
 
-            state.completed_tasks = []
+        if state.formulas:
+            formulas = list(state.formulas)[1:]
 
-        return LogEntry(raftlog, update_state)
+        return LogEntry(LeaderState([], formulas), term, index)
 
     @staticmethod
     def set_completed_tasks(raftlog: Log, completed_tasks: list[bool]) -> LogEntry:

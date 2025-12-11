@@ -297,7 +297,9 @@ class Leader(AbstractAsyncContextManager):
             await asyncio.to_thread(self.__remove_current_formula_blocking)
 
     def __remove_current_formula_blocking(self) -> None:
-        entry = LogEntryFactory.pop_formula(self.__log)
+        entry = LogEntryFactory.pop_formula(
+            self.__log.leader_state, self.__log.term, self.__log.last_log_index + 1
+        )
 
         self.__log.append(entry)
         # here we must wait until majority of non-faulty nodes
