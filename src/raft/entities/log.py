@@ -1,5 +1,4 @@
 import asyncio
-import threading
 from collections.abc import Iterable
 from uuid import UUID
 
