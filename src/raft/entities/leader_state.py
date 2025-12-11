@@ -7,11 +7,9 @@ from entities.sat_formula import SatFormula
 class LeaderState:
     def __init__(
         self,
-        nodes: dict[str, dict] | None = None,
         completed_tasks: list[bool] | None = None,
         formulas: Iterable[SatFormula] | None = None,
     ) -> None:
-        self.nodes: dict[str, dict] = nodes or {}
         self.completed_tasks: list[bool] = completed_tasks or []
         self.formulas: deque[SatFormula] = deque(formulas or [])
 
@@ -23,7 +21,5 @@ class LeaderState:
 
     def __repr__(self) -> str:
         return (
-            f"LeaderState(nodes={self.nodes}, "
-            f"completed_tasks={self.completed_tasks}, "
-            f"formulas={list(self.formulas)})"
+            f"completed_tasks={self.completed_tasks}, formulas={list(self.formulas)})"
         )
