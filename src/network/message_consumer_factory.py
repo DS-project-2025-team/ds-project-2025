@@ -29,7 +29,9 @@ class MessageConsumerFactory:
         )
 
     @staticmethod
-    def append_entries_consumer(server: ServerAddress, node_id: UUID) -> MessageConsumer:
+    def append_entries_consumer(
+        server: ServerAddress, node_id: UUID
+    ) -> MessageConsumer:
         return MessageConsumerFactory.multicast_consumer(
             Topic.APPEND_ENTRIES, server=server, node_id=node_id
         )

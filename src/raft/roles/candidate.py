@@ -44,7 +44,9 @@ class Candidate(AbstractAsyncContextManager):
             server=server, node_id=node_id
         )
         self.__append_entries_consumer: MessageConsumer = (
-            MessageConsumerFactory.append_entries_consumer(server=server, node_id=node_id)
+            MessageConsumerFactory.append_entries_consumer(
+                server=server, node_id=node_id
+            )
         )
 
     async def __aenter__(self) -> Self:
