@@ -275,7 +275,12 @@ class Leader(AbstractAsyncContextManager):
             )
 
     def __set_new_completed_tasks_blocking(self, completed_tasks: list[bool]) -> None:
-        entry = LogEntryFactory.set_completed_tasks(self.__log, completed_tasks)
+        entry = LogEntryFactory.set_completed_tasks(
+            completed_tasks,
+            self.__log.leader_state,
+            self.__log.term,
+            self.__log.last_log_index + 1,
+        )
 
         self.__log.append(entry)
         # here we must wait until majority of non-faulty nodes

@@ -2,7 +2,6 @@ from operator import concat
 
 from entities.sat_formula import SatFormula
 from raft.entities.leader_state import LeaderState
-from raft.entities.log import Log
 from raft.entities.log_entry import LogEntry
 
 
@@ -35,8 +34,9 @@ class LogEntryFactory:
         return LogEntry(LeaderState([], formulas), term, index)
 
     @staticmethod
-    def set_completed_tasks(raftlog: Log, completed_tasks: list[bool]) -> LogEntry:
-        def update_state(state: LeaderState) -> None:
-            state.completed_tasks = completed_tasks
+    def set_completed_tasks(
+        completed_tasks: list[bool], state: LeaderState, term: int, index: int
+    ) -> LogEntry:
+        formulas = state.formulas.copy()
 
-        return LogEntry(raftlog, update_state)
+        return LogEntry(LeaderState(completed_tasks, formulas), term, index)
