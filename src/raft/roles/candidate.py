@@ -43,14 +43,14 @@ class Candidate(AbstractAsyncContextManager):
         self.__vote_consumer: MessageConsumer = MessageConsumerFactory.vote_consumer(
             server=server, node_id=node_id
         )
-        self.__append_entry_consumer: MessageConsumer = (
-            MessageConsumerFactory.append_entry_consumer(server=server, node_id=node_id)
+        self.__append_entries_consumer: MessageConsumer = (
+            MessageConsumerFactory.append_entries_consumer(server=server, node_id=node_id)
         )
 
     async def __aenter__(self) -> Self:
         await self.__ping_service.__aenter__()
         await self.__vote_consumer.__aenter__()
-        await self.__append_entry_consumer.__aenter__()
+        await self.__append_entries_consumer.__aenter__()
         return self
 
     async def __aexit__(
@@ -61,7 +61,7 @@ class Candidate(AbstractAsyncContextManager):
     ) -> None:
         await self.__ping_service.__aexit__(exc_type, exc_value, traceback)
         await self.__vote_consumer.__aexit__(exc_type, exc_value, traceback)
-        await self.__append_entry_consumer.__aexit__(exc_type, exc_value, traceback)
+        await self.__append_entries_consumer.__aexit__(exc_type, exc_value, traceback)
 
     @property
     def term(self) -> int:
@@ -160,7 +160,7 @@ class Candidate(AbstractAsyncContextManager):
 
     @async_loop
     async def __check_leader_existence(self) -> None:
-        message = await self.__append_entry_consumer.receive()
+        message = await self.__append_entries_consumer.receive()
 
         leader_term = message.data["term"]
 

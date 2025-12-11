@@ -3,8 +3,8 @@ from enum import StrEnum, auto
 
 class Topic(StrEnum):
     ASSIGN = auto()
-    APPEND_ENTRY = auto()
-    APPEND_ENTRY_RESPONSE = auto()
+    APPEND_ENTRIES = auto()
+    APPEND_ENTRIES_RESPONSE = auto()
     VOTE = auto()
     VOTE_REQUEST = auto()
     OUTPUT = auto()

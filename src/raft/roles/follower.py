@@ -29,8 +29,8 @@ class Follower(AbstractAsyncContextManager):
         worker: WorkerService | None = None,
     ) -> None:
         self.__producer: MessageProducer = producer
-        self.__append_entry_consumer: MessageConsumer = (
-            MessageConsumerFactory.append_entry_consumer(server=server, node_id=node_id)
+        self.__append_entries_consumer: MessageConsumer = (
+            MessageConsumerFactory.append_entries_consumer(server=server, node_id=node_id)
         )
         self.__assign_consumer: MessageConsumer = (
             MessageConsumerFactory.assign_consumer(server=server)
@@ -43,7 +43,7 @@ class Follower(AbstractAsyncContextManager):
         self.__node_id = node_id
 
     async def __aenter__(self) -> Self:
-        await self.__append_entry_consumer.__aenter__()
+        await self.__append_entries_consumer.__aenter__()
         await self.__assign_consumer.__aenter__()
         self.__worker.__enter__()
 
@@ -55,14 +55,14 @@ class Follower(AbstractAsyncContextManager):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        await self.__append_entry_consumer.__aexit__(exc_type, exc_value, traceback)
+        await self.__append_entries_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__assign_consumer.__aexit__(exc_type, exc_value, traceback)
         self.__worker.__exit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.CANDIDATE]:
         try:
             async with asyncio.TaskGroup() as group:
-                group.create_task(self.__handle_append_entry())
+                group.create_task(self.__handle_append_entries())
                 group.create_task(self.__handle_assign())
 
                 logger.info("Follower is running")
@@ -73,15 +73,15 @@ class Follower(AbstractAsyncContextManager):
         return Role.CANDIDATE
 
     @async_loop
-    async def __handle_append_entry(self) -> None:
-        message = await self.__append_entry_consumer.receive(self.__election_timeout)
-        await self.__append_entry_consumer.commit()
+    async def __handle_append_entries(self) -> None:
+        message = await self.__append_entries_consumer.receive(self.__election_timeout)
+        await self.__append_entries_consumer.commit()
 
         logger.debug(f"Received {message.topic}")
 
         # send response with received message offset
         await self.__producer.send(
-            Topic.APPEND_ENTRY_RESPONSE,
+            Topic.APPEND_ENTRIES_RESPONSE,
             {
                 "responder_uuid": str(self.__node_id),
                 "original_offset": message.offset,
