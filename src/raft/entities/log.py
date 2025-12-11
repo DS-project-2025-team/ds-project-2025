@@ -102,7 +102,7 @@ class Log:
             self.leader_state,
         )
 
-        entry.operate(self.leader_state)
+        self.leader_state = entry.operate(self.leader_state)
         self.commit_index += 1
 
         logger.info(

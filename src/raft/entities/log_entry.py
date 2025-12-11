@@ -1,5 +1,3 @@
-from collections.abc import Callable
-
 from raft.entities.leader_state import LeaderState
 
 
@@ -8,12 +6,19 @@ class LogEntry:
         self.__leader_state = leader_state
         self.__term = term
         self.__index = index
-        self.__operation: Callable[[LeaderState], LeaderState] = (
-            lambda _: self.__leader_state
-        )
 
-    def operate(self, state: LeaderState) -> None:
-        self.__operation(state)
+    def operate(self, _: LeaderState) -> LeaderState:
+        """
+        Compute new leader state based on current state. Not yet implemented.
+
+        Args:
+            _ (LeaderState): Current leader state.
+
+        Returns:
+            LeaderState: New leader state.
+        """
+
+        return self.__leader_state
 
     @property
     def term(self) -> int:
