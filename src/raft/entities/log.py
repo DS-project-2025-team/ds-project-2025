@@ -25,7 +25,6 @@ class Log:
 
         self.commit_index: int = commit_index
         self.lock = asyncio.Lock()
-        self.event = threading.Event()
         self.last_acked_index = -1
         self.leader_state: LeaderState = leader_state or LeaderState()
 

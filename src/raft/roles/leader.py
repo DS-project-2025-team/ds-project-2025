@@ -129,8 +129,6 @@ class Leader(AbstractAsyncContextManager):
             index_len - 1,
         )
         self.__log.last_acked_index = index_len - 1
-        # Send event to the waiting log applier
-        self.__log.event.set()
 
         await asyncio.sleep(2)
 
