@@ -31,5 +31,5 @@ class LogEntry:
         return {
             "term": self.__term,
             "index": self.__index,
-            "state": self.__leader_state.__dict__,
+            "state": self.__leader_state.to_dict(),
         }

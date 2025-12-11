@@ -19,3 +19,9 @@ class LeaderState:
         return (
             f"completed_tasks={self.completed_tasks}, formulas={list(self.formulas)})"
         )
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "completed_tasks": self.completed_tasks,
+            "formulas": [formula.to_list() for formula in self.formulas],
+        }
