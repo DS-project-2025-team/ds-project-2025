@@ -183,7 +183,12 @@ class Leader(AbstractAsyncContextManager):
 
             logger.info(f"Received new SAT formula: {formula}")
 
-            entry = LogEntryFactory.add_formula(self.__log, formula)
+            entry = LogEntryFactory.add_formula(
+                formula,
+                self.__log.leader_state,
+                self.__log.term,
+                self.__log.last_log_index + 1,
+            )
 
             async with self.__log.lock:
                 self.__log.append(entry)

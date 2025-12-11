@@ -1,3 +1,5 @@
+from operator import concat
+
 from entities.sat_formula import SatFormula
 from raft.entities.leader_state import LeaderState
 from raft.entities.log import Log
@@ -15,8 +17,13 @@ class LogEntryFactory:
         return LogEntry(LeaderState(completed_tasks, formulas), term, index)
 
     @staticmethod
-    def add_formula(raftlog: Log, formula: SatFormula) -> LogEntry:
-        return LogEntry(raftlog, lambda state: state.formulas.append(formula))
+    def add_formula(
+        formula: SatFormula, state: LeaderState, term: int, index: int
+    ) -> LogEntry:
+        formulas = concat(state.formulas, [formula])
+        completed_tasks = state.completed_tasks.copy()
+
+        return LogEntry(LeaderState(completed_tasks, formulas), term, index)
 
     @staticmethod
     def pop_formula(raftlog: Log) -> LogEntry:
