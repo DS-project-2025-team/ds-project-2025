@@ -131,6 +131,15 @@ class Leader(AbstractAsyncContextManager):
 
         await asyncio.sleep(2)
 
+    async def __append_entry(self, entry: LogEntry) -> None:
+        async with self.__log.lock:
+            self.__log.append(entry)
+
+            await self.__send_append_entries([entry])
+            await self.__receive_append_entries_response()
+
+            self.__log.commit()
+
     @async_loop
     async def __receive_append_entries_response(self) -> None:
         """
