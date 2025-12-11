@@ -185,19 +185,7 @@ class Leader(AbstractAsyncContextManager):
 
             async with self.__log.lock:
                 self.__log.append(entry)
-            # here we must wait until majority of non-faulty nodes
-            # have acknowledged before committing.
-            while self.__log.last_acked_index != entry.index:
-                logger.debug(
-                    "__handle_input: Wait until append_entries "
-                    "index: %s is sent, last sent: %s",
-                    entry.index,
-                    self.__log.last_acked_index,
-                )
-                await asyncio.sleep(1)
 
-            self.__log.event.wait()
-            logger.debug("Received event")
             self.__log.commit()
 
             logger.info(f"Committed new formula {formula} to log")
