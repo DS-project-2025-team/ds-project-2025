@@ -23,10 +23,14 @@ class Log:
 
         self.entries: list[LogEntry] = list(entries or [])
 
-        self.commit_index: int = commit_index
+        self.__commit_index: int = commit_index
         self.lock = asyncio.Lock()
         self.append_lock: asyncio.Lock = asyncio.Lock()
         self.leader_state: LeaderState = leader_state or LeaderState()
+
+    @property
+    def commit_index(self) -> int:
+        return self.__commit_index
 
     @property
     def term(self) -> int:
@@ -119,7 +123,7 @@ class Log:
         )
 
         self.leader_state = entry.operate(self.leader_state)
-        self.commit_index = commit_index
+        self.__commit_index = commit_index
 
         logger.info(
             "Committed log entry index: %s, state after: %s",
@@ -133,7 +137,7 @@ class Log:
 
         # Trim entries to the requested index and update commit_index
         self.entries = self.entries[: index + 1]
-        self.commit_index = index
+        self.__commit_index = index
 
     def get_commit_index(self) -> int:
         return self.commit_index
