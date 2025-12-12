@@ -64,7 +64,7 @@ class Leader:
 
     @async_loop
     async def __handle_append_entries(self) -> None:
-        entries = self.__log.get_uncommitted_entries()
+        entries = self.__log.entries
 
         await self.__messager.send_append_entries(
             entries=entries,
