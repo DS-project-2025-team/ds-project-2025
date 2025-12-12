@@ -6,6 +6,7 @@ from typing import Literal, Self
 
 from entities.sat_formula import SatFormula
 from entities.second import Second
+from raft.entities.log import Log
 from raft.network.follower_messager import FollowerMessager
 from raft.roles.role import Role
 from services.logger_service import logger
@@ -16,12 +17,14 @@ from utils.async_loop import async_loop
 class Follower(AbstractAsyncContextManager):
     def __init__(
         self,
+        log: Log,
         messager: FollowerMessager,
         election_timeout: Second | None = None,
         worker: WorkerService | None = None,
     ) -> None:
         self.__messager: FollowerMessager = messager
         self.__worker: WorkerService = worker or WorkerService()
+        self.__log: Log = log
 
         self.__election_timeout: Second = election_timeout or Second(
             5 + random.randint(0, 10)

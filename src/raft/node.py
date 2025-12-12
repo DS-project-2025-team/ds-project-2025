@@ -80,6 +80,7 @@ class Node(AbstractAsyncContextManager):
                         producer=self.__producer,
                     ) as messager,
                     Follower(
+                        log=self.__log,
                         messager=messager,
                     ) as follower,
                 ):
