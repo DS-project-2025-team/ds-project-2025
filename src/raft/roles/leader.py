@@ -46,9 +46,6 @@ class Leader(AbstractAsyncContextManager):
                 server=server, node_id=node_id
             )
         )
-        self.__report_consumer: MessageConsumer = (
-            MessageConsumerFactory.report_consumer(server=server)
-        )
 
         self.__task_queue: TaskQueue | None = task_queue
         self.__log: Log = log
@@ -58,7 +55,6 @@ class Leader(AbstractAsyncContextManager):
     async def __aenter__(self) -> Self:
         await self.__messager.__aenter__()
         await self.__append_entries_consumer.__aenter__()
-        await self.__report_consumer.__aenter__()
 
         return self
 
@@ -70,7 +66,6 @@ class Leader(AbstractAsyncContextManager):
     ) -> None:
         await self.__messager.__aexit__(exc_type, exc_value, traceback)
         await self.__append_entries_consumer.__aexit__(exc_type, exc_value, traceback)
-        await self.__report_consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
@@ -130,17 +125,14 @@ class Leader(AbstractAsyncContextManager):
 
     @async_loop
     async def __handle_report(self) -> None:
-        message = await self.__report_consumer.receive()
+        result = await self.__messager.receive_report(hash(self.__task_queue))
 
-        data = message.data
-
-        if data["hash"] != hash(self.__task_queue):
-            logger.debug(f"Received outdated REPORT with hash {data['hash']}")
+        if result is None:
             return
 
-        await self.__complete_task(data["task"])
+        task, satisfiable = result
 
-        satisfiable: bool = message.data["result"]
+        await self.__complete_task(task)
 
         if not (self.__task_queue and self.__task_queue.is_done(satisfiable)):
             return

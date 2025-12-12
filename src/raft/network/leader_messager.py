@@ -12,6 +12,7 @@ from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
 from raft.entities.log_entry import LogEntry
+from services.logger_service import logger
 
 
 class LeaderMessager(AbstractAsyncContextManager):
@@ -97,3 +98,17 @@ class LeaderMessager(AbstractAsyncContextManager):
         input_ = message.data
 
         return SatFormula(input_["data"])
+
+    async def receive_report(self, hash_: int) -> tuple[int, bool] | None:
+        message = await self.__report_consumer.receive()
+
+        data = message.data
+
+        if data["hash"] != hash_:
+            logger.debug(f"Received outdated REPORT with hash {data['hash']}")
+            return None
+
+        task: int = data["task"]
+        satisfiable: bool = message.data["result"]
+
+        return task, satisfiable
