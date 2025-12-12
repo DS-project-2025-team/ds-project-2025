@@ -35,7 +35,7 @@ class Leader:
         try:
             async with asyncio.TaskGroup() as group:
                 _task1 = group.create_task(self.__send_append_entries())
-                _task2 = group.create_task(self.__receive_append_entries_response())
+                _task2 = group.create_task(self.__handle_append_entries_response())
                 _task3 = group.create_task(self.__handle_input(Second(1)))
                 _task4 = group.create_task(self.__assign_task())
                 _task5 = group.create_task(self.__handle_report())
@@ -79,7 +79,7 @@ class Leader:
             self.__log.commit()
 
     @async_loop
-    async def __receive_append_entries_response(self) -> None:
+    async def __handle_append_entries_response(self) -> None:
         """
         Read messages via append_entries_response_consumer
         """
