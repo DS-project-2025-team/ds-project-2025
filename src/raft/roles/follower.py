@@ -63,9 +63,9 @@ class Follower(AbstractAsyncContextManager):
         previous_log_term = message.previous_log_term
 
         term_ok = message.term >= self.__log.term
-        entry_ok = (
-            self.__log.last_log_index <= previous_log_index
-            and self.__log.entries[previous_log_index].term == previous_log_term
+        entry_ok = self.__log.last_log_index <= previous_log_index and (
+            self.__log.last_log_index == -1
+            or self.__log.entries[previous_log_index].term == previous_log_term
         )
 
         success = term_ok and entry_ok
