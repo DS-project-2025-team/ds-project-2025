@@ -89,11 +89,7 @@ class Follower(AbstractAsyncContextManager):
             f"Received work: formula {formula}, task {task}, exponent {exponent}"
         )
 
-        result = await self.__worker.run_task(
-            formula,
-            task,
-            exponent,
-        )
+        result = await self.__worker.run_task(formula, task, exponent)
 
         await self.__send_result(formula, task, result)
 
