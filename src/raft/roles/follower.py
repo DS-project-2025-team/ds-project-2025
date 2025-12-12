@@ -68,7 +68,9 @@ class Follower(AbstractAsyncContextManager):
             self.__log.commit(leader_commit)
 
         logger.debug(f"Received AppendEntriesMessage: {message}")
-        await self.__messager.send_append_entries_response(self.__log.term, True)
+        await self.__messager.send_append_entries_response(
+            self.__log.term, True, self.__log.last_log_index
+        )
 
     @async_loop
     async def __handle_assign(self) -> None:
