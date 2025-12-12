@@ -82,7 +82,6 @@ class Node(AbstractAsyncContextManager):
                     Follower(
                         server=self.__server,
                         node_id=self.node_id,
-                        producer=self.__producer,
                         messager=messager,
                     ) as follower,
                 ):
