@@ -130,3 +130,6 @@ class Log:
 
     def get_entry_at_index(self, index: int) -> LogEntry:
         return self.entries[index]
+
+    def get_uncommitted_entries(self) -> Iterable[LogEntry]:
+        return self.entries[self.commit_index + 1 :]
