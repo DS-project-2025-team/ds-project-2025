@@ -12,6 +12,7 @@ from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
+from raft.network.follower_messager import FollowerMessager
 from raft.roles.role import Role
 from services.logger_service import logger
 from services.worker_service import WorkerService
@@ -25,9 +26,11 @@ class Follower(AbstractAsyncContextManager):
         server: ServerAddress,
         node_id: UUID,
         producer: MessageProducer,
+        messager: FollowerMessager,
         election_timeout: Second | None = None,
         worker: WorkerService | None = None,
     ) -> None:
+        self.__messager: FollowerMessager = messager
         self.__producer: MessageProducer = producer
         self.__append_entries_consumer: MessageConsumer = (
             MessageConsumerFactory.append_entries_consumer(
