@@ -32,9 +32,6 @@ class Follower(AbstractAsyncContextManager):
                 server=server, node_id=node_id
             )
         )
-        self.__assign_consumer: MessageConsumer = (
-            MessageConsumerFactory.assign_consumer(server=server)
-        )
         self.__worker: WorkerService = worker or WorkerService()
 
         self.__election_timeout: Second = election_timeout or Second(
@@ -44,7 +41,6 @@ class Follower(AbstractAsyncContextManager):
 
     async def __aenter__(self) -> Self:
         await self.__append_entries_consumer.__aenter__()
-        await self.__assign_consumer.__aenter__()
         self.__worker.__enter__()
 
         return self
@@ -56,7 +52,6 @@ class Follower(AbstractAsyncContextManager):
         traceback: TracebackType | None,
     ) -> None:
         await self.__append_entries_consumer.__aexit__(exc_type, exc_value, traceback)
-        await self.__assign_consumer.__aexit__(exc_type, exc_value, traceback)
         self.__worker.__exit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.CANDIDATE]:
