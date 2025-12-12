@@ -80,7 +80,7 @@ class LeaderMessager(AbstractAsyncContextManager):
             Topic.APPEND_ENTRIES,
             {
                 "term": self.__term,
-                "sender": str(self.__id),
+                "leader_id": str(self.__id),
                 "previous_log_index": previous_log_index,
                 "previous_log_term": previous_log_term,
                 "entries": [entry.to_dict() for entry in entries],
