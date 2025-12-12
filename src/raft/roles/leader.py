@@ -41,12 +41,6 @@ class Leader(AbstractAsyncContextManager):
             term=log.term,
         )
 
-        self.__append_entries_consumer: MessageConsumer = (
-            MessageConsumerFactory.append_entries_response_consumer(
-                server=server, node_id=node_id
-            )
-        )
-
         self.__task_queue: TaskQueue | None = task_queue
         self.__log: Log = log
         self.__node_id: UUID = node_id
@@ -54,7 +48,6 @@ class Leader(AbstractAsyncContextManager):
 
     async def __aenter__(self) -> Self:
         await self.__messager.__aenter__()
-        await self.__append_entries_consumer.__aenter__()
 
         return self
 
@@ -65,7 +58,6 @@ class Leader(AbstractAsyncContextManager):
         traceback: TracebackType | None,
     ) -> None:
         await self.__messager.__aexit__(exc_type, exc_value, traceback)
-        await self.__append_entries_consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
@@ -115,8 +107,7 @@ class Leader(AbstractAsyncContextManager):
         Read messages via append_entries_response_consumer
         """
 
-        message = await self.__append_entries_consumer.receive()
-        await self.__handle_message(message)
+        await self.__messager.receive_append_entries_response()
 
     async def __send_task(self, formula: SatFormula, task: int, exponent: int) -> None:
         await self.__messager.send_task(formula, task, exponent)
@@ -176,9 +167,6 @@ class Leader(AbstractAsyncContextManager):
             return
 
         await self.__send_task(formula, task, exponent)
-
-    async def __handle_message(self, message: Message) -> None:
-        pass
 
     async def __complete_task(self, task: int) -> None:
         entry = LogEntryFactory.complete_task(

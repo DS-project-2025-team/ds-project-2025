@@ -121,3 +121,8 @@ class LeaderMessager(AbstractAsyncContextManager):
         satisfiable: bool = message.data["result"]
 
         return task, satisfiable
+
+    async def receive_append_entries_response(self) -> dict:
+        message = await self.__append_entries_consumer.receive()
+
+        return message.data
