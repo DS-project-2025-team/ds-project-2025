@@ -1,6 +1,7 @@
 import asyncio
 from contextlib import suppress
 from typing import Literal
+from uuid import UUID
 
 from config import SUBINTERVAL_EXPONENT
 from entities.sat_formula import SatFormula
@@ -24,12 +25,14 @@ class Leader:
         messager: LeaderMessager,
         ping_service: PingService,
         task_queue: TaskQueue | None = None,
+        follower_commit_indexes: dict[UUID, int] | None = None,
     ) -> None:
         self.__messager: LeaderMessager = messager
         self.__ping_service = ping_service
 
         self.__task_queue: TaskQueue | None = task_queue
         self.__log: Log = log
+        self.__follower_commit_indexes: dict[UUID, int] = {}
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
