@@ -4,6 +4,7 @@ from types import TracebackType
 from typing import Self
 from uuid import UUID
 
+from entities.sat_formula import SatFormula
 from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
@@ -77,3 +78,8 @@ class LeaderMessager(AbstractAsyncContextManager):
         }
 
         await self.__producer.send(Topic.OUTPUT, payload)
+
+    async def send_task(self, formula: SatFormula, task: int, exponent: int) -> None:
+        payload = {"formula": formula.to_list(), "task": task, "exponent": exponent}
+
+        await self.__producer.send(Topic.ASSIGN, payload)

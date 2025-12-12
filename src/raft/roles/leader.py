@@ -138,9 +138,8 @@ class Leader(AbstractAsyncContextManager):
         await self.__handle_message(message)
 
     async def __send_task(self, formula: SatFormula, task: int, exponent: int) -> None:
-        payload = {"formula": formula.to_list(), "task": task, "exponent": exponent}
+        await self.__messager.send_task(formula, task, exponent)
 
-        await self.__producer.send(Topic.ASSIGN, payload)
         logger.info(f"Assigned task {task} of formula {hash_sat_formula(formula)}")
 
     @async_loop
