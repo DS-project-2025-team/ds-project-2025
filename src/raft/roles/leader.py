@@ -123,14 +123,7 @@ class Leader(AbstractAsyncContextManager):
     async def __send_append_entries(self) -> None:
         entries = self.__log.get_uncommitted_entries()
 
-        await self.__producer.send(
-            Topic.APPEND_ENTRIES,
-            {
-                "term": self.__log.term,
-                "sender": str(self.__node_id),
-                "entries": [entry.to_dict() for entry in entries],
-            },
-        )
+        await self.__messager.send_append_entries(entries)
 
         await asyncio.sleep(2)
 

@@ -1,12 +1,15 @@
+import asyncio
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
-from typing import Self
+from typing import Iterable, Self
 from uuid import UUID
 
 from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
+from network.topic import Topic
+from raft.entities.log_entry import LogEntry
 
 
 class LeaderMessager(AbstractAsyncContextManager):
@@ -19,6 +22,7 @@ class LeaderMessager(AbstractAsyncContextManager):
         server: ServerAddress,
         node_id: UUID,
         producer: MessageProducer,
+        term: int,
     ) -> None:
         self.__producer: MessageProducer = producer
         self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
@@ -32,6 +36,9 @@ class LeaderMessager(AbstractAsyncContextManager):
         self.__report_consumer: MessageConsumer = (
             MessageConsumerFactory.report_consumer(server=server)
         )
+
+        self.__id: UUID = node_id
+        self.__term: int = term
 
     async def __aenter__(self) -> Self:
         await self.__input_consumer.__aenter__()
@@ -49,3 +56,16 @@ class LeaderMessager(AbstractAsyncContextManager):
         await self.__append_entries_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__report_consumer.__aexit__(exc_type, exc_value, traceback)
+
+    async def send_append_entries(
+        self,
+        entries: Iterable[LogEntry],
+    ) -> None:
+        await self.__producer.send(
+            Topic.APPEND_ENTRIES,
+            {
+                "term": self.__term,
+                "sender": str(self.__id),
+                "entries": [entry.to_dict() for entry in entries],
+            },
+        )
