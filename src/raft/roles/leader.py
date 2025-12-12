@@ -7,9 +7,7 @@ from uuid import UUID
 from config import SUBINTERVAL_EXPONENT
 from entities.sat_formula import SatFormula
 from entities.second import Second
-from entities.server_address import ServerAddress
 from entities.task_queue import TaskQueue
-from network.message_producer import MessageProducer
 from raft.entities.log import Log
 from raft.entities.log_entry import LogEntry
 from raft.entities.log_entry_factory import LogEntryFactory
@@ -20,40 +18,19 @@ from utils.async_loop import async_loop
 from utils.hash_sat_formula import hash_sat_formula
 
 
-class Leader(AbstractAsyncContextManager):
+class Leader:
     def __init__(
         self,
         log: Log,
-        server: ServerAddress,
-        node_id: UUID,
-        producer: MessageProducer,
+        messager: LeaderMessager,
         task_queue: TaskQueue | None = None,
         follower_commit_indexes: dict[UUID, int] | None = None,
     ) -> None:
-        self.__messager: LeaderMessager = LeaderMessager(
-            server=server,
-            node_id=node_id,
-            producer=producer,
-            term=log.term,
-        )
+        self.__messager: LeaderMessager = messager
 
         self.__task_queue: TaskQueue | None = task_queue
         self.__log: Log = log
-        self.__node_id: UUID = node_id
         self.__follower_commit_indexes: dict[UUID, int] = {}
-
-    async def __aenter__(self) -> Self:
-        await self.__messager.__aenter__()
-
-        return self
-
-    async def __aexit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_value: BaseException | None,
-        traceback: TracebackType | None,
-    ) -> None:
-        await self.__messager.__aexit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
