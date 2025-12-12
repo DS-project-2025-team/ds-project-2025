@@ -186,10 +186,7 @@ class Leader(AbstractAsyncContextManager):
                 self.__log.last_log_index + 1,
             )
 
-            async with self.__log.lock:
-                self.__log.append(entry)
-
-            self.__log.commit()
+            await self.__append_entry(entry)
 
             logger.info(f"Committed new formula {formula} to log")
 
@@ -216,46 +213,37 @@ class Leader(AbstractAsyncContextManager):
         pass
 
     async def __complete_task(self, task: int) -> None:
-        async with self.__log.lock:
-            entry = LogEntryFactory.complete_task(
-                task,
-                self.__log.leader_state,
-                self.__log.term,
-                self.__log.last_log_index + 1,
-            )
+        entry = LogEntryFactory.complete_task(
+            task,
+            self.__log.leader_state,
+            self.__log.term,
+            self.__log.last_log_index + 1,
+        )
 
-            if not self.__task_queue:
-                return
+        if not self.__task_queue:
+            return
 
-            self.__task_queue.complete_task(task)
+        self.__task_queue.complete_task(task)
 
-            self.__log.append(entry)
-
-            self.__log.commit()
+        await self.__append_entry(entry)
 
     async def __reset_task_queue(self) -> None:
         self.__task_queue = None
         await self.__remove_current_formula()
 
     async def __set_new_completed_tasks(self, completed_tasks: list[bool]) -> None:
-        async with self.__log.lock:
-            entry = LogEntryFactory.set_completed_tasks(
-                completed_tasks,
-                self.__log.leader_state,
-                self.__log.term,
-                self.__log.last_log_index + 1,
-            )
+        entry = LogEntryFactory.set_completed_tasks(
+            completed_tasks,
+            self.__log.leader_state,
+            self.__log.term,
+            self.__log.last_log_index + 1,
+        )
 
-            self.__log.append(entry)
-
-            self.__log.commit()
+        await self.__append_entry(entry)
 
     async def __remove_current_formula(self) -> None:
-        async with self.__log.lock:
-            entry = LogEntryFactory.pop_formula(
-                self.__log.leader_state, self.__log.term, self.__log.last_log_index + 1
-            )
+        entry = LogEntryFactory.pop_formula(
+            self.__log.leader_state, self.__log.term, self.__log.last_log_index + 1
+        )
 
-            self.__log.append(entry)
-
-            self.__log.commit()
+        await self.__append_entry(entry)
