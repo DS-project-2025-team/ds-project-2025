@@ -108,7 +108,7 @@ class Log:
             commit_index (int): New commit index.
         """
 
-        if commit_index >= len(self.entries):
+        if commit_index >= len(self.entries) or commit_index < 0:
             logger.debug(
                 f"No new entries to commit, commit_index: {commit_index}"
                 f"entries length: {len(self.entries)}"
