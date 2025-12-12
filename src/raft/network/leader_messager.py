@@ -69,3 +69,11 @@ class LeaderMessager(AbstractAsyncContextManager):
                 "entries": [entry.to_dict() for entry in entries],
             },
         )
+
+    async def send_output(self, result: bool, hash_: int) -> None:
+        payload = {
+            "hash": hash_,
+            "result": result,
+        }
+
+        await self.__producer.send(Topic.OUTPUT, payload)

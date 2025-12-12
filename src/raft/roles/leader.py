@@ -110,12 +110,7 @@ class Leader(AbstractAsyncContextManager):
     async def __send_output(self, result: bool) -> None:
         logger.info(f"Computed result: {result}")
 
-        payload = {
-            "hash": hash(self.__task_queue),
-            "result": result,
-        }
-
-        await self.__producer.send(Topic.OUTPUT, payload)
+        await self.__messager.send_output(result, hash(self.__task_queue))
 
         logger.info(f"Sent result {result}")
 
