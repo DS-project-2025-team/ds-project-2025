@@ -133,6 +133,7 @@ class Leader(AbstractAsyncContextManager):
 
     async def __append_entry(self, entry: LogEntry) -> None:
         async with self.__log.append_lock:
+            logger.debug(f"Appending entry {entry.to_dict()} to log")
             self.__log.append(entry)
 
             await self.__send_append_entries([entry])
