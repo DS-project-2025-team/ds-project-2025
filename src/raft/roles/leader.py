@@ -35,7 +35,7 @@ class Leader:
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
             async with asyncio.TaskGroup() as group:
-                _task1 = group.create_task(self.__send_append_entries())
+                _task1 = group.create_task(self.__handle_append_entries())
                 _task2 = group.create_task(self.__handle_append_entries_response())
                 _task3 = group.create_task(self.__handle_input(Second(1)))
                 _task4 = group.create_task(self.__assign_task())
@@ -61,7 +61,7 @@ class Leader:
         logger.info(f"Sent result {result}")
 
     @async_loop
-    async def __send_append_entries(self) -> None:
+    async def __handle_append_entries(self) -> None:
         entries = self.__log.get_uncommitted_entries()
 
         await self.__messager.send_append_entries(
