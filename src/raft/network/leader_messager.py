@@ -1,7 +1,7 @@
-import asyncio
+from collections.abc import Iterable
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
-from typing import Iterable, Self
+from typing import Self
 from uuid import UUID
 
 from entities.server_address import ServerAddress
