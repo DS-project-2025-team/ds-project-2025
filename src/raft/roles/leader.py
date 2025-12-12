@@ -8,8 +8,8 @@ from entities.sat_formula import SatFormula
 from entities.second import Second
 from entities.task_queue import TaskQueue
 from raft.entities.log import Log
-from raft.entities.log_entry import LogEntry
 from raft.entities.log_entry_factory import LogEntryFactory
+from raft.entities.partial_log_entry import PartialLogEntry
 from raft.network.leader_messager import LeaderMessager
 from raft.roles.role import Role
 from services.logger_service import logger
@@ -73,9 +73,8 @@ class Leader:
 
         await asyncio.sleep(2)
 
-    async def __append_entry(self, entry: LogEntry) -> None:
+    async def __append_entry(self, entry: PartialLogEntry) -> None:
         async with self.__log.append_lock:
-            logger.debug(f"Appending entry {entry.to_dict()} to log")
             self.__log.append(entry)
             self.__log.commit()
 
@@ -120,7 +119,6 @@ class Leader:
                 formula,
                 self.__log.leader_state,
                 self.__log.term,
-                self.__log.last_log_index + 1,
             )
 
             await self.__append_entry(entry)
@@ -151,7 +149,6 @@ class Leader:
             task,
             self.__log.leader_state,
             self.__log.term,
-            self.__log.last_log_index + 1,
         )
 
         if not self.__task_queue:
@@ -170,14 +167,14 @@ class Leader:
             completed_tasks,
             self.__log.leader_state,
             self.__log.term,
-            self.__log.last_log_index + 1,
         )
 
         await self.__append_entry(entry)
 
     async def __remove_current_formula(self) -> None:
         entry = LogEntryFactory.pop_formula(
-            self.__log.leader_state, self.__log.term, self.__log.last_log_index + 1
+            self.__log.leader_state,
+            self.__log.term,
         )
 
         await self.__append_entry(entry)

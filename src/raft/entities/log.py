@@ -5,6 +5,7 @@ from uuid import UUID
 from entities.sat_formula import SatFormula
 from raft.entities.leader_state import LeaderState
 from raft.entities.log_entry import LogEntry
+from raft.entities.partial_log_entry import PartialLogEntry
 from services.logger_service import logger
 
 
@@ -83,8 +84,14 @@ class Log:
 
         return self.entries[-1].term
 
-    def append(self, entry: LogEntry) -> None:
-        entry.index = self.entries.__len__()
+    def append(self, raw_entry: PartialLogEntry) -> None:
+        index = self.last_log_index + 1
+
+        entry: LogEntry = LogEntry.from_partial(
+            raw_entry,
+            index,
+        )
+
         self.entries.append(entry)
         logger.debug(f"Applied entry {entry.to_dict()} to raftlog")
 
