@@ -4,10 +4,13 @@ from types import TracebackType
 from typing import Self
 from uuid import UUID
 
+from entities.sat_formula import SatFormula
 from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
+from network.topic import Topic
+from utils.hash_sat_formula import hash_sat_formula
 
 
 class FollowerMessager(AbstractAsyncContextManager):
@@ -47,3 +50,12 @@ class FollowerMessager(AbstractAsyncContextManager):
             _task2 = group.create_task(
                 self.__assign_consumer.__aexit__(exc_type, exc_value, traceback)
             )
+
+    async def send_report(self, formula: SatFormula, task: int, result: bool) -> None:
+        payload = {
+            "hash": hash_sat_formula(formula),
+            "task": task,
+            "result": result,
+        }
+
+        await self.__producer.send(Topic.REPORT, payload)

@@ -17,7 +17,6 @@ from raft.roles.role import Role
 from services.logger_service import logger
 from services.worker_service import WorkerService
 from utils.async_loop import async_loop
-from utils.hash_sat_formula import hash_sat_formula
 
 
 class Follower(AbstractAsyncContextManager):
@@ -114,12 +113,6 @@ class Follower(AbstractAsyncContextManager):
         await self.__send_result(formula, task, result)
 
     async def __send_result(self, formula: SatFormula, task: int, result: bool) -> None:
-        payload = {
-            "hash": hash_sat_formula(formula),
-            "task": task,
-            "result": result,
-        }
-
-        await self.__producer.send(Topic.REPORT, payload)
+        await self.__messager.send_report(formula, task, result)
 
         logger.info(f"Sent result for task {task}: {result}")
