@@ -1,3 +1,4 @@
+from asyncio import TaskGroup
 from collections.abc import Iterable
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
@@ -44,9 +45,10 @@ class LeaderMessager(AbstractAsyncContextManager):
         self.__term: int = term
 
     async def __aenter__(self) -> Self:
-        await self.__input_consumer.__aenter__()
-        await self.__append_entries_consumer.__aenter__()
-        await self.__report_consumer.__aenter__()
+        async with TaskGroup() as group:
+            _task1 = group.create_task(self.__input_consumer.__aenter__())
+            _task2 = group.create_task(self.__append_entries_consumer.__aenter__())
+            _task3 = group.create_task(self.__report_consumer.__aenter__())
 
         return self
 
@@ -56,9 +58,16 @@ class LeaderMessager(AbstractAsyncContextManager):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        await self.__append_entries_consumer.__aexit__(exc_type, exc_value, traceback)
-        await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
-        await self.__report_consumer.__aexit__(exc_type, exc_value, traceback)
+        async with TaskGroup() as group:
+            _task1 = group.create_task(
+                self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
+            )
+            _task2 = group.create_task(
+                self.__append_entries_consumer.__aexit__(exc_type, exc_value, traceback)
+            )
+            _task3 = group.create_task(
+                self.__report_consumer.__aexit__(exc_type, exc_value, traceback)
+            )
 
     async def send_append_entries(
         self,
