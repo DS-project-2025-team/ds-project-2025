@@ -1,7 +1,6 @@
 import asyncio
 from contextlib import suppress
 from typing import Literal
-from uuid import UUID
 
 from config import SUBINTERVAL_EXPONENT
 from entities.sat_formula import SatFormula
