@@ -32,6 +32,7 @@ class Leader(AbstractAsyncContextManager):
         node_id: UUID,
         producer: MessageProducer,
         task_queue: TaskQueue | None = None,
+        follower_commit_indexes: dict[UUID, int] | None = None,
     ) -> None:
         self.__producer: MessageProducer = producer
         self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
@@ -49,6 +50,7 @@ class Leader(AbstractAsyncContextManager):
         self.__task_queue: TaskQueue | None = task_queue
         self.__log: Log = log
         self.__node_id: UUID = node_id
+        self.__follower_commit_indexes: dict[UUID, int] = {}
 
     async def __aenter__(self) -> Self:
         await self.__input_consumer.__aenter__()
