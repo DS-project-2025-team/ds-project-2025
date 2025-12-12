@@ -62,10 +62,9 @@ class Follower(AbstractAsyncContextManager):
         previous_log_index = message.previous_log_index
         previous_log_term = message.previous_log_term
 
-        term_ok = self.__check_term(message.term)
-        entry_ok = self.__check_previous_entry(previous_log_index, previous_log_term)
-
-        success = term_ok and entry_ok
+        success = self.__check_term(message.term) and self.__check_previous_entry(
+            previous_log_index, previous_log_term
+        )
         logger.info(f"AppendEntriesMessage validation success: {success}")
 
         if success:
