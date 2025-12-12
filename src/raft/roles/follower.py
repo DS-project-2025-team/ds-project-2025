@@ -59,35 +59,16 @@ class Follower(AbstractAsyncContextManager):
     @async_loop
     async def __handle_append_entries(self) -> None:
         message = await self.__messager.receive_append_entries(self.__election_timeout)
-        previous_log_index = message.previous_log_index
-        previous_log_term = message.previous_log_term
-
-        success = self.__check_term(message.term) and self.__check_previous_entry(
-            previous_log_index, previous_log_term
-        )
-        logger.info(f"AppendEntriesMessage validation success: {success}")
-
-        if success:
-            pass
+        leader_commit = message.leader_commit
 
         self.__log.term = max(self.__log.term, message.term)
+        self.__log.entries = message.entries
+
+        if leader_commit > -1:
+            self.__log.commit(leader_commit)
 
         logger.debug(f"Received AppendEntriesMessage: {message}")
-        await self.__messager.send_append_entries_response(self.__log.term, success)
-
-    def __check_term(self, term: int) -> bool:
-        return self.__log.term <= term
-
-    def __check_previous_entry(
-        self, previous_log_index: int, previous_log_term: int
-    ) -> bool:
-        if self.__log.last_log_index < previous_log_index:
-            return False
-
-        if previous_log_index == -1:
-            return True
-
-        return self.__log.entries[previous_log_index].term == previous_log_term
+        await self.__messager.send_append_entries_response(self.__log.term, True)
 
     @async_loop
     async def __handle_assign(self) -> None:

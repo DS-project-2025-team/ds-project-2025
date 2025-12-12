@@ -114,13 +114,12 @@ class Log:
             )
             return
 
-        entry = self.entries[commit_index]
-
         logger.info(
             "Committing log entry index: %s, state before: %s",
-            entry.index,
+            commit_index,
             self.leader_state,
         )
+        entry = self.entries[commit_index]
 
         self.leader_state = entry.operate(self.leader_state)
         self.__commit_index = commit_index
