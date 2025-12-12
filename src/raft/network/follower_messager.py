@@ -7,11 +7,12 @@ from uuid import UUID
 from entities.sat_formula import SatFormula
 from entities.second import Second
 from entities.server_address import ServerAddress
-from network.message import Message
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
+from raft.entities.log_entry import LogEntry
+from raft.messages.append_entries_message import AppendEntriesMessage
 from utils.hash_sat_formula import hash_sat_formula
 
 
@@ -85,8 +86,21 @@ class FollowerMessager(AbstractAsyncContextManager):
 
         return formula, task, exponent
 
-    async def receive_append_entries(self, election_timeout: Second) -> Message:
-        message = await self.__append_entries_consumer.receive(election_timeout)
+    async def receive_append_entries(
+        self, election_timeout: Second
+    ) -> AppendEntriesMessage:
+        raw_message = await self.__append_entries_consumer.receive(election_timeout)
+
         await self.__append_entries_consumer.commit()
 
-        return message
+        data = raw_message.data
+        raw_entries: list[dict] = data["entries"]
+
+        return AppendEntriesMessage(
+            term=data["term"],
+            leader_id=UUID(data["leader_id"]),
+            previous_log_index=data["previous_log_index"],
+            previous_log_term=data["previous_log_term"],
+            entries=list(map(LogEntry.from_dict, raw_entries)),
+            leader_commit=data["leader_commit"],
+        )

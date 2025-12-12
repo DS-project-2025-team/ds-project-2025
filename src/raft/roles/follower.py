@@ -60,9 +60,7 @@ class Follower(AbstractAsyncContextManager):
     async def __handle_append_entries(self) -> None:
         message = await self.__messager.receive_append_entries(self.__election_timeout)
 
-        logger.debug(f"Received {message.topic}")
-
-        # send response with received message offset
+        logger.debug(f"Received AppendEntriesMessage: {message}")
         await self.__messager.send_append_entries_response(self.__log.term)
 
     @async_loop
