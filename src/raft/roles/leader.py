@@ -32,7 +32,7 @@ class Leader:
 
         self.__task_queue: TaskQueue | None = task_queue
         self.__log: Log = log
-        self.__follower_log_indexes: dict[UUID, int] = {}
+        self.__follower_log_indexes: dict[UUID, int] = follower_log_indexes or {}
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
