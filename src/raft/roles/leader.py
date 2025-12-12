@@ -78,7 +78,7 @@ class Leader:
     async def __append_entry(self, entry: PartialLogEntry) -> None:
         async with self.__log.append_lock:
             self.__log.append(entry)
-            self.__log.commit()
+            self.__log.commit(self.__log.commit_index + 1)
 
     @async_loop
     async def __handle_append_entries_response(self) -> None:

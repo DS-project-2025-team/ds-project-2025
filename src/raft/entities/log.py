@@ -95,15 +95,22 @@ class Log:
         self.entries.append(entry)
         logger.debug(f"Applied entry {entry.to_dict()} to raftlog")
 
-    def commit(self) -> None:
-        if self.commit_index >= len(self.entries):
+    def commit(self, commit_index: int) -> None:
+        """
+        Commit all entries before given index (inclusive).
+
+        Args:
+            commit_index (int): New commit index.
+        """
+
+        if commit_index >= len(self.entries):
             logger.debug(
-                f"No new entries to commit, commit_index: {self.commit_index}"
+                f"No new entries to commit, commit_index: {commit_index}"
                 f"entries length: {len(self.entries)}"
             )
             return
 
-        entry = self.entries[self.commit_index]
+        entry = self.entries[commit_index]
 
         logger.info(
             "Committing log entry index: %s, state before: %s",
@@ -112,7 +119,7 @@ class Log:
         )
 
         self.leader_state = entry.operate(self.leader_state)
-        self.commit_index += 1
+        self.commit_index = commit_index
 
         logger.info(
             "Committed log entry index: %s, state after: %s",
