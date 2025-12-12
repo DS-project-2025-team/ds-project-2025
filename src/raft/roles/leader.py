@@ -112,7 +112,6 @@ class Leader(AbstractAsyncContextManager):
 
     @async_loop
     async def __send_append_entries(self) -> None:
-        index_len = self.__log.entries.__len__()
         entries = self.__log.get_uncommitted_entries()
 
         await self.__producer.send_and_wait(
@@ -123,12 +122,6 @@ class Leader(AbstractAsyncContextManager):
                 "entries": [entry.to_dict() for entry in entries],
             },
         )
-        logger.debug(
-            "Send event, last sent index: %s -> %s",
-            self.__log.last_acked_index,
-            index_len - 1,
-        )
-        self.__log.last_acked_index = index_len - 1
 
         await asyncio.sleep(2)
 
