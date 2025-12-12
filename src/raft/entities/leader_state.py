@@ -25,3 +25,12 @@ class LeaderState:
             "completed_tasks": self.completed_tasks,
             "formulas": [formula.to_list() for formula in self.formulas],
         }
+
+    @staticmethod
+    def from_dict(data: dict[str, object]) -> "LeaderState":
+        formulas_data: list[list[list[int]]] = data["formulas"]  # type: ignore
+        completed_tasks: list[bool] = data["completed_tasks"]  # type: ignore
+
+        formulas = [SatFormula(formula) for formula in formulas_data]
+
+        return LeaderState(completed_tasks, formulas)
