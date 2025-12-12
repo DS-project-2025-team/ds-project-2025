@@ -64,10 +64,10 @@ class FollowerMessager(AbstractAsyncContextManager):
 
         await self.__producer.send(Topic.REPORT, payload)
 
-    async def send_append_entries_response(self, offset: int) -> None:
+    async def send_append_entries_response(self, term: int) -> None:
         payload = {
             "responder_uuid": str(self.__id),
-            "original_offset": offset,
+            "term": term,
         }
 
         await self.__producer.send(

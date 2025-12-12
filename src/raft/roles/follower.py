@@ -63,7 +63,7 @@ class Follower(AbstractAsyncContextManager):
         logger.debug(f"Received {message.topic}")
 
         # send response with received message offset
-        await self.__messager.send_append_entries_response(message.offset)
+        await self.__messager.send_append_entries_response(self.__log.term)
 
     @async_loop
     async def __handle_assign(self) -> None:
