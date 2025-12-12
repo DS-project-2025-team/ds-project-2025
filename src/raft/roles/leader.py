@@ -70,7 +70,7 @@ class Leader(AbstractAsyncContextManager):
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
             async with asyncio.TaskGroup() as group:
-                _task1 = group.create_task(self.__send_append_entries([]))
+                _task1 = group.create_task(self.__send_append_entries())
                 _task2 = group.create_task(self.__receive_append_entries_response())
                 _task3 = group.create_task(self.__handle_input(Second(1)))
                 _task4 = group.create_task(self.__assign_task())
@@ -111,8 +111,9 @@ class Leader(AbstractAsyncContextManager):
         logger.info(f"Sent result {result}")
 
     @async_loop
-    async def __send_append_entries(self, entries: Iterable[LogEntry]) -> None:
+    async def __send_append_entries(self) -> None:
         index_len = self.__log.entries.__len__()
+        entries = self.__log.get_uncommitted_entries()
 
         await self.__producer.send_and_wait(
             Topic.APPEND_ENTRIES,
