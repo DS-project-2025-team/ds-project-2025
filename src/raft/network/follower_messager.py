@@ -30,6 +30,8 @@ class FollowerMessager(AbstractAsyncContextManager):
             MessageConsumerFactory.assign_consumer(server=server)
         )
 
+        self.__id: UUID = node_id
+
     async def __aenter__(self) -> Self:
         async with TaskGroup() as group:
             _task1 = group.create_task(self.__append_entries_consumer.__aenter__())
@@ -59,3 +61,14 @@ class FollowerMessager(AbstractAsyncContextManager):
         }
 
         await self.__producer.send(Topic.REPORT, payload)
+
+    async def send_append_entries_response(self, offset: int) -> None:
+        payload = {
+                "responder_uuid": str(self.__id),
+                "original_offset": offset,
+            }
+
+        await self.__producer.send(
+            Topic.APPEND_ENTRIES_RESPONSE,
+            payload,
+        )

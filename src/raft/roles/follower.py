@@ -11,7 +11,6 @@ from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
-from network.topic import Topic
 from raft.network.follower_messager import FollowerMessager
 from raft.roles.role import Role
 from services.logger_service import logger
@@ -84,13 +83,7 @@ class Follower(AbstractAsyncContextManager):
         logger.debug(f"Received {message.topic}")
 
         # send response with received message offset
-        await self.__producer.send(
-            Topic.APPEND_ENTRIES_RESPONSE,
-            {
-                "responder_uuid": str(self.__node_id),
-                "original_offset": message.offset,
-            },
-        )
+        await self.__messager.send_append_entries_response(message.offset)
 
     @async_loop
     async def __handle_assign(self) -> None:
