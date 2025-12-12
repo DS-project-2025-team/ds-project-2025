@@ -63,7 +63,12 @@ class Leader:
     async def __send_append_entries(self) -> None:
         entries = self.__log.get_uncommitted_entries()
 
-        await self.__messager.send_append_entries(entries)
+        await self.__messager.send_append_entries(
+            entries=entries,
+            previous_log_index=self.__log.commit_index,
+            previous_log_term=self.__log.term,
+            commit_index=self.__log.commit_index,
+        )
 
         await asyncio.sleep(2)
 

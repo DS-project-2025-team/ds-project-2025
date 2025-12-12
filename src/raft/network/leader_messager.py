@@ -72,13 +72,19 @@ class LeaderMessager(AbstractAsyncContextManager):
     async def send_append_entries(
         self,
         entries: Iterable[LogEntry],
+        previous_log_index: int,
+        previous_log_term: int,
+        commit_index: int,
     ) -> None:
         await self.__producer.send(
             Topic.APPEND_ENTRIES,
             {
                 "term": self.__term,
                 "sender": str(self.__id),
+                "previous_log_index": previous_log_index,
+                "previous_log_term": previous_log_term,
                 "entries": [entry.to_dict() for entry in entries],
+                "leader_commit": commit_index,
             },
         )
 
