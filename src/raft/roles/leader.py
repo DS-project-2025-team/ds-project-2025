@@ -39,9 +39,10 @@ class Leader:
             async with asyncio.TaskGroup() as group:
                 _task1 = group.create_task(self.__handle_append_entries())
                 _task2 = group.create_task(self.__handle_append_entries_response())
-                _task3 = group.create_task(self.__handle_input(Second(1)))
-                _task4 = group.create_task(self.__assign_task())
-                _task5 = group.create_task(self.__handle_report())
+                _task3 = group.create_task(self.__commit())
+                _task4 = group.create_task(self.__handle_input(Second(1)))
+                _task5 = group.create_task(self.__assign_task())
+                _task6 = group.create_task(self.__handle_report())
 
                 logger.info("Leader is running")
         except Exception as error:
@@ -78,7 +79,6 @@ class Leader:
     async def __append_entry(self, entry: PartialLogEntry) -> None:
         async with self.__log.append_lock:
             self.__log.append(entry)
-            self.__log.commit(self.__log.commit_index + 1)
 
     @async_loop
     async def __handle_append_entries_response(self) -> None:
@@ -95,7 +95,9 @@ class Leader:
     @async_loop
     async def __commit(self) -> None:
         async with self.__log.commit_lock:
-            min_follower_log_index = min(self.__follower_log_indexes.values())
+            min_follower_log_index = min(
+                self.__follower_log_indexes.values(), default=0
+            )
             index = max(self.__log.commit_index, min_follower_log_index)
 
             self.__log.commit(index)
