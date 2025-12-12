@@ -9,11 +9,7 @@ from entities.sat_formula import SatFormula
 from entities.second import Second
 from entities.server_address import ServerAddress
 from entities.task_queue import TaskQueue
-from network.message import Message
-from network.message_consumer import MessageConsumer
-from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
-from network.topic import Topic
 from raft.entities.log import Log
 from raft.entities.log_entry import LogEntry
 from raft.entities.log_entry_factory import LogEntryFactory
