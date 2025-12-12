@@ -1,7 +1,6 @@
 import asyncio
-from contextlib import AbstractAsyncContextManager, suppress
-from types import TracebackType
-from typing import Literal, Self
+from contextlib import suppress
+from typing import Literal
 from uuid import UUID
 
 from config import SUBINTERVAL_EXPONENT
