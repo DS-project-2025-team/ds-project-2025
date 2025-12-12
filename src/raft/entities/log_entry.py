@@ -1,6 +1,7 @@
 from typing import Any
 
 from raft.entities.leader_state import LeaderState
+from raft.entities.partial_log_entry import PartialLogEntry
 
 
 class LogEntry:
@@ -48,3 +49,7 @@ class LogEntry:
         index = data["index"]  # type: ignore
 
         return LogEntry(leader_state, term, index)
+
+    @staticmethod
+    def from_partial(partial: PartialLogEntry, index: int) -> "LogEntry":
+        return LogEntry(partial.leader_state, partial.term, index)
