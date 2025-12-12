@@ -84,15 +84,10 @@ class Follower(AbstractAsyncContextManager):
 
     @async_loop
     async def __handle_assign(self) -> None:
-        message = await self.__assign_consumer.receive()
-
-        data = message.data
-
-        logger.info(f"Received work: {data}")
-
-        formula: SatFormula = SatFormula(data["formula"])
-        task: int = data["task"]
-        exponent: int = data["exponent"]
+        formula, task, exponent = await self.__messager.receive_assign()
+        logger.info(
+            f"Received work: formula {formula}, task {task}, exponent {exponent}"
+        )
 
         result = await self.__worker.run_task(
             formula,

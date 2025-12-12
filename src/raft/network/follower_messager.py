@@ -64,11 +64,21 @@ class FollowerMessager(AbstractAsyncContextManager):
 
     async def send_append_entries_response(self, offset: int) -> None:
         payload = {
-                "responder_uuid": str(self.__id),
-                "original_offset": offset,
-            }
+            "responder_uuid": str(self.__id),
+            "original_offset": offset,
+        }
 
         await self.__producer.send(
             Topic.APPEND_ENTRIES_RESPONSE,
             payload,
         )
+
+    async def receive_assign(self) -> tuple[SatFormula, int, int]:
+        message = await self.__assign_consumer.receive()
+        data = message.data
+
+        formula: SatFormula = SatFormula(data["formula"])
+        task: int = data["task"]
+        exponent: int = data["exponent"]
+
+        return formula, task, exponent
