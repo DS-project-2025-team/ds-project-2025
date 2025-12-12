@@ -1,3 +1,6 @@
+from contextlib import AbstractAsyncContextManager
+from types import TracebackType
+from typing import Self
 from uuid import UUID
 
 from entities.server_address import ServerAddress
@@ -6,7 +9,7 @@ from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 
 
-class LeaderMessager:
+class LeaderMessager(AbstractAsyncContextManager):
     """
     Class for handling Leader messaging.
     """
@@ -29,3 +32,20 @@ class LeaderMessager:
         self.__report_consumer: MessageConsumer = (
             MessageConsumerFactory.report_consumer(server=server)
         )
+
+    async def __aenter__(self) -> Self:
+        await self.__input_consumer.__aenter__()
+        await self.__append_entries_consumer.__aenter__()
+        await self.__report_consumer.__aenter__()
+
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        await self.__append_entries_consumer.__aexit__(exc_type, exc_value, traceback)
+        await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
+        await self.__report_consumer.__aexit__(exc_type, exc_value, traceback)
