@@ -25,24 +25,23 @@ class Leader:
         messager: LeaderMessager,
         ping_service: PingService,
         task_queue: TaskQueue | None = None,
-        follower_log_indexes: dict[UUID, int] | None = None,
+        follower_commit_indexes: dict[UUID, int] | None = None,
     ) -> None:
         self.__messager: LeaderMessager = messager
         self.__ping_service = ping_service
 
         self.__task_queue: TaskQueue | None = task_queue
         self.__log: Log = log
-        self.__follower_log_indexes: dict[UUID, int] = follower_log_indexes or {}
+        self.__follower_commit_indexes: dict[UUID, int] = {}
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
             async with asyncio.TaskGroup() as group:
                 _task1 = group.create_task(self.__handle_append_entries())
                 _task2 = group.create_task(self.__handle_append_entries_response())
-                _task3 = group.create_task(self.__commit())
-                _task4 = group.create_task(self.__handle_input(Second(1)))
-                _task5 = group.create_task(self.__assign_task())
-                _task6 = group.create_task(self.__handle_report())
+                _task3 = group.create_task(self.__handle_input(Second(1)))
+                _task4 = group.create_task(self.__assign_task())
+                _task5 = group.create_task(self.__handle_report())
 
                 logger.info("Leader is running")
         except Exception as error:
@@ -79,6 +78,7 @@ class Leader:
     async def __append_entry(self, entry: PartialLogEntry) -> None:
         async with self.__log.append_lock:
             self.__log.append(entry)
+            self.__log.commit(self.__log.commit_index + 1)
 
     @async_loop
     async def __handle_append_entries_response(self) -> None:
@@ -86,23 +86,7 @@ class Leader:
         Read messages via append_entries_response_consumer
         """
 
-        message = await self.__messager.receive_append_entries_response()
-        follower_id = message.follower_id
-        last_log_index = message.previous_log_index
-
-        self.__follower_log_indexes[follower_id] = last_log_index
-
-    @async_loop
-    async def __commit(self) -> None:
-        async with self.__log.commit_lock:
-            min_follower_log_index = min(
-                self.__follower_log_indexes.values(), default=0
-            )
-            index = max(self.__log.commit_index, min_follower_log_index)
-
-            self.__log.commit(index)
-
-        await asyncio.sleep(2)
+        await self.__messager.receive_append_entries_response()
 
     async def __send_task(self, formula: SatFormula, task: int, exponent: int) -> None:
         await self.__messager.send_task(formula, task, exponent)

@@ -26,7 +26,6 @@ class Log:
         self.__commit_index: int = commit_index
         self.lock = asyncio.Lock()
         self.append_lock: asyncio.Lock = asyncio.Lock()
-        self.commit_lock: asyncio.Lock = asyncio.Lock()
         self.leader_state: LeaderState = leader_state or LeaderState()
 
     @property
@@ -108,7 +107,7 @@ class Log:
             commit_index (int): New commit index.
         """
 
-        if commit_index >= len(self.entries) or commit_index < 0:
+        if commit_index >= len(self.entries):
             logger.debug(
                 f"No new entries to commit, commit_index: {commit_index}"
                 f"entries length: {len(self.entries)}"

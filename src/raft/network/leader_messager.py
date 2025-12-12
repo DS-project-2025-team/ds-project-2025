@@ -13,7 +13,6 @@ from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
 from raft.entities.log_entry import LogEntry
-from raft.messages.append_entries_response_message import AppendEntriesResponseMessage
 from services.logger_service import logger
 
 
@@ -129,14 +128,7 @@ class LeaderMessager(AbstractAsyncContextManager):
 
         return task, satisfiable
 
-    async def receive_append_entries_response(self) -> AppendEntriesResponseMessage:
+    async def receive_append_entries_response(self) -> dict:
         message = await self.__append_entries_consumer.receive()
-        data = message.data
-        follower_id = UUID(data["follower_id"])
 
-        return AppendEntriesResponseMessage(
-            term=data["term"],
-            follower_id=follower_id,
-            previous_log_index=data["last_log_index"],
-            success=data["success"],
-        )
+        return message.data
