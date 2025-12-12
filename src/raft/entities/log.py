@@ -91,6 +91,10 @@ class Log:
 
     def commit(self) -> None:
         if self.commit_index >= len(self.entries):
+            logger.debug(
+                f"No new entries to commit, commit_index: {self.commit_index}"
+                f"entries length: {len(self.entries)}"
+            )
             return
 
         entry = self.entries[self.commit_index]
