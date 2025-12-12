@@ -18,7 +18,6 @@ from raft.roles.leader import Leader
 from raft.roles.role import Role
 from raft.vote_receiver_service import VoteReceiverService
 from services.logger_service import logger
-from services.ping_service import PingService
 from utils.async_loop import async_loop
 
 
@@ -98,11 +97,6 @@ class Node(AbstractAsyncContextManager):
 
             case Role.LEADER:
                 async with (
-                    PingService(
-                        server=self.__server,
-                        node_id=self.node_id,
-                        producer=self.__producer,
-                    ) as ping_service,
                     LeaderMessager(
                         server=self.__server,
                         node_id=self.node_id,
@@ -110,9 +104,7 @@ class Node(AbstractAsyncContextManager):
                         term=self.__log.term,
                     ) as messager,
                 ):
-                    leader = Leader(
-                        log=self.__log, messager=messager, ping_service=ping_service
-                    )
+                    leader = Leader(log=self.__log, messager=messager)
 
                     self.__role = await leader.run()
 

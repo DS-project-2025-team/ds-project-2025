@@ -1,7 +1,6 @@
 import asyncio
 from contextlib import suppress
 from typing import Literal
-from uuid import UUID
 
 from config import SUBINTERVAL_EXPONENT
 from entities.sat_formula import SatFormula
@@ -13,7 +12,6 @@ from raft.entities.partial_log_entry import PartialLogEntry
 from raft.network.leader_messager import LeaderMessager
 from raft.roles.role import Role
 from services.logger_service import logger
-from services.ping_service import PingService
 from utils.async_loop import async_loop
 from utils.hash_sat_formula import hash_sat_formula
 
@@ -23,16 +21,12 @@ class Leader:
         self,
         log: Log,
         messager: LeaderMessager,
-        ping_service: PingService,
         task_queue: TaskQueue | None = None,
-        follower_commit_indexes: dict[UUID, int] | None = None,
     ) -> None:
         self.__messager: LeaderMessager = messager
-        self.__ping_service = ping_service
 
         self.__task_queue: TaskQueue | None = task_queue
         self.__log: Log = log
-        self.__follower_commit_indexes: dict[UUID, int] = {}
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
