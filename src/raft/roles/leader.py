@@ -86,7 +86,11 @@ class Leader:
         Read messages via append_entries_response_consumer
         """
 
-        await self.__messager.receive_append_entries_response()
+        message = await self.__messager.receive_append_entries_response()
+        follower_id = message.follower_id
+        last_log_index = message.previous_log_index
+
+        self.__follower_log_indexes[follower_id] = last_log_index
 
     async def __send_task(self, formula: SatFormula, task: int, exponent: int) -> None:
         await self.__messager.send_task(formula, task, exponent)
