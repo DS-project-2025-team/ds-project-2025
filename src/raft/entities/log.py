@@ -26,6 +26,7 @@ class Log:
         self.__commit_index: int = commit_index
         self.lock = asyncio.Lock()
         self.append_lock: asyncio.Lock = asyncio.Lock()
+        self.commit_lock: asyncio.Lock = asyncio.Lock()
         self.leader_state: LeaderState = leader_state or LeaderState()
 
     @property

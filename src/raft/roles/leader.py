@@ -92,6 +92,16 @@ class Leader:
 
         self.__follower_log_indexes[follower_id] = last_log_index
 
+    @async_loop
+    async def __commit(self) -> None:
+        async with self.__log.commit_lock:
+            min_follower_log_index = min(self.__follower_log_indexes.values())
+            index = max(self.__log.commit_index, min_follower_log_index)
+
+            self.__log.commit(index)
+
+        await asyncio.sleep(2)
+
     async def __send_task(self, formula: SatFormula, task: int, exponent: int) -> None:
         await self.__messager.send_task(formula, task, exponent)
 
