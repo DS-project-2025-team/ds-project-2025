@@ -5,7 +5,9 @@ from typing import Self
 from uuid import UUID
 
 from entities.sat_formula import SatFormula
+from entities.second import Second
 from entities.server_address import ServerAddress
+from network.message import Message
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
@@ -82,3 +84,9 @@ class FollowerMessager(AbstractAsyncContextManager):
         exponent: int = data["exponent"]
 
         return formula, task, exponent
+
+    async def receive_append_entries(self, election_timeout: Second) -> Message:
+        message = await self.__append_entries_consumer.receive(election_timeout)
+        await self.__append_entries_consumer.commit()
+
+        return message

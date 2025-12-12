@@ -8,8 +8,6 @@ from uuid import UUID
 from entities.sat_formula import SatFormula
 from entities.second import Second
 from entities.server_address import ServerAddress
-from network.message_consumer import MessageConsumer
-from network.message_consumer_factory import MessageConsumerFactory
 from raft.network.follower_messager import FollowerMessager
 from raft.roles.role import Role
 from services.logger_service import logger
@@ -27,11 +25,6 @@ class Follower(AbstractAsyncContextManager):
         worker: WorkerService | None = None,
     ) -> None:
         self.__messager: FollowerMessager = messager
-        self.__append_entries_consumer: MessageConsumer = (
-            MessageConsumerFactory.append_entries_consumer(
-                server=server, node_id=node_id
-            )
-        )
         self.__worker: WorkerService = worker or WorkerService()
 
         self.__election_timeout: Second = election_timeout or Second(
@@ -40,7 +33,6 @@ class Follower(AbstractAsyncContextManager):
         self.__node_id = node_id
 
     async def __aenter__(self) -> Self:
-        await self.__append_entries_consumer.__aenter__()
         self.__worker.__enter__()
 
         return self
@@ -51,7 +43,6 @@ class Follower(AbstractAsyncContextManager):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        await self.__append_entries_consumer.__aexit__(exc_type, exc_value, traceback)
         self.__worker.__exit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.CANDIDATE]:
@@ -69,8 +60,7 @@ class Follower(AbstractAsyncContextManager):
 
     @async_loop
     async def __handle_append_entries(self) -> None:
-        message = await self.__append_entries_consumer.receive(self.__election_timeout)
-        await self.__append_entries_consumer.commit()
+        message = await self.__messager.receive_append_entries(self.__election_timeout)
 
         logger.debug(f"Received {message.topic}")
 
