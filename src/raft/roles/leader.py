@@ -25,14 +25,14 @@ class Leader:
         messager: LeaderMessager,
         ping_service: PingService,
         task_queue: TaskQueue | None = None,
-        follower_commit_indexes: dict[UUID, int] | None = None,
+        follower_log_indexes: dict[UUID, int] | None = None,
     ) -> None:
         self.__messager: LeaderMessager = messager
         self.__ping_service = ping_service
 
         self.__task_queue: TaskQueue | None = task_queue
         self.__log: Log = log
-        self.__follower_commit_indexes: dict[UUID, int] = {}
+        self.__follower_log_indexes: dict[UUID, int] = {}
 
     async def run(self) -> Literal[Role.FOLLOWER]:
         try:
