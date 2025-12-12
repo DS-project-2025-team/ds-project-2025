@@ -5,6 +5,7 @@ from typing import Self
 from uuid import UUID
 
 from entities.sat_formula import SatFormula
+from entities.second import Second
 from entities.server_address import ServerAddress
 from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
@@ -83,3 +84,16 @@ class LeaderMessager(AbstractAsyncContextManager):
         payload = {"formula": formula.to_list(), "task": task, "exponent": exponent}
 
         await self.__producer.send(Topic.ASSIGN, payload)
+
+    async def receive_input(self, timeout: Second) -> SatFormula:
+        """
+        Receives one SAT formula.
+
+        Raises:
+            TimeoutError: If timeout is exceeded.
+        """
+
+        message = await self.__input_consumer.receive(timeout)
+        input_ = message.data
+
+        return SatFormula(input_["data"])

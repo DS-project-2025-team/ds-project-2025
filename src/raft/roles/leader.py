@@ -41,9 +41,6 @@ class Leader(AbstractAsyncContextManager):
             term=log.term,
         )
 
-        self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
-            server,
-        )
         self.__append_entries_consumer: MessageConsumer = (
             MessageConsumerFactory.append_entries_response_consumer(
                 server=server, node_id=node_id
@@ -59,7 +56,7 @@ class Leader(AbstractAsyncContextManager):
         self.__follower_commit_indexes: dict[UUID, int] = {}
 
     async def __aenter__(self) -> Self:
-        await self.__input_consumer.__aenter__()
+        await self.__messager.__aenter__()
         await self.__append_entries_consumer.__aenter__()
         await self.__report_consumer.__aenter__()
 
@@ -71,8 +68,8 @@ class Leader(AbstractAsyncContextManager):
         exc_value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
+        await self.__messager.__aexit__(exc_type, exc_value, traceback)
         await self.__append_entries_consumer.__aexit__(exc_type, exc_value, traceback)
-        await self.__input_consumer.__aexit__(exc_type, exc_value, traceback)
         await self.__report_consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def run(self) -> Literal[Role.FOLLOWER]:
@@ -94,17 +91,7 @@ class Leader(AbstractAsyncContextManager):
         return Role.FOLLOWER
 
     async def __receive_input(self, timeout: Second) -> SatFormula:
-        """
-        Receives one SAT formula.
-
-        Raises:
-            TimeoutError: If timeout is exceeded.
-        """
-
-        message = await self.__input_consumer.receive(timeout)
-        input_ = message.data
-
-        return SatFormula(input_["data"])
+        return await self.__messager.receive_input(timeout)
 
     async def __send_output(self, result: bool) -> None:
         logger.info(f"Computed result: {result}")
