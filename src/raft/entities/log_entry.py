@@ -1,3 +1,5 @@
+from typing import Any, Self
+
 from raft.entities.leader_state import LeaderState
 
 
@@ -38,3 +40,11 @@ class LogEntry:
             "index": self.__index,
             "state": self.__leader_state.to_dict(),
         }
+
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -> "LogEntry":
+        leader_state = LeaderState.from_dict(data["state"])  # type: ignore
+        term = data["term"]  # type: ignore
+        index = data["index"]  # type: ignore
+
+        return LogEntry(leader_state, term, index)
