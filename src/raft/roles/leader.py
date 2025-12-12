@@ -41,7 +41,6 @@ class Leader(AbstractAsyncContextManager):
             term=log.term,
         )
 
-        self.__producer: MessageProducer = producer
         self.__input_consumer: MessageConsumer = MessageConsumerFactory.input_consumer(
             server,
         )
