@@ -114,7 +114,7 @@ class Leader(AbstractAsyncContextManager):
     async def __send_append_entries(self) -> None:
         entries = self.__log.get_uncommitted_entries()
 
-        await self.__producer.send_and_wait(
+        await self.__producer.send(
             Topic.APPEND_ENTRIES,
             {
                 "term": self.__log.term,
