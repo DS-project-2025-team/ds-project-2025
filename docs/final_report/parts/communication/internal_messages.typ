@@ -1,9 +1,9 @@
 == Internal messages
 
-In _Initialization_ state, all nodes read a pre-configured file of the IP addresses and ports of all nodes. 
-All the nodes start in the Follower state. 
-At this point there are no APPEND_ENTRY messages in the system. 
-This indicates that there is no Leader in the system. 
+In _Initialization_ state, all nodes read a pre-configured file of the IP addresses and ports of all nodes.
+All the nodes start in the Follower state.
+At this point there are no APPEND_ENTRY messages in the system.
+This indicates that there is no Leader in the system.
 Because of that the system enters the _Leader election_ state.
 The election is done using Raft algorithm with IP address and port as node ID.
 The combination of IP address and port can be represented a unique binary number.

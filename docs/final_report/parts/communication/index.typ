@@ -8,8 +8,8 @@ The available messages depend on the state of the system.
 @fig:states shows the states and state transitions of the system.
 There might be more states for different failures and transitions depending on how they are handled.
 #figure(
-  include("/docs/final_report/images/states.typ"),
-  caption: [System states and transitions.]
+  include "/docs/final_report/images/states.typ",
+  caption: [System states and transitions.],
 )<fig:states>
 
 #include "external_messages.typ"

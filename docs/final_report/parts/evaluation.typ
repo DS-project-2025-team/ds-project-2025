@@ -2,5 +2,5 @@
 
 = Evaluation #todo[Tähän tuloksia/poistetaan]
 
-- start-up time 
+- start-up time
 - runtime with some test function

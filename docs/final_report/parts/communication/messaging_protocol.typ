@@ -3,7 +3,7 @@
 The system relies on reliable message passing to distribute work, maintain state, and detect failures. Messages are divided into two categories: external (user $<->$ system) and internal (node $<->$ node).
 
 External Messages:
-- INPUT — sent by user to submit formulas  
+- INPUT — sent by user to submit formulas
 - OUTPUT — sent by Leader after computation
 
 Internal Messages:
@@ -11,13 +11,36 @@ Internal Messages:
 #table(
   columns: (auto, auto, auto, auto),
   align: horizon,
-  table.header([*Purpose*],[*Message*], [*Direction*],[*Description*]),
-  [Work distribution], [ASSIGN], [Leader $->$ Follower], [Assign a task and state hash],
-  [Task reporting], [REPORT], [Follower $->$ Leader], [Report task result and state hash],
-  [Acknowledgment], [OK], [Follower $->$ Leader], [Confirm receipt of ASSIGN message],
-  [Outdated node updates itself], [GET_ENTRIES], [New Node $->$ Leader], [New or failed node joins the cluster],
-  [Logging and failure detection], [APPEND_ENTRY], [Leader $->$ Follower], [Update replicated log/state, empty message for liveness check],
-  [Acknowledgement], [APPENDENTRY \_RESPONSE], [Follower $->$ Leader], [Confirm receipt of an empty APPEND_ENTRY message],
+  table.header([*Purpose*], [*Message*], [*Direction*], [*Description*]),
+  [Work distribution],
+  [ASSIGN],
+  [Leader $->$ Follower],
+  [Assign a task and state hash],
+
+  [Task reporting],
+  [REPORT],
+  [Follower $->$ Leader],
+  [Report task result and state hash],
+
+  [Acknowledgment],
+  [OK],
+  [Follower $->$ Leader],
+  [Confirm receipt of ASSIGN message],
+
+  [Outdated node updates itself],
+  [GET_ENTRIES],
+  [New Node $->$ Leader],
+  [New or failed node joins the cluster],
+
+  [Logging and failure detection],
+  [APPEND_ENTRY],
+  [Leader $->$ Follower],
+  [Update replicated log/state, empty message for liveness check],
+
+  [Acknowledgement],
+  [APPENDENTRY \_RESPONSE],
+  [Follower $->$ Leader],
+  [Confirm receipt of an empty APPEND_ENTRY message],
 )
 
 == Message Flow Example:

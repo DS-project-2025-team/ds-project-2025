@@ -4,8 +4,8 @@ We introduce the workflow from submitting a boolean formula to getting the resul
 
 #figure(
   placement: auto,
-  include("/docs/final_report/images/workflow.typ"),
-  caption: [User initiates a computation.]
+  include "/docs/final_report/images/workflow.typ",
+  caption: [User initiates a computation.],
 )<fig:workflow>
 
 The computation begins when a user submits a boolean formula to the system.
@@ -17,6 +17,6 @@ The Leader keeps sending tasks until a Follower reports satisfiable or all tasks
 When the computation is done, the Leader returns the result to the user.
 
 #figure(
-  include("/docs/final_report/images/node_work_done.typ"),
-  caption: [Follower 1 reports to Leader, message broker omitted.]
+  include "/docs/final_report/images/node_work_done.typ",
+  caption: [Follower 1 reports to Leader, message broker omitted.],
 )<fig:node_work_done>

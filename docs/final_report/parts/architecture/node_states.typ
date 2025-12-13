@@ -24,6 +24,6 @@ This repeats until a Leader is elected.
 
 
 #figure(
-    include("/docs/final_report/images/node_states.typ"),
-    caption: [Node states, simplified version of~@ongaro_2014_raft[Figure 4]]
+  include "/docs/final_report/images/node_states.typ",
+  caption: [Node states, simplified version of~@ongaro_2014_raft[Figure 4]],
 )<fig:node_states>

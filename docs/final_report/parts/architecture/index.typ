@@ -13,8 +13,8 @@ Next, we discuss the states of the nodes in the system.
 Lastly, we discuss shared state in the system and its replication.
 
 #figure(
-  include("/docs/final_report/images/roles.typ"),
-  caption: [Leader $L$ and Followers $F_1,...,F_n$.]
+  include "/docs/final_report/images/roles.typ",
+  caption: [Leader $L$ and Followers $F_1,...,F_n$.],
 )<fig:roles>
 
 #include "workflow.typ"

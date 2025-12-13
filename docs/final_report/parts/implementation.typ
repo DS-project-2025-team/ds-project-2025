@@ -1,16 +1,16 @@
 == Implementation
 
 The implementation is written in Python using the following key components:
-- Kafka — message broker  
-- asyncio — concurrency management for Followers  
-- Python bitwise operations — efficient SAT evaluation  
+- Kafka — message broker
+- asyncio — concurrency management for Followers
+- Python bitwise operations — efficient SAT evaluation
 - A Raft election mechanism — achieve consensus among nodes
 - A Raft state replication mechanism — periodic state broadcasts
 
 Followers run an event loop that:
-1. Listens for ASSIGN messages  
-2. Computes satisfiability for the assigned interval  
-3. Sends REPORT messages  
+1. Listens for ASSIGN messages
+2. Computes satisfiability for the assigned interval
+3. Sends REPORT messages
 4. Responds to APPEND_ENTRY messages with APPENDENTRY_RESPONSE message
 5. Accepts new tasks until Leader signals completion
 

@@ -3,18 +3,18 @@ Now there is a skeleton code for creating a cluster based on static node informa
 
 == Next Steps in control plane implementation
 - Add a clock which causes a message be periodically sent.
-- Create ApplyLog message including sequence number, and potential data (without data it acts only as heartbeat message) 
+- Create ApplyLog message including sequence number, and potential data (without data it acts only as heartbeat message)
 -- create bookkeeping for sent ApplyLog messages, separate for each node (reset timer etc.)
 - Create handler function for ApplyLog, which responds to the sender
 -- create bookkeeping for received messages from the Leader (reset timer etc.)
-- Add necessary debug logging 
+- Add necessary debug logging
 - Create persistent log for a node. Log entries include at least term, log index, operation id+content
 
 - think about code structure, prevent functions from growing huge etc.
 
-In general, the first version uses the messaging but is limited to non-blocking heartbeat message and its response. Or just the sending part, and the receivers detect message type and print its name. 
+In general, the first version uses the messaging but is limited to non-blocking heartbeat message and its response. Or just the sending part, and the receivers detect message type and print its name.
 
-The big think at this point is that every incoming message raises an event, which is handled by any available thread but without blocking any other threads. 
+The big think at this point is that every incoming message raises an event, which is handled by any available thread but without blocking any other threads.
 
 Next heartbeat response can be added if not done already.
 

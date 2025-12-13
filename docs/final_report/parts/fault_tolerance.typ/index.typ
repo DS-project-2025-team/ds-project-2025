@@ -35,8 +35,8 @@ Particularly, no tasks are not done.
 
 The cluster runs Raft consensus algorithm. The number of members can be anything between 2 to thousands. A cluster with _2n+1_ members tolerates _n_ (fail-stop) faults.
 
-Configuration changes may be started internally, when a node fails, or is restarted, for example, or externally, when a new node joins the cluster. 
+Configuration changes may be started internally, when a node fails, or is restarted, for example, or externally, when a new node joins the cluster.
 
-Nodes communicate with messages which are sent to and received from a Kafka cluster. The properties of Kafka guarantee similar safety properties as Raft, _2n+1_ Kafka instances tolerate _n_ faults. 
+Nodes communicate with messages which are sent to and received from a Kafka cluster. The properties of Kafka guarantee similar safety properties as Raft, _2n+1_ Kafka instances tolerate _n_ faults.
 
 #include "node_join.typ"
