@@ -10,6 +10,8 @@ from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
+from raft.node import Node
+from services.logger_service import logger
 from utils.async_loop import async_loop
 
 
@@ -69,9 +71,12 @@ class PingService(AbstractAsyncContextManager):
         message = await self.__consumer.receive()
 
         receiver = UUID(message.data["receiver"])
+        logger.debug("Received message: %s", message)
 
         if receiver != self.__id:
             return
+
+        node = Node(message.data["connect"])
 
         async with asyncio.Lock():
             self.__count += 1

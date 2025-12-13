@@ -117,6 +117,10 @@ class Node(AbstractAsyncContextManager):
 
         payload = {
             "receiver": sender,
+            "connect" : {
+                "host" : self.__server.host,
+                "port" : self.__server.port,
+            },
         }
 
         await self.__producer.send(Topic.PING_RESPONSE, payload)
