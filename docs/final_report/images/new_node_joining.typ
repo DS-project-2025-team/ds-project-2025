@@ -2,7 +2,7 @@
 
 #raw-render(
   ```dot
-  digraph {    
+  digraph {
     subgraph {
       cluster=true
       L
@@ -16,5 +16,5 @@
     N->L [label="JOIN"]
     L->N [label="ASSIGN tasks"]
   }
-  ```
+  ```,
 )

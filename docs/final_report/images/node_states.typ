@@ -10,5 +10,5 @@
     Candidate->Leader [label="Won election"]
     Leader->Follower [label="Outdated term"]
   }
-  ```
+  ```,
 )

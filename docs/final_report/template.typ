@@ -11,7 +11,7 @@
   set enum(numbering: "(1)(a)(i)")
   set figure(placement: auto)
   set heading(numbering: "1.1.1")
-  
+
   set math.mat(delim: "[")
   set math.vec(delim: "[")
   show math.equation: set block(breakable: true)

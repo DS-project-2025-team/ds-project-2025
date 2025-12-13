@@ -1,15 +1,15 @@
-#import "template.typ": config, appendix
+#import "template.typ": appendix, config
 
 #show: config
 
 #align(center)[
   #v(25%)
-  #text(size:20pt)[
+  #text(size: 20pt)[
     *Distributed brute-force 3-SAT solver:\
     Final report*
   ]
 
-  Group 8: 
+  Group 8:
   Jiahao Li, Petteri Huvio and Vilho Raatikka
 ]
 

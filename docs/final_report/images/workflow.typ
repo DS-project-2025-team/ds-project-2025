@@ -4,7 +4,7 @@
   ```dot
   digraph {
     MessageBroker [label="Message broker"]
-    
+
     User->Leader [label="Boolean formula"]
     Leader->MessageBroker [label="Assign tasks"]
 
@@ -17,6 +17,6 @@
   ```,
   labels: (
     Follower1: [Follower $1$],
-    Follower2: [Follower $2$]
-  )
+    Follower2: [Follower $2$],
+  ),
 )
