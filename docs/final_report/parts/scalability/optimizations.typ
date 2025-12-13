@@ -34,3 +34,4 @@ Faster Followers will poll more tasks the message broker.
 A simpler solution is sending tasks with delay $d=t\/n$ and utilize the batching provided by message broker~(libraries).
 
 By continuosly measuring the average time $t$, the system can react to node leave and joins.
+The Followers can measure their computation time and report them to the Leader.
