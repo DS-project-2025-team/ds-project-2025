@@ -14,7 +14,7 @@
     LeaderFailure->LeaderElection [label="Decide new leader"]
 
     Ready->FollowerFailure [label="Follower failed"]
-    FollowerFailure->Ready [label="Reclaim tasks"]
+    FollowerFailure->Ready [label="Leader detects failure"]
   }
   ```,
 )
