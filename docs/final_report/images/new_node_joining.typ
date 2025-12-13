@@ -13,8 +13,8 @@
       edge [style=invisible, arrowhead=none]
       L->{F_1,F_2}
     }
-    N->L [label="JOIN"]
-    L->N [label="ASSIGN tasks"]
+    N->L [label="GET_ENTRIES"]
+    L->N [label="log entries"]
   }
   ```,
 )

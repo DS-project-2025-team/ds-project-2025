@@ -4,10 +4,6 @@ When a new node or a failed node joins, it becomes a Follower and connects to th
 Additionally, it requests missing entries from Leader.
 the Leader assign tasks to it and it becomes a Follower, see @fig:new_node_joining.
 Additionally, if a node fails, the Leader reclaims its tasks and reassigns them later, see @fig:node_failing.
-#figure(
-  include "/docs/final_report/images/new_node_joining.typ",
-  caption: [A new node $N$ joins],
-)<fig:new_node_joining>
 
 #figure(
   include "/docs/final_report/images/node_failing.typ",
