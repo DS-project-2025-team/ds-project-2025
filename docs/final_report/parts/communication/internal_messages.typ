@@ -30,11 +30,21 @@ The Leader sends periodically an empty APPEND_ENTRIES to all Followers which mus
 If a Follower does not receive a APPEND_ENTRIES message within a certain time window, it converts it self to CANDIDATE, increases the term, and initiates a Leader election.
 If a Follower does not respond within a certain time window, then the Leader appends a "node fail" log entry.
 
-Lastly, when a new node joins the system, it sets itself to Follower and sends a GET_ENTRIES message to the Leader, see @fig:new_node_joining.
-When the Leader receives the message, it detects a new node and appends "node join" log entry and (eventually) changes the cluster configuration.
-The entry is replicated to the new node as well.
+If a Follower receives an APPEND_ENTRIES and detects that it has invalid log compared to the Leader's log, then the system has a Follower failure.
+The Follower will try to find the last valid log entry index and revert back to it, see @fig:follower_recovery.
+
+The index can be found by sending index and term of entries to the leader and checking whether the leader has an entry with same index and term.
+Raft ensures that if two logs have an entry with same index and term, then all preceding entries are the same~@ongaro_2014_raft.
+This property allows using binary search find to find the last valid index.
+
+After reverting, the Follower sends a GET_ENTRIES with the last log index to the Leader which will then send all entries after that index.
+Now the Follower is recovered and can continue working.
+
+Lastly, when a new node joins the system, it sets itself to Follower and uses same mechanism to synchonize its state.
+The Leader will detect the new node when receiving any message from it.
+Then the Leader appends "node join" log entry and (eventually) changes the cluster configuration.
 
 #figure(
-  include "/docs/final_report/images/new_node_joining.typ",
-  caption: [A new node $N$ joins to the system],
-)<fig:new_node_joining>
+  include "/docs/final_report/images/follower_recover.typ",
+  caption: [A Follower $F$ recovers from invalid state, reverting process is omitted.],
+)<fig:follower_recovery>
