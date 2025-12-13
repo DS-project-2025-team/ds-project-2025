@@ -1,7 +1,7 @@
 import asyncio
 from contextlib import AbstractAsyncContextManager, suppress
 from types import TracebackType
-from typing import Self
+from typing import TYPE_CHECKING, Self
 from uuid import UUID
 
 from entities.second import Second
@@ -10,11 +10,12 @@ from network.message_consumer import MessageConsumer
 from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
-from raft.node import Node
+from raft.raft_config import RaftConfig
 from services.logger_service import logger
 from utils.async_loop import async_loop
 
-
+if TYPE_CHECKING:
+    from raft.node import Node
 class PingService(AbstractAsyncContextManager):
     """
     Class for counting alive consumers, assuming one consumer per group.
@@ -25,12 +26,12 @@ class PingService(AbstractAsyncContextManager):
         server: ServerAddress,
         node_id: UUID,
         producer: MessageProducer,
-        count: int = 0,
         timeout: Second = Second(5),
+        raft_config: RaftConfig | None = None,
     ) -> None:
-        self.__count: int = count
         self.__id: UUID = node_id
         self.__timeout: Second = timeout
+        self.__raft_config: RaftConfig = raft_config or RaftConfig()
         self.__producer: MessageProducer = producer
         self.__consumer: MessageConsumer = (
             MessageConsumerFactory.ping_response_consumer(server, node_id)
@@ -48,7 +49,7 @@ class PingService(AbstractAsyncContextManager):
     ) -> bool | None:
         await self.__consumer.__aexit__(exc_type, exc_value, traceback)
 
-    async def count_consumers(self) -> int:
+    async def count_consumers(self) -> RaftConfig:
         """
         Counts alive consumers.
 
@@ -64,19 +65,21 @@ class PingService(AbstractAsyncContextManager):
         with suppress(TimeoutError):
             await asyncio.wait_for(self.receive_response(), timeout=self.__timeout)
 
-        return self.__count
+        return self.__raft_config
+
 
     @async_loop
     async def receive_response(self) -> None:
         message = await self.__consumer.receive()
 
         receiver = UUID(message.data["receiver"])
-        logger.debug("Received message: %s", message)
 
         if receiver != self.__id:
             return
 
-        node = Node(message.data["connect"])
+        server = ServerAddress(
+                    message.data["connect"]["host"],
+                    message.data["connect"]["port"])
+        uuid = message.data["receiver"]
 
-        async with asyncio.Lock():
-            self.__count += 1
+        await self.__raft_config.add_node(uuid, server)

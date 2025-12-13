@@ -88,7 +88,7 @@ class Log:
 
         return self.entries[-1].term
 
-    def append(self, raw_entry: PartialLogEntry) -> None:
+    def append(self, raw_entry: PartialLogEntry) -> int:
         index = self.last_log_index + 1
 
         entry: LogEntry = LogEntry.from_partial(
@@ -97,7 +97,9 @@ class Log:
         )
 
         self.entries.append(entry)
-        logger.debug(f"Applied entry {entry.to_dict()} to raftlog")
+        logger.debug(f"Applied entry index: {index} {entry.to_dict()} to raftlog")
+
+        return index
 
     def commit(self, commit_index: int) -> None:
         """
@@ -149,3 +151,8 @@ class Log:
 
     def get_uncommitted_entries(self) -> Iterable[LogEntry]:
         return self.entries[self.commit_index + 1 :]
+    """
+    async def wait_until_majority_acked(self, index: int) -> None:
+        while True:
+            async with self.append_lock:
+    """

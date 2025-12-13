@@ -12,6 +12,7 @@ from network.message_consumer_factory import MessageConsumerFactory
 from network.message_producer import MessageProducer
 from network.topic import Topic
 from raft.entities.log import Log
+from raft.raft_config import RaftConfig
 from raft.roles.role import Role
 from services.logger_service import logger
 from services.ping_service import PingService
@@ -75,15 +76,18 @@ class Candidate(AbstractAsyncContextManager):
 
         logger.info(f"Canditate running for term {self.term}")
 
-        nodes = await self.__count_nodes()
-
+        config = await self.__count_nodes()
+        count = config.count
         role = Role.FOLLOWER
+        self.__log.leader_state.set_nodes(config.nodes)
+
+        logger.debug("leader_state: nodes: %s", self.__log.leader_state.get_nodes())
 
         try:
             async with asyncio.TaskGroup() as group:
                 group.create_task(self.__check_leader_existence())
                 group.create_task(
-                    asyncio.wait_for(self.__elect(nodes), timeout=self.__vote_timeout)
+                    asyncio.wait_for(self.__elect(count), timeout=self.__vote_timeout)
                 )
 
         except* (LeaderExistsError, OutDatedTermError) as error:
@@ -99,11 +103,11 @@ class Candidate(AbstractAsyncContextManager):
 
         return role
 
-    async def __elect(self, nodes: int) -> None:
+    async def __elect(self, count: int) -> None:
         logger.info(f"Starting election for term {self.term}")
 
         await self.__send_vote_request()
-        await self.__wait_for_votes(nodes)
+        await self.__wait_for_votes(count)
 
         raise WonElection()
 
@@ -121,20 +125,21 @@ class Candidate(AbstractAsyncContextManager):
         await self.__producer.send(Topic.VOTE_REQUEST, payload)
         logger.info("Sent vote requests")
 
-    async def __wait_for_votes(self, nodes: int) -> None:
+    async def __wait_for_votes(self, count: int) -> None:
         votes = 0
-        votes_required = nodes // 2 + 1
+        votes_required = count // 2 + 1
 
         while votes < votes_required:
             votes += await self.__receive_vote()
 
             logger.info(f"Received votes: {votes}")
 
-    async def __count_nodes(self) -> int:
-        count = await self.__ping_service.count_consumers()
-        logger.info(f"Alive nodes: {count}")
+    async def __count_nodes(self) -> RaftConfig:
+        config = await self.__ping_service.count_consumers()
+        logger.info(
+            "Alive nodes: count: %s %s", config.count, config.nodes)
 
-        return count
+        return config
 
     async def __receive_vote(self) -> int:
         message = await self.__vote_consumer.receive()

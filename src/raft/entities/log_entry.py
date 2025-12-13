@@ -53,3 +53,6 @@ class LogEntry:
     @staticmethod
     def from_partial(partial: PartialLogEntry, index: int) -> "LogEntry":
         return LogEntry(partial.leader_state, partial.term, index)
+
+    def get_index(self) -> int:
+        return self.__index

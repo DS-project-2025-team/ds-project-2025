@@ -92,8 +92,15 @@ class Leader:
         Append a new log entry and increase commit index atomically
         """
         async with self.__log.append_lock:
-            self.__log.append(entry)
-            self.__log.commit(self.__log.commit_index + 1)
+            index = self.__log.append(entry)
+        """
+        Wait until most nodes have appended the entry at index to their log
+        """
+        # await self.__log.wait_until_majority_acked(index)
+
+        async with self.__log.append_lock:
+            logger.debug("Commit index %s", index)
+            self.__log.commit(index)
 
     @async_loop
     async def __handle_append_entries_response(self) -> None:

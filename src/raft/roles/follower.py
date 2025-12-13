@@ -63,12 +63,18 @@ class Follower(AbstractAsyncContextManager):
 
         self.__log.term = max(self.__log.term, message.term)
         self.__log.entries = message.entries
+        last_index = self.__log.last_log_index
+
+        message.entries[-1] if message.entries else None
 
         if leader_commit > -1:
             self.__log.commit(leader_commit)
 
-        logger.debug(f"Received AppendEntriesMessage: {message}")
-        await self.__messager.send_append_entries_response(self.__log.term, True)
+        logger.debug(
+            "Received AppendEntriesMessage: index: %s %s",
+            self.__log.last_log_index, message)
+
+        await self.__messager.send_append_entries_response(self.__log.term, self.__log.last_log_index, True)
 
     @async_loop
     async def __handle_assign(self) -> None:
