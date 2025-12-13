@@ -11,6 +11,13 @@ Additionally, the computation of different tasks is done in parallel with all pr
 For further optimization, we could run the computation within each task in parallel.
 This is not implementend in our prototype.
 
+=== Reindexing sparse variables
+
+By sorting the indexes of variables and relabeling variables like $(x_100,x_6,x_8)|->(x_3,x_1,x_2)$ we can duplicate checks that only differ in variables not in the formula.
+
+This is not implemented in the prototype, since it makes controlling computation time more difficult.
+We appended clauses with large variable indexes to non-satisfiable formulas to adjust computation time, which relies on not implementing the optimization.
+
 === Task assignment
 
 Currently, the Leader node assigns new tasks every $d=2$ seconds and splits the full interval into subintervals of length $2^S$ where $S=18$.
