@@ -12,7 +12,7 @@
       Follower2 [label="Follower 2"]
     }
 
-    Follower1->Leader [label="REPORT false hash=123"]
+    Follower1->Leader [label="REPORT satisfiable=false, formula=..., hash=..."]
   }
   ```,
 )
