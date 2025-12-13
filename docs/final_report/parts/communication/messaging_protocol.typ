@@ -33,26 +33,26 @@ Internal Messages:
   [New or failed node joins the cluster],
 
   [Logging and failure detection],
-  [APPEND_ENTRY],
+  [APPEND_ENTRIES],
   [Leader $->$ Follower],
   [Update replicated log/state, empty message for liveness check],
 
   [Acknowledgement],
   [APPENDENTRY \_RESPONSE],
   [Follower $->$ Leader],
-  [Confirm receipt of an empty APPEND_ENTRY message],
+  [Confirm receipt of an empty APPEND_ENTRIES message],
 )
 
 == Message Flow Example:
 
 - Leader sends ASSIGN $->$ Follower updates hash and computes.
 - Follower sends REPORT $->$ Leader verifies hash and marks task complete.
-- Leader optionally sends APPEND_ENTRY $->$ Follower proceeds with next task.
+- Leader optionally sends APPEND_ENTRIES $->$ Follower proceeds with next task.
 
 == Blocking vs Non-blocking Messages:
 
 - Blocking: ASSIGN, INPUT, configuration changes $->$ sender waits for response.
-- Non-blocking: APPEND_ENTRY, REPORT $->$ sender continues without waiting.
+- Non-blocking: APPEND_ENTRIES, REPORT $->$ sender continues without waiting.
 
 == Safety Measures:
 

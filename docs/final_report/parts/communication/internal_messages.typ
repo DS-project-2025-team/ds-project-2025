@@ -1,7 +1,7 @@
 == Internal messages
 
 In _Initialization_ state, all nodes start as Follower and connect to the message broker.
-At this point there are no APPEND_ENTRY messages in the system.
+At this point there are no APPEND_ENTRIES messages in the system.
 This indicates that there is no Leader in the system.
 Because of that the system enters the _Leader election_ state.
 The election is done using Raft algorithm with random UUIDs as node IDs.
@@ -25,9 +25,9 @@ The failure handling is based on the principle that recomputing does not change 
 Particularly, a satisfiable assignment can appear in any subinterval.
 Thus, in case of failure, recomputing is always a valid solution.
 
-For detecting both Leader and Follower failures, we use APPEND_ENTRY messages.
-The Leader sends periodically an empty APPEND_ENTRY to all Followers which must respond with an APPENDENTRY_REPONSE message.
-If a Follower does not receive a APPEND_ENTRY message within a certain time window, it converts it self to CANDIDATE, increases the term, and initiates a Leader election.
+For detecting both Leader and Follower failures, we use APPEND_ENTRIES messages.
+The Leader sends periodically an empty APPEND_ENTRIES to all Followers which must respond with an APPENDENTRY_REPONSE message.
+If a Follower does not receive a APPEND_ENTRIES message within a certain time window, it converts it self to CANDIDATE, increases the term, and initiates a Leader election.
 If a Follower does not respond within a certain time window, then the Leader appends a "node fail" log entry.
 
 Lastly, when a new node joins the system, it sets itself to Follower and sends a GET_ENTRIES message to the Leader, see @fig:new_node_joining.
