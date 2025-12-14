@@ -1,6 +1,6 @@
 == Performance
 
-The following tests are done with an 8 core processor Ryzen 7 5700X.
+The following tests are done with an 8 core processor AMD Ryzen 7 5700X.
 The system is at Git commit `de4cc777227c6a679994158bff57d9fcb40a8b2c` at the time of testing.
 
 === Startup time
