@@ -68,16 +68,28 @@ Additionally, the aiokafka library provides no types for message payload which c
 
 == Starting
 
-Next, we introduce how our program is started.
+Next, we explain what our program does when it is started, see `README.md` for instructions of starting the system.
+
 The entry point of a the program running a node is `main.py`, in which a `Node` instance is initialized and ran.
 The `Node` runs the state machine in @fig:node_states in an infinite loop.
 
+Each time running a role, a new instance of that role is created and ran.
+The role changes when the previous role ends and return the next role.
+Each role gets the log object when initialized and they update it according to Raft algorithm~@ongaro_2014_raft.
 
-Followers run an event loop that:
-1. Listens for ASSIGN messages
-2. Computes satisfiability for the assigned interval
-3. Sends REPORT messages
-4. Responds to APPEND_ENTRIES messages with APPENDENTRY_RESPONSE message
-5. Accepts new tasks until Leader signals completion
+The nodes run several event loops concurrently for polling messages.
+Whenever a message arrives, the node processes it, sends responses if needed and then continues waiting.
+For example, a Follower works as follows:
++ Poll ASSIGN messages
+  + When a message arrives, compute satisfiability for the assigned interval.
+  + Send a REPORT message.
++ Poll APPEND_ENTRIES messages
+  + Update log and respond to APPEND_ENTRIES messages with APPENDENTRY_RESPONSE message
+Additionally, some common functionalities, such as voting and responding to PING messages are handled in `Node` class itself.
 
-The prototype was tested with 3, 4, and 5 nodes. The Leader election worked fine with all test configurations. The situation where the Leader dies was tested with different configurations. That worked well and new Leader was selected in all cases. We also tested how our prototype solves the given SAT-problem. It also worked well with different configuration.
+Lastly, we have tested the prototype with 3, 4 and 5 nodes.
+The Leader election worked fine with all test configurations.
+The situation where the Leader dies was tested with different configurations.
+That worked well and new Leader was selected in all cases.
+We also tested how our prototype solves the given SAT-problem.
+It also worked with different inputs.
