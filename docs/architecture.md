@@ -54,27 +54,25 @@ sequenceDiagram
     participant MessageBroker
     participant Node2 as Node 2
 
-    Node1 ->> Node1: Follower()
-    Node2 ->> Node2: Follower()
+    Node1 ->> Node1: Follower.run()
+    Node2 ->> Node2: Follower.run()
 
     Node1 ->> Node1: election timeout
-    Node1 ->> Node1: Candidate.elect()
+    Node1 ->> Node1: Candidate.run()
 
     Node1 ->> MessageBroker: PING (multicast)
     MessageBroker ->> Node2: PING
-    Node2 -->> MessageBroker: OK
-    MessageBroker -->> Node1: OK
+    Node2 -->> MessageBroker: PING_RESPONSE
+    MessageBroker -->> Node1: PING_RESPONSE
 
     Node1 ->> Node1: Count nodes
 
-    Node1 ->> MessageBroker: ELECT REQUEST
+    Node1 ->> MessageBroker: VOTE_REQUEST (multicast)
     MessageBroker ->> Node2:
 
-    Node2 -->> MessageBroker: RESPONSE OK
-    MessageBroker -->> Node1: RESPONSE OK
+    Node2 -->> MessageBroker: VOTE
+    MessageBroker -->> Node1: VOTE
 
     Note over Node1: "Majority of votes"
-    Node1 ->> Node1: Leader()
-    Node1 ->> MessageBroker: LEADER
-    MessageBroker ->> Node2: LEADER
+    Node1 ->> Node1: Leader.run()
 ```
