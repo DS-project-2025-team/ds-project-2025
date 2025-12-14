@@ -1,4 +1,4 @@
-= Work distribution algorithm<work_distribution>
+= Work distribution algorithm<sect:work_distribution>
 
 == Creating search intervals
 

@@ -20,7 +20,7 @@ There are two kind of Follower failures: Follower losing connection to leader an
 
 The Leader detects the first case by APPEND_ENTRIES messages.
 If a Follower does not respond to  within a certain time window, then the Leader appends a "node fail" log entry.
-We have designed our work distribution algorithm such that the Leader automatically reassigns tasks of a failed Follower, see @work_distribution.
+We have designed our work distribution algorithm such that the Leader automatically reassigns tasks of a failed Follower, see @sect:work_distribution.
 Followers leaving the system are also handled by the same mechanism.
 
 The latter case is detected by the Follower itself when receiving APPEND_ENTRIES messages, see @ongaro_2014_raft.
