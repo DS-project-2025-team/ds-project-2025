@@ -6,7 +6,11 @@ The system is at Git commit `de4cc777227c6a679994158bff57d9fcb40a8b2c` at the ti
 === Startup time
 
 With local Kafka instance already started, starting a node takes about 10-15 seconds.
-We counted the time from running the command until the first log line of the form `[INFO] 12:34:56: ...` is outputted.
+We counted the time from running the command until the first log line of the form
+```log
+[INFO] 12:34:56: ...
+```
+is outputted.
 The aiokafka package prints some logs before our logs but it has clearly different format.
 
 We suspect that the slow startup time is caused by creating many connections to Kafka instance.
