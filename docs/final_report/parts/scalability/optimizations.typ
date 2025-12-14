@@ -29,16 +29,20 @@ In the contrary, if the subintervals are too small, then most of the time is spe
 Ideally, there should be multiple tasks for each Follower and the computation of each subinterval takes much more time than messaging.
 
 Another optimization would be reducing or updating the delay $d$ between task assignments depending on the performance of Followers.
-Like the subinterval size, with too small $d$ the messaging overhead is large.
-On the other hand too large delay $d$ causes a lot of idling.
+Like the subinterval size, with too small $d$ the messaging overhead is large and many tasks will be recomputed because reporting tasks takes time.
+On the other hand, a large delay $d$ causes a lot of idling.
 
-Next, we assume that parallelization within tasks is implementend and messaging delay is negligible relative to computation time.
+Next, we assume that parallelization within tasks is implementend and messaging delay is negligible relative to computation time of a task.
 Additionally, let $n$ be the number of Followers and $t$ be the average computing time of a task.
 
 Now, in ideal case, each Follower should get a new task immediately after they have completed the previous task.
 This could be achieved by sending $n$ tasks with delay $d=t$.
 Faster Followers will poll more tasks the message broker.
-A simpler solution is sending tasks with delay $d=t\/n$ and utilize the batching provided by message broker~(libraries).
+However, the a whole batch is computed if the a task is computed to be satisfiable but not reported.
+
+Another solutions is sending tasks with delay $d=t\/n$.
+In this case the Leader sends less unnecessary tasks while waiting for a satisfiable task.
+This can lead to too small delay $d$ and cause previously mentioned issues.
 
 By continuosly measuring the average time $t$, the system can react to node leave and joins.
 The Followers can measure their computation time and report them to the Leader.
