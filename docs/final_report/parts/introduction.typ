@@ -18,4 +18,9 @@ To ensure this in failure cases, we allow sending redundant tasks and use Raft c
 
 On top of that, our goals include building a robust and scalable distributed computation system capable of solving large 3-SAT instances while maintaining shared state, consistency, and tolerating node failures.
 
-This report is organized as follows: @sect:background introduces 3-SAT problem, @sect:architecture describes the architecture.
+In this report, we first introduce the 3-SAT problem in
+@sect:background.
+Next, in @sect:architecture and @sect:communication_and_system_state we discuss the architecture and communication in the system.
+In @sect:work_distribution, we give a simple algorithm for dividing the computation into subtasks.
+Then, @sect:prototype and @sect:scalability discusses the prototype we implemented and its performance.
+Lastly, we present the key enablers and lessons learned during the development of the project in @sect:key_enablers_and_lessons_learned.
