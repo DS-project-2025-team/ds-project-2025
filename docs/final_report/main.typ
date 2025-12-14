@@ -24,7 +24,6 @@
 #include "parts/architecture/index.typ"
 #include "parts/communication/index.typ"
 #include "parts/distributing_work.typ"
-#include "parts/fault_tolerance.typ/index.typ"
 #include "parts/implementation.typ"
 #include "parts/scalability/index.typ"
 #include "parts/conclusions.typ"
