@@ -1,4 +1,4 @@
-== Implementation
+= Prototype
 
 The implementation is written in Python using the following key components:
 - Kafka — message broker
