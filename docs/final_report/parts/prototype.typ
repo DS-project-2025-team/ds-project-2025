@@ -1,4 +1,4 @@
-= Prototype
+= Prototype<sect:prototype>
 
 We implemented a prototype of the system using Python, Kafka and aiokafka library.
 The project source is available at https://github.com/DS-project-2025-team/ds-project-2025.

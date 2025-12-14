@@ -1,4 +1,4 @@
-= Communication and system states
+= Communication and system states<sect:communication_and_system_state>
 
 The system has two types of messages: external and internal.
 The former is for interactions between users and the system.

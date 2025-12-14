@@ -1,4 +1,4 @@
-= Scalability
+= Scalability<sect:scalability>
 
 We have tested our prototype with 3, 4 and 5 nodes.
 The Leader election worked fine with all test configurations.
