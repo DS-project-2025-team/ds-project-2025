@@ -16,5 +16,6 @@ There should be more states for different failures and transitions depending on 
 In this section, we will introduce the external messages and discuss the internal messages by system state.
 
 #include "external_messages.typ"
+#include "initialization.typ"
 #include "internal_messages.typ"
 #include "messaging_protocol.typ"
