@@ -39,7 +39,7 @@ This allows assigning tasks using the multicast functionality provided by messag
 
 == Multicast assignment via Kafka
 
-The Leader repeatedly sends tasks to all Followers via the message broker and with some fixed time interval.
+The Leader repeatedly sends tasks to all Followers via the message broker and with some fixed time interval $d$, see @sect:task_assignment for other choices of~$d$.
 The at-most-once delivery provided by Kafka will ensure that at most one Follower receives the task.
 Since Kafka is poll-based, it can guarantee at-most-once delivery by disabling retries.
 After a Follower completes its task, it reports to the Leader which marks the task completed.
