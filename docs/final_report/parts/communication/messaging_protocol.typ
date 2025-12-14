@@ -36,8 +36,9 @@ The messages ASSIGN and REPORT are non-blocking, the sender can send multiple me
 Since the messaging is done in asynchronous functions, the sender can execute other asynchronous functions while waiting for response.
 The blocking only means whether the sender waits for responses before sending messages of same type.
 
-== Safety Measures:
+Additionally, the freshness of messages are identified by hashes, content, sender IDs etc.
+For example outdated REPORT messages can be detected by hashes of formulas and outdated VOTE_REQUEST can be detected by term.
+Therefore message ordering is not required.
 
-- Sequence numbers and source IDs ensure unique and ordered messages.
-- Hashes prevent outdated REPORT messages from corrupting state.
-- At-most-once delivery (Kafka) ensures tasks are not redundantly executed.
+However, we require at-least-once delivery for blocking messages, their responses and REPORT messages.
+Only ASSIGN messages require at-most-once delivery.
