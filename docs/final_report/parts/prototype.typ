@@ -42,11 +42,29 @@ Our prototype implements the following features:
 == Structure
 
 The high-level architecture of the prototype is shown in @fig:prototype_architecture.
+Most of the functionalities are in the modules `raft` and `network` which we will discuss next.
 
 #figure(
   include "/docs/final_report/images/prototype_architecture.typ",
   caption: [Prototype architecture],
 )<fig:prototype_architecture>
+
+The module `raft` contains all functionalities related to Raft algorithm, including the node states (roles) and classes for log and log entries.
+
+Following single responsibility principle, the messaging functionalities of Leader and Follower are extracted into corresponding `Messager` classes.
+This is not done for Candidate due to lack of time.
+
+The module `network` encapsulates the producer (for sending) and consumer (for receiving) provided by aiokafka.
+Additionally, the construction of consumers for different topics is done using factory pattern.
+Other modules only need to instantiate a producer for sending messages and one consumer per topic to receive messages.
+
+Additionally, there could be separate classes for the payload of each message type.
+Again, due to lack of time, this is only implemented for the most complex APPEND_ENTRIES message.
+
+The payload of messages is serialized and deserialized using as JSON.
+Implementing serialization and deserialization for each message is also possible but tedious, unlike using `derive` macros from `serde` library in Rust.
+Therefore we did not choose that approach.
+Additionally, the aiokafka library provides no types for message payload which causes potential type errors independent of how we implemented the serialization and deserialization.
 
 == Starting
 
