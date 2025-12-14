@@ -1,4 +1,4 @@
-== Internal messages
+== Failures
 
 Next, we will discuss the messages related to failures.
 Currently, we have identified two error states: _Leader failure_ and _Follower failure_.
