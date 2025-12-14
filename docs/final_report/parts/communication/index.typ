@@ -17,5 +17,6 @@ In this section, we will introduce the external messages and discuss the interna
 
 #include "external_messages.typ"
 #include "initialization.typ"
+#include "ready.typ"
 #include "internal_messages.typ"
 #include "messaging_protocol.typ"
