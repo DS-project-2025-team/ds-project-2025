@@ -3,6 +3,7 @@ from collections.abc import Iterable
 from uuid import UUID
 
 from entities.sat_formula import SatFormula
+from entities.server_address import ServerAddress
 from raft.entities.leader_state import LeaderState
 from raft.entities.log_entry import LogEntry
 from raft.entities.partial_log_entry import PartialLogEntry
@@ -16,13 +17,14 @@ class Log:
         commit_index: int = -1,
         term: int = 0,
         voted_for: UUID | None = None,
+        nodes: list[dict[str, object]] | None = None,
         leader_state: LeaderState | None = None,
     ) -> None:
         self.__term: int = term
         self.__voted_for: UUID | None = voted_for
-
+        self.nodes: list[dict[str, object]] = nodes or []
         self.entries: list[LogEntry] = list(entries or [])
-
+        self.commit_event = asyncio.Event()
         self.__commit_index: int = commit_index
         self.lock = asyncio.Lock()
         self.append_lock: asyncio.Lock = asyncio.Lock()
@@ -71,6 +73,7 @@ class Log:
         """
         Return index of the last log entry if exists, otherwise -1.
         """
+        logger.debug("last_log_index : log entries: %s", len(self.entries))
 
         if not self.entries:
             return -1
@@ -97,7 +100,7 @@ class Log:
         )
 
         self.entries.append(entry)
-        logger.debug(f"Applied entry index: {index} {entry.to_dict()} to raftlog")
+        logger.debug(f"Appended entry index: {index} {entry.to_dict()} to raftlog")
 
         return index
 
@@ -111,7 +114,7 @@ class Log:
 
         if commit_index >= len(self.entries):
             logger.debug(
-                f"No new entries to commit, commit_index: {commit_index}"
+                f"No new entries to commit, commit_index: {commit_index} "
                 f"entries length: {len(self.entries)}"
             )
             return
@@ -151,8 +154,17 @@ class Log:
 
     def get_uncommitted_entries(self) -> Iterable[LogEntry]:
         return self.entries[self.commit_index + 1 :]
+
     """
-    async def wait_until_majority_acked(self, index: int) -> None:
-        while True:
-            async with self.append_lock:
+    Copy tuples from nodelist to log.nodes list with
+    initial value -1 for last_acked_index
     """
+    def set_nodes(self, nodelist: list) -> None:
+        if not self.nodes:
+            self.nodes = [
+                {"uuid": uuid, "server": server, "last_index": -1} 
+                for (uuid, server) in nodelist
+            ]
+
+    def get_nodes(self) -> list:
+        return list(self.nodes)

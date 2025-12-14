@@ -39,13 +39,3 @@ class LeaderState:
         formulas = [SatFormula(formula) for formula in formulas_data]
 
         return LeaderState([], completed_tasks, formulas)
-
-    def get_nodes(self) -> list:
-        return self.nodes
-
-    """
-    Copy tuples from nodelist to LeaderState.nodes with
-    initial value -1 for last_acked_index
-    """
-    def set_nodes(self, nodelist: list) -> None:
-        self.nodes = [(uuid, server, -1) for uuid, server in nodelist]

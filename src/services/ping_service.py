@@ -80,6 +80,6 @@ class PingService(AbstractAsyncContextManager):
         server = ServerAddress(
                     message.data["connect"]["host"],
                     message.data["connect"]["port"])
-        uuid = message.data["receiver"]
+        uuid = message.data["connect"]["uuid"]
 
         await self.__raft_config.add_node(uuid, server)

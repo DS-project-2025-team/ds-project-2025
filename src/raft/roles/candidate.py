@@ -79,9 +79,9 @@ class Candidate(AbstractAsyncContextManager):
         config = await self.__count_nodes()
         count = config.count
         role = Role.FOLLOWER
-        self.__log.leader_state.set_nodes(config.nodes)
+        self.__log.set_nodes(config.nodes)
 
-        logger.debug("leader_state: nodes: %s", self.__log.leader_state.get_nodes())
+        logger.debug("leader_state: nodes: %s", self.__log.get_nodes())
 
         try:
             async with asyncio.TaskGroup() as group:

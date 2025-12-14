@@ -1,6 +1,7 @@
 import asyncio
 from contextlib import suppress
 from typing import Literal
+from uuid import UUID, uuid4
 
 from config import SUBINTERVAL_EXPONENT
 from entities.sat_formula import SatFormula
@@ -26,9 +27,10 @@ class Leader:
         log: Log,
         messager: LeaderMessager,
         task_queue: TaskQueue | None = None,
+        node_id: UUID | None = None,
     ) -> None:
         self.__messager: LeaderMessager = messager
-
+        self.node_id: UUID = node_id or uuid4()
         self.__task_queue: TaskQueue | None = task_queue
         self.__log: Log = log
 
@@ -76,16 +78,56 @@ class Leader:
         """
         Send AppendEntries -messages periodically to followers to replicate the log
         """
-        entries = self.__log.entries
+        commit_index = self.__log.commit_index
+        entries = self.__log.entries[commit_index+1:]
+
+        if entries:
+            logger.debug(
+                "Send %s log enrties starting from index: %s", 
+                len(entries), commit_index+1)
+        else:
+            logger.debug("Nothing to send")
+
+        prev_log_index = entries[0].index - 1 if entries else -1
 
         await self.__messager.send_append_entries(
             entries=entries,
-            previous_log_index=self.__log.commit_index,
+            previous_log_index=prev_log_index,
             previous_log_term=self.__log.term,
-            commit_index=self.__log.commit_index,
+            commit_index=commit_index,
         )
 
         await asyncio.sleep(2)
+
+    async def __wait_until_majority_acked(self, index: int) -> None:
+        while True:
+            count = 0
+            async with self.__log.append_lock:
+                nodes = self.__log.get_nodes()
+                nodecount = len(nodes)
+                count = 0
+                for n in nodes:
+                    if n["uuid"] == self.node_id:
+                        # entry is found from own log and it is counted
+                        n["last_index"] = index
+
+                    if n["last_index"] >= index:
+                        count += 1
+
+                    logger.debug(
+                        "wait_until_majority_acked: wait index: "
+                        "%s, node: %s, acks: %s/%s",
+                        index, n, count, nodecount)
+
+            event = self.__log.commit_event
+            # majority has acked at least index
+            if count >= (nodecount//2)+1:
+                break
+            # wait for the next wake-up event
+            logger.debug("wait_until_majority_acked: start to wait wake-up event")
+            await event.wait()
+            logger.debug("wait_until_majority_acked: received wake-up event")
+            event.clear()
 
     async def __append_entry(self, entry: PartialLogEntry) -> None:
         """
@@ -96,7 +138,7 @@ class Leader:
         """
         Wait until most nodes have appended the entry at index to their log
         """
-        # await self.__log.wait_until_majority_acked(index)
+        await self.__wait_until_majority_acked(index)
 
         async with self.__log.append_lock:
             logger.debug("Commit index %s", index)
@@ -107,7 +149,21 @@ class Leader:
         """
         Consume and process AppendEntry -responses from followers
         """
-        await self.__messager.receive_append_entries_response()
+        data = await self.__messager.receive_append_entries_response()
+
+        # Update follower's last index
+        for n in self.__log.nodes:
+            if n["uuid"] == data["follower_id"] and n["last_index"] != data["last_index"]:
+                logger.debug(
+                    "handle_append_entries_response: "
+                    "uuid: %s, last_index: %s -> %s",
+                    data["follower_id"],
+                    n["last_index"],
+                    data["last_index"])
+                n["last_index"] = data["last_index"]
+                # wake up the task which appended this log
+                logger.debug("handle_append_entries_response: send wake-up event")
+                self.__log.commit_event.set()
 
     async def __send_task(self, formula: SatFormula, task: int, exponent: int) -> None:
         """
