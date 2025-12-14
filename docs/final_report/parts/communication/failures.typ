@@ -7,10 +7,14 @@ The failure handling is based on the principle that recomputing does not change 
 Particularly, a satisfiable assignment can appear in any subinterval.
 Thus, in case of failure, recomputing is always a valid solution.
 
+=== Leader failure
+
 For detecting both Leader and Follower failures, we use APPEND_ENTRIES messages.
 The Leader sends periodically an empty APPEND_ENTRIES to all Followers which must respond with an APPENDENTRY_REPONSE message.
 If a Follower does not receive a APPEND_ENTRIES message within a certain time window, it converts it self to CANDIDATE, increases the term, and initiates a Leader election.
 If a Follower does not respond within a certain time window, then the Leader appends a "node fail" log entry.
+
+=== Follower failure
 
 If a Follower receives an APPEND_ENTRIES and detects that it has invalid log compared to the Leader's log, then the system has a Follower failure.
 The Follower will try to find the last valid log entry index and revert back to it, see @fig:follower_recovery.
