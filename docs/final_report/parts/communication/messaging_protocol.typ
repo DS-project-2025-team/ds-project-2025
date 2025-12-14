@@ -1,47 +1,33 @@
 == Messaging Protocol
 
-The system relies on reliable message passing to distribute work, maintain state, and detect failures. Messages are divided into two categories: external (user $<->$ system) and internal (node $<->$ node).
+The system relies on a message broker to distribute work, maintain state, and detect failures.
+Messages are divided into two categories: external (user $<->$ system) and internal (node $<->$ node).
 
-External Messages:
-- INPUT — sent by user to submit formulas
-- OUTPUT — sent by Leader after computation
+The message types are shown in @table:message_types.
+The messages VOTE_REQUEST, APPEND_ENTRIES and GET_ENTRIES have corresponding acknowledgement messages.
 
-Internal Messages:
+#figure(
+  table(
+    columns: (auto, auto, auto),
+    align: (left, left, left),
 
-#table(
-  columns: (auto, auto, auto, auto),
-  align: horizon,
-  table.header([*Purpose*], [*Message*], [*Direction*], [*Description*]),
-  [Work distribution],
-  [ASSIGN],
-  [Leader $->$ Follower],
-  [Assign a task and state hash],
+    table.header([*Message*], [*Direction*], [*Purpose*]),
+    [INPUT], [User $->$ Leader], [User input],
+    [OUTPUT], [Leader $->$ User], [Outputting result],
 
-  [Task reporting],
-  [REPORT],
-  [Follower $->$ Leader],
-  [Report task result and state hash],
+    [VOTE_REQUEST], [Candidate $->$ Node], [Leader election],
 
-  [Acknowledgment],
-  [OK],
-  [Follower $->$ Leader],
-  [Confirm receipt of ASSIGN message],
+    [ASSIGN], [Leader $->$ Follower], [Work distribution],
 
-  [Outdated node updates itself],
-  [GET_ENTRIES],
-  [New Node $->$ Leader],
-  [New or failed node joins the cluster],
+    [REPORT], [Follower $->$ Leader], [Task reporting],
 
-  [Logging and failure detection],
-  [APPEND_ENTRIES],
-  [Leader $->$ Follower],
-  [Update replicated log/state, empty message for liveness check],
+    [GET_ENTRIES], [Follower $->$ Leader], [Updating outdated nodes],
 
-  [Acknowledgement],
-  [APPENDENTRY \_RESPONSE],
-  [Follower $->$ Leader],
-  [Confirm receipt of an empty APPEND_ENTRIES message],
-)
+    [APPEND_ENTRIES], [Leader $->$ Follower], [Logging and failure detection],
+  ),
+  caption: [Purposes of different message types],
+)<table:message_types>
+
 
 == Message Flow Example:
 
