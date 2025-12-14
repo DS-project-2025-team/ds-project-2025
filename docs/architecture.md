@@ -24,7 +24,7 @@ entities[
 ]
 utils[
     utils
-    helper functions
+    Helper functions
 ]
 
 
