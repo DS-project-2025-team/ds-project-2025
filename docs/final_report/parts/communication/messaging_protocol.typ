@@ -1,7 +1,7 @@
 == Messaging Protocol
 
 The system relies on a message broker to distribute work, maintain state, and detect failures.
-Messages are divided into two categories: external (user $<->$ system) and internal (node $<->$ node).
+Messages are divided into two categories: external (User $<->$ System) and internal (Node $<->$ Node).
 
 #figure(
   table(
