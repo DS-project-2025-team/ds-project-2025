@@ -8,7 +8,7 @@ Because the search space grows exponentially with the number of variables, brute
 To address this, we distribute the work across up to thousands of identical nodes using a Leader–Follower architecture.
 The Leader partitions the search space into independent intervals and assigns computation tasks to Followers, which evaluate them in parallel.
 
-Fault tolerance is achieved through task redundancy, and Raft consensus algorithm~@ongaro_2014_raft for Leader election and Leader state replication.
+Fault tolerance is achieved through task redundancy, and using Raft consensus algorithm~@ongaro_2014_raft for Leader election and Leader state replication.
 Followers can join and leave dynamically, and the system tolerates node failures by reassigning tasks and potentially electing a new Leader.
 The goal is a robust, scalable distributed computation system capable of solving large 3‑SAT instances correctly while maintaining shared state, ensuring consistency, and tolerating node failures.
 
