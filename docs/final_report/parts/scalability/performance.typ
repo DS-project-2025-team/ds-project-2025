@@ -11,7 +11,7 @@ The aiokafka package prints some logs before our logs but it has clearly differe
 
 We suspect that the slow startup time is caused by creating many connections to Kafka instance.
 
-=== Computation
+=== Computation<sect:computation>
 
 The system is already in running in ready state before we sent inputs.
 
