@@ -13,9 +13,8 @@ There should be more states for different failures and transitions depending on 
   caption: [System states and transitions.],
 )<fig:states>
 
-In this section, we will introduce the external messages and discuss the internal messages by system state.
+In this section, we will discuss the internal messages by system state and give a summary of message types.
 
-#include "external_messages.typ"
 #include "initialization.typ"
 #include "ready.typ"
 #include "failures.typ"
