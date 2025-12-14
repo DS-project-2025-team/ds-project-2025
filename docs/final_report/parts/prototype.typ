@@ -5,7 +5,7 @@ The project source is available at https://github.com/DS-project-2025-team/ds-pr
 
 In this section, we first introduce the (partially) implemented features.
 Next, we discuss the architecture and architectural choices we made.
-Lastly, we briefly introduce how the prototype runs and how we tested it.
+Lastly, we briefly introduce how the prototype runs.
 
 == Features
 
@@ -92,10 +92,3 @@ For example, a Follower works as follows:
 + Poll APPEND_ENTRIES messages
   + Update log and respond to APPEND_ENTRIES messages with APPENDENTRY_RESPONSE message
 Additionally, some common functionalities, such as voting and responding to PING messages are handled in `Node` class itself.
-
-Lastly, we have tested the prototype with 3, 4 and 5 nodes.
-The Leader election worked fine with all test configurations.
-The situation where the Leader dies was tested with different configurations.
-That worked well and new Leader was selected in all cases.
-We also tested how our prototype solves the given SAT-problem.
-It also worked with different inputs.
