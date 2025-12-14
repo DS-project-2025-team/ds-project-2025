@@ -15,10 +15,10 @@ Each of these intervals can be checked individually.
 Then we can pass a 3-SAT instance of variables $x_1,...,x_n$ and assign subintervals to the nodes.
 Now, satisfiability can be checked in parallel.
 
+== Task queue algorithm
+
 Suppose that we have $n$ tasks and the aim is to assign tasks such every task will be computed eventually.
 For simplicity, we identify the tasks with integers $1, ..., n$.
-
-== Task queue algorithm
 
 Let $Q$ be a queue of tasks (not the queue of formulas) and $L$ a list of boolean variables such that $L[i]$ indicates whether the task $i$ is completed.
 
