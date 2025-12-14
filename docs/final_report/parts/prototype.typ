@@ -1,5 +1,3 @@
-#import "@preview/diagraph:0.3.6": raw-render
-
 = Prototype
 
 We implemented a prototype of the system using Python, Kafka and aiokafka library.
@@ -41,58 +39,21 @@ Our prototype implements the following features:
 - Scalability: New nodes can join the system while it is running.
   Kafka used in the system is also distributed message broker which can be scaled up.
 
-The implementation is written in Python using the following key components:
-- Kafka — message broker
-- asyncio — concurrency management for Followers
-- Python bitwise operations — "efficient" SAT evaluation
-- A Raft election mechanism — achieve consensus among nodes
-- A Raft state replication mechanism — periodic state broadcasts
+== Structure
+
+The high-level architecture of the prototype is shown in @fig:prototype_architecture.
 
 #figure(
-  raw-render(
-    ```dot
-      digraph {
-        node [shape=box]
-        edge [arrowhead=vee]
-
-        raft -> network
-        raft -> services
-        raft -> utils
-        raft -> entities
-
-        services -> utils
-        services -> entities
-
-        network -> entities
-        network -> services
-        network -> utils
-    }
-    ```,
-    labels: (
-      raft: align(center)[
-        raft\
-        Raft consensus algorithm
-      ],
-      network: align(center)[
-        network\
-        Handles messaging between nodes
-      ],
-      services: align(center)[
-        services\
-        Business logic
-      ],
-      entities: align(center)[
-        entities\
-        Types and objects, mostly data objects
-      ],
-      utils: align(center)[
-        utils\
-        Helper functions
-      ],
-    ),
-  ),
+  include "/docs/final_report/images/prototype_architecture.typ",
   caption: [Prototype architecture],
-)
+)<fig:prototype_architecture>
+
+== Starting
+
+Next, we introduce how our program is started.
+The entry point of a the program running a node is `main.py`, in which a `Node` instance is initialized and ran.
+The `Node` runs the state machine in @fig:node_states in an infinite loop.
+
 
 Followers run an event loop that:
 1. Listens for ASSIGN messages
@@ -101,4 +62,4 @@ Followers run an event loop that:
 4. Responds to APPEND_ENTRIES messages with APPENDENTRY_RESPONSE message
 5. Accepts new tasks until Leader signals completion
 
-A prototype was tested with 3, 4, and 5 nodes. The Leader election worked fine with all test configurations. The situation where the Leader dies was tested with different configurations. That worked well and new Leader was selected in all cases. We also tested how our prototype solves the given SAT-problem. It also worked well with different configuration.
+The prototype was tested with 3, 4, and 5 nodes. The Leader election worked fine with all test configurations. The situation where the Leader dies was tested with different configurations. That worked well and new Leader was selected in all cases. We also tested how our prototype solves the given SAT-problem. It also worked well with different configuration.
