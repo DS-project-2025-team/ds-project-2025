@@ -3,10 +3,14 @@
 
 = Conclusions
 
-The project repo can be found in #link("https://github.com/DS-project-2025-team/ds-project-2025")[Github].
+In this report, we introduced a distributed system for computing the satisfiability of 3-SAT formulas.
+The system allows distributing computation among multiple nodes and ensures that no failures can lead to an incorrect result.
 
-- what features are implemented in prototype
-- future improvements
-- scalability limitations - Kafka limits, network latency
+We used Raft algorithm~@ongaro_2014_raft for Leader election and log replication.
+On top of that we designed a fault tolerant work distribution algorithm that runs on Leader.
 
-A distributed 3-SAT system generalizes to other real-world distributed workloads such as distributed search problems, distributed rendering, or MapReduce-like workloads.
+We also implemented a prototype featuring parallel computation, Leader election, Leader state replication and fault tolerance among others.
+Additionally, we measured its performance and identified some bottlenecks such as Follower idling and slow startup time due to Kafka or aiokafka library.
+On top of that, we proposed possible optimizations to speed up computation.
+
+Our system also generalizes to other real-world distributed workloads such as distributed search problems, distributed rendering, or MapReduce-like workloads.
