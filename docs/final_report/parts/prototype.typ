@@ -16,7 +16,7 @@ Our prototype implements the following features:
 
 - Shared distributed state:
   Implemented using an ad hoc broadcast-based solution.
-  
+
   The log and leader state are replicated to all nodes.
   The whole log and state is repeatedly copied to Followers without further validation.
 
@@ -37,6 +37,9 @@ Our prototype implements the following features:
 
   No incorrect results will be returned in any failure.
   REPORT and OUTPUT messages can be checked by the formula it contains.
+
+- Scalability: New nodes can join the system while it is running.
+  Kafka used in the system is also distributed message broker which can be scaled up.
 
 The implementation is written in Python using the following key components:
 - Kafka — message broker
