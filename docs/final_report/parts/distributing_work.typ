@@ -1,5 +1,9 @@
 = Work distribution algorithm<sect:work_distribution>
 
+In this section, we first describe how our problem can be divided into smaller parts.
+Next, we give a simple queue-based algorithm that handles Follower failures automatically.
+Lastly, we discuss practical implementation of the algorithm using Kafka message broker.
+
 == Creating search intervals
 
 Let $x_1,...,x_n$ be the boolean variables. Each assignment of boolean values can be represented as a bit sequence $(b_1,...,b_n)$ such that $x_i=b_i$ for all $i in {1,...,n}$.
