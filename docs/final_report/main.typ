@@ -26,6 +26,7 @@
 #include "parts/distributing_work.typ"
 #include "parts/prototype.typ"
 #include "parts/scalability/index.typ"
+#include "parts/key_enablers_and_lessons_learned.typ"
 #include "parts/conclusions.typ"
 #include "parts/participation.typ"
 
