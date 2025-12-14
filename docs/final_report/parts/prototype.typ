@@ -3,6 +3,12 @@
 We implemented a prototype of the system using Python, Kafka and aiokafka library.
 The project source is available at https://github.com/DS-project-2025-team/ds-project-2025.
 
+In this section, we first introduce the (partially) implemented features.
+Next, we discuss the architecture and architectural choices we made.
+Lastly, we briefly introduce how the prototype runs and how we tested it.
+
+== Features
+
 Our prototype implements the following features:
 
 - A simple script for user input.
