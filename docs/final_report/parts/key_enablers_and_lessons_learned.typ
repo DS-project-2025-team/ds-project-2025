@@ -4,14 +4,14 @@ We learned the following lessons:
 
 - Python was a bad choice.
   Rust might have been a better choice, although some of us have not written Rust.
-  
+
   - Python is not statically typed.
     The aiokafka library we used did not have precise types for message objects.
     This caused many serialization and type errors in runtime.
-  
+
   - Python does not provide `Mutex` wrappers like in Rust.
     This makes it easy to forget locks and cause race conditions that are difficult to debug.
-  
+
   - Error handling with exceptions does not work well.
     Exceptions are often unexpected and not catched.
     Rust-like `Result` enum would be better.
