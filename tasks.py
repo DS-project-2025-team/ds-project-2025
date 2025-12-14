@@ -20,6 +20,7 @@ from services.logger_service import logger
 def format(ctx: Context) -> None:
     with ctx.cd(ROOT_DIR):
         ctx.run("ruff format")
+        ctx.run("typstyle --inplace .")
 
 
 @task

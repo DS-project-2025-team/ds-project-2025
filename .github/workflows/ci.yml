@@ -36,6 +36,11 @@ jobs:
       - name: Set up
         uses: ./.github/workflows/setup
 
+      - name: Install typstyle
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: typstyle
+
       - name: Format code
         run: uv run invoke format
 
