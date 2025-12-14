@@ -33,6 +33,8 @@
       x
     }
   }
+  show link: underline
+  show link: set text(navy)
 
   body
 }
