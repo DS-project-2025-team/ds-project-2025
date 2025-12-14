@@ -3,9 +3,6 @@
 The system relies on a message broker to distribute work, maintain state, and detect failures.
 Messages are divided into two categories: external (user $<->$ system) and internal (node $<->$ node).
 
-The message types are shown in @table:message_types.
-The messages VOTE_REQUEST, APPEND_ENTRIES and GET_ENTRIES have corresponding acknowledgement messages.
-
 #figure(
   table(
     columns: (auto, auto, auto),
@@ -14,6 +11,8 @@ The messages VOTE_REQUEST, APPEND_ENTRIES and GET_ENTRIES have corresponding ack
     table.header([*Message*], [*Direction*], [*Purpose*]),
     [INPUT], [User $->$ Leader], [User input],
     [OUTPUT], [Leader $->$ User], [Outputting result],
+
+    [PING], [Candidate $->$ Node], [Detecting other nodes],
 
     [VOTE_REQUEST], [Candidate $->$ Node], [Leader election],
 
@@ -29,16 +28,13 @@ The messages VOTE_REQUEST, APPEND_ENTRIES and GET_ENTRIES have corresponding ack
 )<table:message_types>
 
 
-== Message Flow Example:
+The message types are shown in @table:message_types.
+The messages VOTE_REQUEST, PING, APPEND_ENTRIES and GET_ENTRIES have corresponding acknowledgement messages.
+These and INPUT are blocking messages, the sender does not send same message type before receiving responses or timeout.
+The messages ASSIGN and REPORT are non-blocking, the sender can send multiple messages of these type without waiting.
 
-- Leader sends ASSIGN $->$ Follower updates hash and computes.
-- Follower sends REPORT $->$ Leader verifies hash and marks task complete.
-- Leader optionally sends APPEND_ENTRIES $->$ Follower proceeds with next task.
-
-== Blocking vs Non-blocking Messages:
-
-- Blocking: ASSIGN, INPUT, configuration changes $->$ sender waits for response.
-- Non-blocking: APPEND_ENTRIES, REPORT $->$ sender continues without waiting.
+Since the messaging is done in asynchronous functions, the sender can execute other asynchronous functions while waiting for response.
+The blocking only means whether the sender waits for responses before sending messages of same type.
 
 == Safety Measures:
 
