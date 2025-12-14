@@ -9,7 +9,7 @@ We introduce the workflow from submitting a boolean formula to getting the resul
 )<fig:workflow>
 
 The computation begins when a user submits a boolean formula to the system.
-Then the Leader splits the computation into smaller tasks and sending tasks to the message broker, see @work_distribution.
+Then the Leader splits the computation into smaller tasks and sending tasks to the message broker, see @sect:work_distribution.
 
 The Followers polls tasks from the message broker and compute them.
 When a Follower completes its task it reports the result to the Leader, see @fig:node_work_done.

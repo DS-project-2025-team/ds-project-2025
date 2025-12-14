@@ -79,10 +79,10 @@ For compiling Typst documentation:
    cargo install --locked typst-cli typstyle
    ```
 
-The documentation can be compiled with
+The final report can be compiled in project root directory with
 
 ```sh
-typst compile path/to/file.typ
+typst compile docs/final_report/main.typ --root .
 ```
 
 ## Tasks

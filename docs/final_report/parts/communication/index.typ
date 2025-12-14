@@ -1,4 +1,4 @@
-= Communication and system states
+= Communication and system states<sect:communication_and_system_state>
 
 The system has two types of messages: external and internal.
 The former is for interactions between users and the system.
@@ -13,7 +13,7 @@ There should be more states for different failures and transitions depending on 
   caption: [System states and transitions.],
 )<fig:states>
 
-In this section, we will discuss the internal messages by system state and give a summary of message types.
+In this section, we will discuss the messages by system state and give a summary of the messaging protocol.
 
 #include "initialization.typ"
 #include "ready.typ"

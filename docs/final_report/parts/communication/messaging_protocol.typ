@@ -1,61 +1,44 @@
 == Messaging Protocol
 
-The system relies on reliable message passing to distribute work, maintain state, and detect failures. Messages are divided into two categories: external (user $<->$ system) and internal (node $<->$ node).
+The system relies on a message broker to distribute work, maintain state, and detect failures.
+Messages are divided into two categories: external (User $<->$ System) and internal (Node $<->$ Node).
 
-External Messages:
-- INPUT — sent by user to submit formulas
-- OUTPUT — sent by Leader after computation
+#figure(
+  table(
+    columns: (auto, auto, auto),
+    align: (left, left, left),
 
-Internal Messages:
+    table.header([*Message*], [*Direction*], [*Purpose*]),
+    [INPUT], [User $->$ Leader], [User input],
+    [OUTPUT], [Leader $->$ User], [Outputting result],
 
-#table(
-  columns: (auto, auto, auto, auto),
-  align: horizon,
-  table.header([*Purpose*], [*Message*], [*Direction*], [*Description*]),
-  [Work distribution],
-  [ASSIGN],
-  [Leader $->$ Follower],
-  [Assign a task and state hash],
+    [PING], [Candidate $->$ Node], [Detecting other nodes],
 
-  [Task reporting],
-  [REPORT],
-  [Follower $->$ Leader],
-  [Report task result and state hash],
+    [VOTE_REQUEST], [Candidate $->$ Node], [Leader election],
 
-  [Acknowledgment],
-  [OK],
-  [Follower $->$ Leader],
-  [Confirm receipt of ASSIGN message],
+    [ASSIGN], [Leader $->$ Follower], [Work distribution],
 
-  [Outdated node updates itself],
-  [GET_ENTRIES],
-  [New Node $->$ Leader],
-  [New or failed node joins the cluster],
+    [REPORT], [Follower $->$ Leader], [Task reporting],
 
-  [Logging and failure detection],
-  [APPEND_ENTRIES],
-  [Leader $->$ Follower],
-  [Update replicated log/state, empty message for liveness check],
+    [GET_ENTRIES], [Follower $->$ Leader], [Updating outdated nodes],
 
-  [Acknowledgement],
-  [APPENDENTRY \_RESPONSE],
-  [Follower $->$ Leader],
-  [Confirm receipt of an empty APPEND_ENTRIES message],
-)
+    [APPEND_ENTRIES], [Leader $->$ Follower], [Logging and failure detection],
+  ),
+  caption: [Purposes of different message types],
+)<table:message_types>
 
-== Message Flow Example:
 
-- Leader sends ASSIGN $->$ Follower updates hash and computes.
-- Follower sends REPORT $->$ Leader verifies hash and marks task complete.
-- Leader optionally sends APPEND_ENTRIES $->$ Follower proceeds with next task.
+The message types are shown in @table:message_types.
+The messages VOTE_REQUEST, PING, APPEND_ENTRIES and GET_ENTRIES have corresponding acknowledgement messages.
+These and INPUT are blocking messages, the sender does not send same message type before receiving responses or timeout.
+The messages ASSIGN and REPORT are non-blocking, the sender can send multiple messages of these type without waiting.
 
-== Blocking vs Non-blocking Messages:
+Since the messaging is done in asynchronous functions, the sender can execute other asynchronous functions while waiting for response.
+The blocking only means whether the sender waits for responses before sending messages of same type.
 
-- Blocking: ASSIGN, INPUT, configuration changes $->$ sender waits for response.
-- Non-blocking: APPEND_ENTRIES, REPORT $->$ sender continues without waiting.
+Additionally, the freshness of messages are identified by hashes, content, sender IDs etc.
+For example outdated REPORT messages can be detected by hashes of formulas and outdated VOTE_REQUEST can be detected by term.
+Therefore message ordering is not required.
 
-== Safety Measures:
-
-- Sequence numbers and source IDs ensure unique and ordered messages.
-- Hashes prevent outdated REPORT messages from corrupting state.
-- At-most-once delivery (Kafka) ensures tasks are not redundantly executed.
+However, we require at-least-once delivery for blocking messages, their responses and REPORT messages.
+Only ASSIGN messages require at-most-once delivery.

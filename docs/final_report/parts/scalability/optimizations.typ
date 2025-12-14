@@ -18,7 +18,7 @@ By sorting the indexes of variables and relabeling variables like $(x_100,x_6,x_
 This is not implemented in the prototype, since it makes controlling computation time more difficult.
 We appended clauses with large variable indexes to non-satisfiable formulas to adjust computation time, which relies on not implementing the optimization.
 
-=== Task assignment
+=== Task assignment<sect:task_assignment>
 
 Currently, the Leader node assigns new tasks every $d=2$ seconds and splits the full interval into subintervals of length $2^S$ where $S=18$.
 This causes a lot of idling for Followers.

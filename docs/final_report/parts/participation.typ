@@ -1,3 +1,4 @@
 = Group member participation
 
-The coding work is mostly done by Jiahao and Vilho. Petteri mostly contributed to final report and design plan.
+The coding work is mostly done by Jiahao and Vilho.
+The design plan and final report are written jointly by Jiahao, Petteri and Vilho.

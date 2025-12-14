@@ -13,3 +13,4 @@ If the something does not match, then the message is outdated and the Leader ign
 Lastly, when the computation is done, the Leader sends an OUTPUT message to the user with the formula, formula hash and result.
 Currently, the user connects directly to the message broker and the OUTPUT is multicasted to all users with same topic.
 Therefore the formula hash and formula are required to identify the OUTPUT.
+Verifying hash first will make processing many OUTPUT messages faster at the cost of bigger message payload.
