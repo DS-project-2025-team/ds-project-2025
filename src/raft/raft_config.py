@@ -7,9 +7,7 @@ from services.logger_service import logger
 
 class RaftConfig:
     def __init__(
-            self,
-            nodes: list[tuple[UUID, ServerAddress]] | None=None,
-            count: int = 0
+        self, nodes: list[tuple[UUID, ServerAddress]] | None = None, count: int = 0
     ) -> None:
         self.nodes: list[tuple[UUID, ServerAddress]] = []
         self.lock: asyncio.Lock = asyncio.Lock()
