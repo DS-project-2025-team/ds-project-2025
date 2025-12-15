@@ -62,24 +62,13 @@ class Follower(AbstractAsyncContextManager):
         leader_commit = message.leader_commit
 
         self.__log.term = max(self.__log.term, message.term)
-        # add received entry list to the end of existing raftlog
-        self.__log.entries.extend(message.entries)
+        self.__log.entries = message.entries
 
-        message.entries[-1] if message.entries else None
-
-        if leader_commit > -1 and leader_commit > self.__log.commit_index:
+        if leader_commit > -1:
             self.__log.commit(leader_commit)
 
-        if message.entries:
-            logger.debug("handle_append_entries: "
-                         "updated last index: %s ",
-                         self.__log.last_log_index)
-
-        await self.__messager.send_append_entries_response(
-            self.__log.term, self.__log.last_log_index, True)
-
-        if message.entries:
-            logger.debug("handle_append_entries: Log in Follower: %s", self.__log.entries)
+        logger.debug(f"Received AppendEntriesMessage: {message}")
+        await self.__messager.send_append_entries_response(self.__log.term, True)
 
     @async_loop
     async def __handle_assign(self) -> None:

@@ -84,7 +84,6 @@ class LeaderMessager(AbstractAsyncContextManager):
                 "previous_log_index": previous_log_index,
                 "previous_log_term": previous_log_term,
                 "entries": [entry.to_dict() for entry in entries],
-                "last_index": len(list(entries))-1,
                 "leader_commit": commit_index,
             },
         )

@@ -104,10 +104,7 @@ class Node(AbstractAsyncContextManager):
                         term=self.__log.term,
                     ) as messager,
                 ):
-                    leader = Leader(
-                        log=self.__log,
-                        messager=messager,
-                        node_id=self.node_id)
+                    leader = Leader(log=self.__log, messager=messager)
 
                     self.__role = await leader.run()
 
@@ -120,11 +117,6 @@ class Node(AbstractAsyncContextManager):
 
         payload = {
             "receiver": sender,
-            "connect": {
-                "uuid": str(self.node_id),
-                "host": self.__server.host,
-                "port": self.__server.port,
-            },
         }
 
         await self.__producer.send(Topic.PING_RESPONSE, payload)

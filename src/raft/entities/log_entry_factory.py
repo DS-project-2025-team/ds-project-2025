@@ -13,7 +13,7 @@ class LogEntryFactory:
             (i == task) or x for i, x in enumerate(state.completed_tasks)
         )
 
-        return PartialLogEntry(LeaderState([], completed_tasks, formulas), term)
+        return PartialLogEntry(LeaderState(completed_tasks, formulas), term)
 
     @staticmethod
     def add_formula(
@@ -22,7 +22,7 @@ class LogEntryFactory:
         formulas = concat(list(state.formulas), [formula])
         completed_tasks = state.completed_tasks.copy()
 
-        return PartialLogEntry(LeaderState([], completed_tasks, formulas), term)
+        return PartialLogEntry(LeaderState(completed_tasks, formulas), term)
 
     @staticmethod
     def pop_formula(state: LeaderState, term: int) -> PartialLogEntry:
@@ -31,7 +31,7 @@ class LogEntryFactory:
         if state.formulas:
             formulas = list(state.formulas)[1:]
 
-        return PartialLogEntry(LeaderState([], [], formulas), term)
+        return PartialLogEntry(LeaderState([], formulas), term)
 
     @staticmethod
     def set_completed_tasks(
@@ -39,4 +39,4 @@ class LogEntryFactory:
     ) -> PartialLogEntry:
         formulas = state.formulas.copy()
 
-        return PartialLogEntry(LeaderState([], completed_tasks, formulas), term)
+        return PartialLogEntry(LeaderState(completed_tasks, formulas), term)
