@@ -107,7 +107,10 @@ class Leader:
                 nodecount = len(nodes)
                 count = 0
                 for n in nodes:
-                    if n["uuid"] == self.node_id:
+                    if n["uuid"] == str(self.node_id) and n["last_index"] != index:
+                        logger.debug(
+                            "wait_until_majority_acked: set own index: %s -> %s",
+                            n["last_index"], index)
                         # entry is found from own log and it is counted
                         n["last_index"] = index
 
@@ -135,14 +138,17 @@ class Leader:
         """
         async with self.__log.append_lock:
             index = self.__log.append(entry)
-        """
-        Wait until most nodes have appended the entry at index to their log
-        """
-        await self.__wait_until_majority_acked(index)
 
-        async with self.__log.append_lock:
-            logger.debug("Commit index %s", index)
-            self.__log.commit(index)
+        if entry:
+            """
+            Wait until most nodes have appended the entry at index to their log
+            """
+            await self.__wait_until_majority_acked(index)
+
+            async with self.__log.append_lock:
+                self.__log.commit(index)
+
+                logger.debug("append_entry: Log in the Leader: %s", self.__log.entries)
 
     @async_loop
     async def __handle_append_entries_response(self) -> None:

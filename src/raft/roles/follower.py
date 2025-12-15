@@ -67,7 +67,7 @@ class Follower(AbstractAsyncContextManager):
 
         message.entries[-1] if message.entries else None
 
-        if leader_commit > -1:
+        if leader_commit > -1 and leader_commit > self.__log.commit_index:
             self.__log.commit(leader_commit)
 
         if message.entries:
@@ -77,6 +77,9 @@ class Follower(AbstractAsyncContextManager):
 
         await self.__messager.send_append_entries_response(
             self.__log.term, self.__log.last_log_index, True)
+
+        if message.entries:
+            logger.debug("handle_append_entries: Log in Follower: %s", self.__log.entries)
 
     @async_loop
     async def __handle_assign(self) -> None:
