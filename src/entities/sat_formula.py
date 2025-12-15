@@ -38,5 +38,7 @@ class SatFormula(UserList):
         Returns:
             int: The maximum index of variables.
         """
+        if not self.data:
+            raise ValueError("Cannot compute max_variable for empty formula")
 
         return max(map(abs, chain.from_iterable(self.data)))
