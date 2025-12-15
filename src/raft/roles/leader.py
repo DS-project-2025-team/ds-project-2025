@@ -83,7 +83,7 @@ class Leader:
 
         if entries:
             logger.debug(
-                "Send %s log enrties starting from index: %s", 
+                "Send %s log entries starting from index: %s", 
                 len(entries), commit_index+1)
         else:
             logger.debug("Nothing to send")
@@ -107,7 +107,7 @@ class Leader:
                 nodecount = len(nodes)
                 count = 0
                 for n in nodes:
-                    if n["uuid"] == str(self.node_id) and n["last_index"] != index:
+                    if n["uuid"] == self.node_id and n["last_index"] != index:
                         logger.debug(
                             "wait_until_majority_acked: set own index: %s -> %s",
                             n["last_index"], index)
@@ -156,10 +156,12 @@ class Leader:
         Consume and process AppendEntry -responses from followers
         """
         data = await self.__messager.receive_append_entries_response()
+        logger.debug("handle_append_entries_response: received message: %s", data)
 
         # Update follower's last index
         for n in self.__log.nodes:
-            if n["uuid"] == data["follower_id"] and n["last_index"] != data["last_index"]:
+            logger.debug("handle_append_entries_response: node: %s", n)
+            if n["uuid"] == UUID(data["follower_id"]) and n["last_index"] != data["last_index"]:
                 logger.debug(
                     "handle_append_entries_response: "
                     "uuid: %s, last_index: %s -> %s",

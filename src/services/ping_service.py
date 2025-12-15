@@ -50,12 +50,6 @@ class PingService(AbstractAsyncContextManager):
         await self.__consumer.__aexit__(exc_type, exc_value, traceback)
 
     async def count_consumers(self) -> RaftConfig:
-        """
-        Counts alive consumers.
-
-        Returns:
-            int: Number of alive consumers
-        """
         payload = {
             "sender": str(self.__id),
         }
@@ -80,6 +74,6 @@ class PingService(AbstractAsyncContextManager):
         server = ServerAddress(
                     message.data["connect"]["host"],
                     message.data["connect"]["port"])
-        uuid = message.data["connect"]["uuid"]
+        uuid = UUID(message.data["connect"]["uuid"])
 
         await self.__raft_config.add_node(uuid, server)

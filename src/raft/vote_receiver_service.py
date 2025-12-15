@@ -41,7 +41,7 @@ class VoteReceiverService(AbstractAsyncContextManager):
     async def handle_vote(self) -> None:
         message = await self.__vote_consumer.receive()
 
-        term: bool = message.data["term"]
+        term: int = message.data["term"]
         candidate_id = UUID(message.data["candidate_id"])
         last_log_index = message.data["last_log_index"]
         last_log_term = message.data["last_log_term"]

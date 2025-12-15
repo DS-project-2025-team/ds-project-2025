@@ -11,12 +11,12 @@ class RaftConfig:
             nodes: list[tuple[UUID, ServerAddress]] | None=None,
             count: int = 0
     ) -> None:
-        self.nodes: list[tuple[UUID, ServerAddress]] = []
+        self.nodes = nodes or []
+        self.count = count if count else len(self.nodes)
         self.lock: asyncio.Lock = asyncio.Lock()
-        self.count = count
 
     async def add_node(self, uuid: UUID, server: ServerAddress) -> None:
-        async with asyncio.Lock():
+        async with self.lock:
             data: tuple[UUID, ServerAddress] = (uuid, server)
             self.nodes.append(data)
             self.count += 1

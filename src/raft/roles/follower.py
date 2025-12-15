@@ -65,8 +65,6 @@ class Follower(AbstractAsyncContextManager):
         # add received entry list to the end of existing raftlog
         self.__log.entries.extend(message.entries)
 
-        message.entries[-1] if message.entries else None
-
         if leader_commit > -1 and leader_commit > self.__log.commit_index:
             self.__log.commit(leader_commit)
 
