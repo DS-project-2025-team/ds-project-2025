@@ -31,7 +31,16 @@ Our prototype implements the following features:
   The Leader repeatedly sends logs to all Followers with APPEND_ENTRIES message.
   Each message contains the whole log and state.
 
-  Consistency is not implemented.
+  Consistency is not implemented in latest commit.
+  It (appending only new entries according to Raft) was implemented at the commit `247f8ba3bf1564f57668be270b92654abf65b92c` but it broke the task distribution and is reverted.
+  It is possible to checkout that commit with:
+  ```sh
+  git checkout 247f8ba3bf1564f57668be270b92654abf65b92c
+  ```
+  The following command restores the repository to the latest commit (main):
+  ```sh
+  git checkout main
+  ```
 
 - Consensus: Implemented in Leader election.
 
